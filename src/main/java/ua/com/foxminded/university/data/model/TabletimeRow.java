@@ -10,7 +10,8 @@ public class TabletimeRow {
     private Course course;
     private Teacher teacher;
 
-    public TabletimeRow(LocalDateTime dateTime, Group group, Course course, Teacher teacher) {
+    public TabletimeRow(LocalDateTime dateTime, Group group, Course course,
+            Teacher teacher) {
         super();
         this.dateTime = dateTime;
         this.group = group;
