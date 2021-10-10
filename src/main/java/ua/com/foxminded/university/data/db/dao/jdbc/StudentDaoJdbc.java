@@ -2,7 +2,9 @@ package ua.com.foxminded.university.data.db.dao.jdbc;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -37,11 +39,21 @@ public class StudentDaoJdbc implements StudentDao {
 
     @Override
     public Student getById(long id) {
-        String sql = queryGet + "WHERE id = :id";
+        String sql = queryGet + " WHERE id = :id";
         SqlParameterSource nameParameters = new MapSqlParameterSource("id", id);
         return this.namedParameterJdbcTemplate.queryForObject(
-                sql,
-                nameParameters, Student.class);
+                sql, nameParameters, this::mapStudent);
+    }
+
+    @Override
+    public Student getByFullName(String firstName, String lastName) {
+        String sql = queryGet +
+                " WHERE first_Name = :firstName AND last_name = :lastName";
+        Map<String, Object> namedParameters = new HashMap<>();
+        namedParameters.put("firstName", firstName);
+        namedParameters.put("lastName", lastName);
+        return namedParameterJdbcTemplate.queryForObject(
+                sql, namedParameters, this::mapStudent);
     }
 
     @Override
@@ -67,6 +79,7 @@ public class StudentDaoJdbc implements StudentDao {
     private Student mapStudent(ResultSet resultSet, int rowNum)
             throws SQLException {
         Student student = new Student();
+        student.setId(resultSet.getLong("id"));
         student.setFirstName(resultSet.getString("first_name"));
         student.setLastName(resultSet.getString("last_name"));
         return student;
