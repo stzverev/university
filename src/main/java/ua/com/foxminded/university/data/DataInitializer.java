@@ -8,7 +8,7 @@ import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.stereotype.Component;
 
 @Component
-public class InitializeData {
+public class DataInitializer {
 
     @Autowired
     private DataSource dataSource;
