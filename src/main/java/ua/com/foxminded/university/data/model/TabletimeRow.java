@@ -77,7 +77,8 @@ public class TabletimeRow {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((course == null) ? 0 : course.hashCode());
-        result = prime * result + ((dateTime == null) ? 0 : dateTime.hashCode());
+        result = prime * result + ((dateTime == null) ? 0
+                : dateTime.hashCode());
         result = prime * result + ((group == null) ? 0 : group.hashCode());
         result = prime * result + ((teacher == null) ? 0 : teacher.hashCode());
         return result;
