@@ -5,12 +5,6 @@ public abstract class Person {
     private String firstName;
     private String lastName;
 
-    Person(String firstName, String lastName) {
-        super();
-        this.firstName = firstName;
-        this.lastName = lastName;
-    }
-
     public String getFirstName() {
         return firstName;
     }

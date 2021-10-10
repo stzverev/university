@@ -7,8 +7,8 @@ public class Teacher extends Person {
     private long id;
     private List<Course> courses;
 
-    public Teacher(String firstName, String lastName) {
-        super(firstName, lastName);
+    public Teacher() {
+        super();
     }
 
     public long getId() {

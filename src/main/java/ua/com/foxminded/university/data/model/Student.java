@@ -5,11 +5,6 @@ public class Student extends Person {
     private long id;
     private Group group;
 
-    Student(String firstName, String lastName, Group group) {
-        super(firstName, lastName);
-        this.group = group;
-    }
-
     public long getId() {
         return id;
     }
