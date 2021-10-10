@@ -9,9 +9,8 @@ public class Course {
     private List<Teacher> teachers;
     private List<Group> groups;
 
-    public Course(String name) {
+    public Course() {
         super();
-        this.name = name;
     }
 
     public long getId() {
