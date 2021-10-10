@@ -23,8 +23,8 @@ import ua.com.foxminded.university.data.model.Teacher;
 @Repository
 public class TeacherDaoJdbc implements TeacherDao {
 
-    @Value("${teachers.get}")
-    private String queryGet;
+    @Value("${teachers.select}")
+    private String querySelect;
 
     @Value("${teachers.insert}")
     private String queryInsert;
@@ -39,7 +39,7 @@ public class TeacherDaoJdbc implements TeacherDao {
 
     @Override
     public Teacher getById(long id) {
-        String sql = queryGet + " WHERE id = :id";
+        String sql = querySelect + " WHERE id = :id";
         SqlParameterSource nameParameters = new MapSqlParameterSource("id", id);
         return this.namedParameterJdbcTemplate.queryForObject(
                 sql, nameParameters, this::mapTeacher);
@@ -47,7 +47,7 @@ public class TeacherDaoJdbc implements TeacherDao {
 
     @Override
     public Teacher getByFullName(String firstName, String lastName) {
-        String sql = queryGet +
+        String sql = querySelect +
                 " WHERE first_Name = :firstName AND last_name = :lastName";
         Map<String, Object> namedParameters = new HashMap<>();
         namedParameters.put("firstName", firstName);
@@ -58,7 +58,7 @@ public class TeacherDaoJdbc implements TeacherDao {
 
     @Override
     public List<Teacher> getAll() {
-        return this.namedParameterJdbcTemplate.query(queryGet,
+        return this.namedParameterJdbcTemplate.query(querySelect,
                 this::mapTeacher);
     }
 

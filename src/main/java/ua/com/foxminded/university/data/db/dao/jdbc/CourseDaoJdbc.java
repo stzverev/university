@@ -21,11 +21,11 @@ import ua.com.foxminded.university.data.model.Course;
 @Repository
 public class CourseDaoJdbc implements CourseDao {
 
-    @Value("${courses.get}")
-    private String queryGet;
+    @Value("${courses.select}")
+    private String coursesSelect;
 
     @Value("${courses.insert}")
-    private String queryInsert;
+    private String coursesInsert;
 
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
@@ -37,7 +37,7 @@ public class CourseDaoJdbc implements CourseDao {
 
     @Override
     public Course getById(long id) {
-        String sql = queryGet + " WHERE id = :id";
+        String sql = coursesSelect + " WHERE id = :id";
         SqlParameterSource nameParameters = new MapSqlParameterSource("id", id);
         return this.namedParameterJdbcTemplate.queryForObject(
                 sql, nameParameters, this::mapCourse);
@@ -45,7 +45,7 @@ public class CourseDaoJdbc implements CourseDao {
 
     @Override
     public Course getByName(String name) {
-        String sql = queryGet + " WHERE name = :name";
+        String sql = coursesSelect + " WHERE name = :name";
         SqlParameterSource nameParameters = new MapSqlParameterSource(
                 "name", name);
         return this.namedParameterJdbcTemplate.queryForObject(
@@ -54,7 +54,7 @@ public class CourseDaoJdbc implements CourseDao {
 
     @Override
     public List<Course> getAll() {
-        return this.namedParameterJdbcTemplate.query(queryGet,
+        return this.namedParameterJdbcTemplate.query(coursesSelect,
                 this::mapCourse);
     }
 
@@ -62,14 +62,14 @@ public class CourseDaoJdbc implements CourseDao {
     public void save(Course course) {
         SqlParameterSource namedParameters = new BeanPropertySqlParameterSource(
                 course);
-        this.namedParameterJdbcTemplate.update(queryInsert, namedParameters);
+        this.namedParameterJdbcTemplate.update(coursesInsert, namedParameters);
     }
 
     @Override
     public void save(List<Course> courses) {
         SqlParameterSource[] batch = SqlParameterSourceUtils
                 .createBatch(courses);
-        this.namedParameterJdbcTemplate.batchUpdate(queryInsert, batch);
+        this.namedParameterJdbcTemplate.batchUpdate(coursesInsert, batch);
     }
 
     private Course mapCourse(ResultSet resultSet, int rowNum)

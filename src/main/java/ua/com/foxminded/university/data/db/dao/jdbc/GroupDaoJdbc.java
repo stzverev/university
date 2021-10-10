@@ -1,13 +1,12 @@
 package ua.com.foxminded.university.data.db.dao.jdbc;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -17,67 +16,77 @@ import org.springframework.stereotype.Repository;
 
 import ua.com.foxminded.university.data.db.dao.GroupDao;
 import ua.com.foxminded.university.data.model.Group;
+import ua.com.foxminded.university.data.model.Student;
 
 @Repository
 public class GroupDaoJdbc implements GroupDao {
 
-    @Value("${groups.get}")
-    private String queryGet;
+    @Value("${groups.select}")
+    private String groupsSelect;
 
     @Value("${groups.insert}")
-    private String queryInsert;
+    private String groupsInsert;
 
-    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    @Value("${students.select}")
+    private String studentsSelect;
+
+    @Autowired
+    private RowMapper<Group> groupMapper;
+
+    @Autowired
+    private RowMapper<Student> studentMapper;
+
+    private NamedParameterJdbcTemplate jdbcTemplate;
 
     @Autowired
     public void setDataSource(DataSource dataSource) {
-        this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(
+        this.jdbcTemplate = new NamedParameterJdbcTemplate(
                 dataSource);
     }
 
     @Override
     public Group getById(long id) {
-        String sql = queryGet + " WHERE id = :id";
+        String sql = groupsSelect + " WHERE id = :id";
         SqlParameterSource nameParameters = new MapSqlParameterSource("id", id);
-        return this.namedParameterJdbcTemplate.queryForObject(
-                sql, nameParameters, this::mapGroup);
+        return this.jdbcTemplate.queryForObject(
+                sql, nameParameters, groupMapper::mapRow);
     }
 
     @Override
     public Group getByName(String name) {
-        String sql = queryGet + " WHERE name = :name";
+        String sql = groupsSelect + " WHERE name = :name";
         SqlParameterSource nameParameters = new MapSqlParameterSource(
                 "name", name);
-        return this.namedParameterJdbcTemplate.queryForObject(
-                sql, nameParameters, this::mapGroup);
+        return this.jdbcTemplate.queryForObject(
+                sql, nameParameters, groupMapper::mapRow);
     }
 
     @Override
     public List<Group> getAll() {
-        return this.namedParameterJdbcTemplate.query(queryGet,
-                this::mapGroup);
+        return this.jdbcTemplate.query(groupsSelect,
+                groupMapper::mapRow);
     }
 
     @Override
     public void save(Group group) {
         SqlParameterSource namedParameters = new BeanPropertySqlParameterSource(
                 group);
-        this.namedParameterJdbcTemplate.update(queryInsert, namedParameters);
+        this.jdbcTemplate.update(groupsInsert, namedParameters);
     }
 
     @Override
     public void save(List<Group> groups) {
         SqlParameterSource[] batch = SqlParameterSourceUtils
                 .createBatch(groups);
-        this.namedParameterJdbcTemplate.batchUpdate(queryInsert, batch);
+        this.jdbcTemplate.batchUpdate(groupsInsert, batch);
     }
 
-    private Group mapGroup(ResultSet resultSet, int rowNum)
-            throws SQLException {
-        Group group = new Group();
-        group.setId(resultSet.getLong("id"));
-        group.setName(resultSet.getString("name"));
-        return group;
+    @Override
+    public List<Student> getStudents(Group group) {
+        String sql = studentsSelect + " WHERE group_id = :groupId";
+        SqlParameterSource nameParameters = new MapSqlParameterSource(
+                "groupId", group.getId());
+        return jdbcTemplate.query(sql, nameParameters, studentMapper::mapRow);
     }
 
 }

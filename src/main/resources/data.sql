@@ -1,10 +1,20 @@
+DROP TABLE IF EXISTS groups CASCADE;
+
+CREATE TABLE groups(
+    id SERIAL NOT NULL,
+    name varchar(150),
+    CONSTRAINT PK_groups PRIMARY KEY(id)
+);
+
 DROP TABLE IF EXISTS students CASCADE;
 
 CREATE TABLE students(
     id SERIAL NOT NULL,
     first_name varchar(150),
     last_name varchar(150),
-    CONSTRAINT PK_students PRIMARY KEY(id)
+    group_id int,
+    CONSTRAINT PK_students PRIMARY KEY(id),
+    CONSTRAINT FK_students_groups FOREIGN KEY (group_id) REFERENCES groups(id)
 );
 
 DROP TABLE IF EXISTS teachers CASCADE;
@@ -14,14 +24,6 @@ CREATE TABLE teachers(
     first_name varchar(150),
     last_name varchar(150),
     CONSTRAINT PK_teachers PRIMARY KEY(id)
-);
-
-DROP TABLE IF EXISTS groups CASCADE;
-
-CREATE TABLE groups(
-    id SERIAL NOT NULL,
-    name varchar(150),
-    CONSTRAINT PK_groups PRIMARY KEY(id)
 );
 
 DROP TABLE IF EXISTS courses CASCADE;
