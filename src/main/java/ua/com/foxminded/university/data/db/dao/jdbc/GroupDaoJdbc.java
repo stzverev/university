@@ -46,7 +46,7 @@ public class GroupDaoJdbc implements GroupDao {
 
     @Override
     public Group getById(long id) {
-        String sql = groupsSelect + " WHERE id = :id";
+        String sql = groupsSelect + " WHERE groups.id = :id";
         SqlParameterSource nameParameters = new MapSqlParameterSource("id", id);
         return this.jdbcTemplate.queryForObject(
                 sql, nameParameters, groupMapper::mapRow);
@@ -54,7 +54,7 @@ public class GroupDaoJdbc implements GroupDao {
 
     @Override
     public Group getByName(String name) {
-        String sql = groupsSelect + " WHERE name = :name";
+        String sql = groupsSelect + " WHERE groups.name = :name";
         SqlParameterSource nameParameters = new MapSqlParameterSource(
                 "name", name);
         return this.jdbcTemplate.queryForObject(
@@ -83,7 +83,7 @@ public class GroupDaoJdbc implements GroupDao {
 
     @Override
     public List<Student> getStudents(Group group) {
-        String sql = studentsSelect + " WHERE group_id = :groupId";
+        String sql = studentsSelect + " WHERE groups.id = :groupId";
         SqlParameterSource nameParameters = new MapSqlParameterSource(
                 "groupId", group.getId());
         return jdbcTemplate.query(sql, nameParameters, studentMapper::mapRow);

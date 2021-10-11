@@ -18,6 +18,7 @@ class StudentDaoJdbcTest {
 
     private AnnotationConfigApplicationContext context;
     private StudentDaoJdbc studentDao;
+    private GroupDaoJdbc groupDao;
 
     @BeforeEach
     private void init() {
@@ -26,17 +27,19 @@ class StudentDaoJdbcTest {
                 context.getBean(DataInitializer.class);
         dataInitializer.loadData();
         studentDao = context.getBean(StudentDaoJdbc.class);
+        groupDao = context.getBean(GroupDaoJdbc.class);
         context.close();
     }
 
     @Test
     void shouldGetByNameStudentWhenSaveStudent() {
+        Group group = saveAndGetTestGroup();
         String firstName = "Albert";
         String lastName = "Einstein";
         Student student = new Student();
         student.setFirstName(firstName);
         student.setLastName(lastName);
-        student.setGroup(new Group());
+        student.setGroup(group);
         studentDao.save(student);
         Student expected = student;
 
@@ -47,16 +50,17 @@ class StudentDaoJdbcTest {
 
     @Test
     void shouldGetListStudentsWhenSaveList() {
+        Group group = saveAndGetTestGroup();
         List<Student> students = new ArrayList<>();
         Student student1 = new Student();
         student1.setFirstName("Albert");
         student1.setLastName("Einstein");
-        student1.setGroup(new Group());
+        student1.setGroup(group);
         students.add(student1);
         Student student2 = new Student();
         student2.setFirstName("Francis");
         student2.setLastName("Bacon");
-        student2.setGroup(new Group());
+        student2.setGroup(group);
         students.add(student2);
         studentDao.save(students);
 
@@ -67,18 +71,27 @@ class StudentDaoJdbcTest {
 
     @Test
     void shouldGetStudentByIdWhenSaveStudent() {
+        Group group = saveAndGetTestGroup();
         String firstName = "Blaize";
         String lastName = "Pascal";
         Student expected = new Student();
         expected.setFirstName(firstName);
         expected.setLastName(lastName);
-        expected.setGroup(new Group());
+        expected.setGroup(group);
         studentDao.save(expected);
         expected = studentDao.getByFullName(firstName, lastName);
 
         Student actual = studentDao.getById(expected.getId());
 
         assertEquals(expected, actual);
+    }
+
+    private Group saveAndGetTestGroup() {
+        String groupName = "B4";
+        Group group = new Group();
+        group.setName(groupName);
+        groupDao.save(group);
+        return groupDao.getByName(groupName);
     }
 
 }

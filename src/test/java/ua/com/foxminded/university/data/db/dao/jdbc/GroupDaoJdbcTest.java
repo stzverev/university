@@ -3,6 +3,7 @@ package ua.com.foxminded.university.data.db.dao.jdbc;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -12,11 +13,13 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import ua.com.foxminded.university.data.Config;
 import ua.com.foxminded.university.data.DataInitializer;
 import ua.com.foxminded.university.data.model.Group;
+import ua.com.foxminded.university.data.model.Student;
 
 class GroupDaoJdbcTest {
 
     private AnnotationConfigApplicationContext context;
     private GroupDaoJdbc groupDao;
+    private StudentDaoJdbc studentDao;
 
     @BeforeEach
     private void init() {
@@ -25,6 +28,7 @@ class GroupDaoJdbcTest {
                 context.getBean(DataInitializer.class);
         dataInitializer.loadData();
         groupDao = context.getBean(GroupDaoJdbc.class);
+        studentDao = context.getBean(StudentDaoJdbc.class);
         context.close();
     }
 
@@ -66,6 +70,25 @@ class GroupDaoJdbcTest {
         expected = groupDao.getByName(name);
 
         Group actual = groupDao.getById(expected.getId());
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void shouldGetStudentsWhenSaveStudentToGroupThenOk() {
+        String groupName = "Elementary physics";
+        Group group = new Group();
+        group.setName(groupName);
+        groupDao.save(group);
+        group = groupDao.getByName(groupName);
+        Student student = new Student();
+        student.setFirstName("Albert");
+        student.setLastName("Einstein");
+        student.setGroup(group);
+        studentDao.save(student);
+        List<Student> expected = Collections.singletonList(student);
+
+        List<Student> actual = groupDao.getStudents(group);
 
         assertEquals(expected, actual);
     }
