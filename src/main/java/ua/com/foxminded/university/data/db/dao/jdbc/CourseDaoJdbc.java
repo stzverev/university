@@ -1,13 +1,12 @@
 package ua.com.foxminded.university.data.db.dao.jdbc;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -27,11 +26,14 @@ public class CourseDaoJdbc implements CourseDao {
     @Value("${courses.insert}")
     private String coursesInsert;
 
-    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    @Autowired
+    private RowMapper<Course> courseMapper;
+
+    private NamedParameterJdbcTemplate jdbcTemplate;
 
     @Autowired
     public void setDataSource(DataSource dataSource) {
-        this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(
+        this.jdbcTemplate = new NamedParameterJdbcTemplate(
                 dataSource);
     }
 
@@ -39,8 +41,8 @@ public class CourseDaoJdbc implements CourseDao {
     public Course getById(long id) {
         String sql = coursesSelect + " WHERE id = :id";
         SqlParameterSource nameParameters = new MapSqlParameterSource("id", id);
-        return this.namedParameterJdbcTemplate.queryForObject(
-                sql, nameParameters, this::mapCourse);
+        return this.jdbcTemplate.queryForObject(
+                sql, nameParameters, courseMapper::mapRow);
     }
 
     @Override
@@ -48,36 +50,28 @@ public class CourseDaoJdbc implements CourseDao {
         String sql = coursesSelect + " WHERE name = :name";
         SqlParameterSource nameParameters = new MapSqlParameterSource(
                 "name", name);
-        return this.namedParameterJdbcTemplate.queryForObject(
-                sql, nameParameters, this::mapCourse);
+        return this.jdbcTemplate.queryForObject(
+                sql, nameParameters, courseMapper::mapRow);
     }
 
     @Override
     public List<Course> getAll() {
-        return this.namedParameterJdbcTemplate.query(coursesSelect,
-                this::mapCourse);
+        return this.jdbcTemplate.query(coursesSelect,
+                courseMapper::mapRow);
     }
 
     @Override
     public void save(Course course) {
         SqlParameterSource namedParameters = new BeanPropertySqlParameterSource(
                 course);
-        this.namedParameterJdbcTemplate.update(coursesInsert, namedParameters);
+        this.jdbcTemplate.update(coursesInsert, namedParameters);
     }
 
     @Override
     public void save(List<Course> courses) {
         SqlParameterSource[] batch = SqlParameterSourceUtils
                 .createBatch(courses);
-        this.namedParameterJdbcTemplate.batchUpdate(coursesInsert, batch);
-    }
-
-    private Course mapCourse(ResultSet resultSet, int rowNum)
-            throws SQLException {
-        Course course = new Course();
-        course.setId(resultSet.getLong("id"));
-        course.setName(resultSet.getString("name"));
-        return course;
+        this.jdbcTemplate.batchUpdate(coursesInsert, batch);
     }
 
 }

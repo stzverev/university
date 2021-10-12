@@ -17,6 +17,8 @@ CREATE TABLE students(
     CONSTRAINT FK_students_groups FOREIGN KEY (group_id) REFERENCES groups(id)
 );
 
+DROP TABLE IF EXISTS teachers_courses CASCADE;
+
 DROP TABLE IF EXISTS teachers CASCADE;
 
 CREATE TABLE teachers(
@@ -32,4 +34,12 @@ CREATE TABLE courses(
     id SERIAL NOT NULL,
     name varchar(150),
     CONSTRAINT PK_courses PRIMARY KEY(id)
+);
+
+CREATE TABLE teachers_courses(
+    teacher_id int NOT NULL,
+    course_id int NOT NULL,
+    CONSTRAINT PK_teachers_courses PRIMARY KEY (teacher_id, course_id),
+    CONSTRAINT FK_teachers FOREIGN KEY (teacher_id) REFERENCES teachers(id),
+    CONSTRAINT FK_courses FOREIGN KEY (course_id) REFERENCES courses(id)
 );

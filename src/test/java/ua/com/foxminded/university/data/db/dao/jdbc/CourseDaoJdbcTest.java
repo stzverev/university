@@ -15,12 +15,12 @@ import ua.com.foxminded.university.data.model.Course;
 
 class CourseDaoJdbcTest {
 
-    private AnnotationConfigApplicationContext context;
     private CourseDaoJdbc courseDao;
 
     @BeforeEach
     private void init() {
-        context = new AnnotationConfigApplicationContext(Config.class);
+        AnnotationConfigApplicationContext context =
+                new AnnotationConfigApplicationContext(Config.class);
         DataInitializer dataInitializer =
                 context.getBean(DataInitializer.class);
         dataInitializer.loadData();

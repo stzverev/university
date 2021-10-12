@@ -31,11 +31,11 @@ public class StudentDaoJdbc implements StudentDao {
     @Autowired
     private RowMapper<Student> studentMapper;
 
-    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    private NamedParameterJdbcTemplate jdbcTemplate;
 
     @Autowired
     public void setDataSource(DataSource dataSource) {
-        this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(
+        this.jdbcTemplate = new NamedParameterJdbcTemplate(
                 dataSource);
     }
 
@@ -43,7 +43,7 @@ public class StudentDaoJdbc implements StudentDao {
     public Student getById(long id) {
         String sql = studentsSelect + " WHERE students.id = :id";
         SqlParameterSource nameParameters = new MapSqlParameterSource("id", id);
-        return this.namedParameterJdbcTemplate.queryForObject(
+        return this.jdbcTemplate.queryForObject(
                 sql, nameParameters, studentMapper::mapRow);
     }
 
@@ -56,20 +56,20 @@ public class StudentDaoJdbc implements StudentDao {
         Map<String, Object> namedParameters = new HashMap<>();
         namedParameters.put("firstName", firstName);
         namedParameters.put("lastName", lastName);
-        return namedParameterJdbcTemplate.queryForObject(
+        return jdbcTemplate.queryForObject(
                 sql, namedParameters, studentMapper::mapRow);
     }
 
     @Override
     public List<Student> getAll() {
-        return this.namedParameterJdbcTemplate.query(studentsSelect,
+        return this.jdbcTemplate.query(studentsSelect,
                 studentMapper::mapRow);
     }
 
     @Override
     public void save(Student student) {
         Map<String, Object> namedParameters = parametersForSave(student);
-        this.namedParameterJdbcTemplate.update(studentsInsert, namedParameters);
+        this.jdbcTemplate.update(studentsInsert, namedParameters);
     }
 
     @Override
@@ -80,7 +80,7 @@ public class StudentDaoJdbc implements StudentDao {
                 .collect(Collectors.toList());
         SqlParameterSource[] batch = SqlParameterSourceUtils
                 .createBatch(parametersForSave);
-        this.namedParameterJdbcTemplate.batchUpdate(studentsInsert, batch);
+        this.jdbcTemplate.batchUpdate(studentsInsert, batch);
     }
 
     private Map<String, Object> parametersForSave(Student student) {
@@ -90,4 +90,5 @@ public class StudentDaoJdbc implements StudentDao {
         namedParameters.put("groupId", student.getGroup().getId());
         return namedParameters;
     }
+
 }

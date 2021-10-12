@@ -17,10 +17,14 @@ public class Config {
 
     @Bean
     public DataSource dataSource(@Value("${driver}") String driverClassName,
-            @Value("${url}") String url) {
+            @Value("${url}") String url,
+            @Value("${username}") String username,
+            @Value("${password}") String password) {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(driverClassName);
         dataSource.setUrl(url);
+        dataSource.setUsername(username);
+        dataSource.setUsername(password);
         return dataSource;
     }
 

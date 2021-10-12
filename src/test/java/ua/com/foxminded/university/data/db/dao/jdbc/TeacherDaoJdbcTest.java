@@ -11,20 +11,23 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import ua.com.foxminded.university.data.Config;
 import ua.com.foxminded.university.data.DataInitializer;
+import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Teacher;
 
 class TeacherDaoJdbcTest {
 
-    private AnnotationConfigApplicationContext context;
     private TeacherDaoJdbc teacherDao;
+    private CourseDaoJdbc courseDao;
 
     @BeforeEach
     private void init() {
-        context = new AnnotationConfigApplicationContext(Config.class);
+        AnnotationConfigApplicationContext context =
+                new AnnotationConfigApplicationContext(Config.class);
         DataInitializer dataInitializer =
                 context.getBean(DataInitializer.class);
         dataInitializer.loadData();
         teacherDao = context.getBean(TeacherDaoJdbc.class);
+        courseDao = context.getBean(CourseDaoJdbc.class);
         context.close();
     }
 
@@ -74,6 +77,38 @@ class TeacherDaoJdbcTest {
         Teacher actual = teacherDao.getById(expected.getId());
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    void shouldGetCoursesWhenSaveCoursesForTeacher() {
+        Course courseMath = saveAndGetCourse("Math");
+        Course courseHistory = saveAndGetCourse("History");
+        Teacher teacher = saveAndGetTeacher("Sheldon", "Cooper");
+        List<Course> courses = new ArrayList<>();
+        courses.add(courseMath);
+        courses.add(courseHistory);
+        teacher.setCourses(courses);
+        teacherDao.saveCourses(teacher);
+        List<Course> expected = courses;
+
+        List<Course> actual = teacherDao.getCourses(teacher);
+
+        assertEquals(expected, actual);
+    }
+
+    private Teacher saveAndGetTeacher(String firstName, String lastName) {
+        Teacher teacher = new Teacher();
+        teacher.setFirstName(firstName);
+        teacher.setLastName(lastName);
+        teacherDao.save(teacher);
+        return teacherDao.getByFullName(firstName, lastName);
+    }
+
+    private Course saveAndGetCourse(String courseName) {
+        Course course = new Course();
+        course.setName(courseName);
+        courseDao.save(course);
+        return courseDao.getByName(courseName);
     }
 
 }
