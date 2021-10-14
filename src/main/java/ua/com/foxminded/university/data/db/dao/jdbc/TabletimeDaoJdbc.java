@@ -1,5 +1,6 @@
 package ua.com.foxminded.university.data.db.dao.jdbc;
 
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,12 +25,17 @@ public abstract class TabletimeDaoJdbc<T> implements TabletimeDao<T> {
     @Value("${tabletime.insert}")
     private String tabletimeInsert;
 
+
     private NamedParameterJdbcTemplate jdbcTemplate;
 
     @Autowired
     public void setDataSource(DataSource dataSource) {
         this.jdbcTemplate = new NamedParameterJdbcTemplate(
                 dataSource);
+    }
+
+    public NamedParameterJdbcTemplate getJdbcTemplate() {
+        return this.jdbcTemplate;
     }
 
     @Override
@@ -44,10 +50,10 @@ public abstract class TabletimeDaoJdbc<T> implements TabletimeDao<T> {
 
     private Map<String, Object> mapParam(TabletimeRow row) {
         Map<String, Object> map = new HashMap<>();
-        map.put("date_time", row.getDateTime());
-        map.put("group_id", row.getGroup().getId());
-        map.put("teacher_id", row.getTeacher().getId());
-        map.put("course_id", row.getCourse().getId());
+        map.put("dateTime", Timestamp.valueOf(row.getDateTime()));
+        map.put("groupId", row.getGroup().getId());
+        map.put("teacherId", row.getTeacher().getId());
+        map.put("courseId", row.getCourse().getId());
         return map;
     }
 
