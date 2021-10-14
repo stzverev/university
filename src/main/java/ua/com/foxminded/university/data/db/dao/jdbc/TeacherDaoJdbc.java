@@ -19,7 +19,6 @@ import org.springframework.stereotype.Repository;
 
 import ua.com.foxminded.university.data.db.dao.TeacherDao;
 import ua.com.foxminded.university.data.model.Course;
-import ua.com.foxminded.university.data.model.Tabletime;
 import ua.com.foxminded.university.data.model.Teacher;
 
 @Repository
@@ -111,12 +110,6 @@ public class TeacherDaoJdbc implements TeacherDao {
         }
         SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(list);
         jdbcTemplate.batchUpdate(teacherCoursesInsert, batch);
-    }
-
-    @Override
-    public Tabletime getTabletime(Teacher teacher) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
 }

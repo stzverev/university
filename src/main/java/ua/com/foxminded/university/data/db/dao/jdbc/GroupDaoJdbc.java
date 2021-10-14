@@ -17,7 +17,6 @@ import org.springframework.stereotype.Repository;
 import ua.com.foxminded.university.data.db.dao.GroupDao;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.Student;
-import ua.com.foxminded.university.data.model.Tabletime;
 
 @Repository
 public class GroupDaoJdbc implements GroupDao {
@@ -88,12 +87,6 @@ public class GroupDaoJdbc implements GroupDao {
         SqlParameterSource nameParameters = new MapSqlParameterSource(
                 "groupId", group.getId());
         return jdbcTemplate.query(sql, nameParameters, studentMapper::mapRow);
-    }
-
-    @Override
-    public Tabletime getTabletime(Group group) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
 }

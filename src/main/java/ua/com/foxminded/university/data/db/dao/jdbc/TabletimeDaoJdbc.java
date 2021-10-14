@@ -25,7 +25,6 @@ public abstract class TabletimeDaoJdbc<T> implements TabletimeDao<T> {
     @Value("${tabletime.insert}")
     private String tabletimeInsert;
 
-
     private NamedParameterJdbcTemplate jdbcTemplate;
 
     @Autowired
