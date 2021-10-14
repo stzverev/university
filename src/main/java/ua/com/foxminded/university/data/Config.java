@@ -24,7 +24,7 @@ public class Config {
         dataSource.setDriverClassName(driverClassName);
         dataSource.setUrl(url);
         dataSource.setUsername(username);
-        dataSource.setUsername(password);
+        dataSource.setPassword(password);
         return dataSource;
     }
 
