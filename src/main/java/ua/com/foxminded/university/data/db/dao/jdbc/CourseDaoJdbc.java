@@ -20,11 +20,23 @@ import ua.com.foxminded.university.data.model.Course;
 @Repository
 public class CourseDaoJdbc implements CourseDao {
 
-    @Value("${courses.select}")
-    private String coursesSelect;
+    private final String coursesInsert;
+    private final String coursesSelect;
+    private final String coursesGetById;
+    private final String coursesGetByName;
 
-    @Value("${courses.insert}")
-    private String coursesInsert;
+    public CourseDaoJdbc(
+            @Value("${courses.insert}") String coursesInsert,
+            @Value("${courses.select}") String coursesSelect,
+            @Value("${courses.select} WHERE id = :id")
+            String coursesGetById,
+            @Value("${courses.select} WHERE name = :name")
+            String coursesGetByName) {
+        this.coursesInsert = coursesInsert;
+        this.coursesSelect = coursesSelect;
+        this.coursesGetById = coursesGetById;
+        this.coursesGetByName = coursesGetByName;
+    }
 
     @Autowired
     private RowMapper<Course> courseMapper;
@@ -39,19 +51,17 @@ public class CourseDaoJdbc implements CourseDao {
 
     @Override
     public Course getById(long id) {
-        String sql = coursesSelect + " WHERE id = :id";
         SqlParameterSource nameParameters = new MapSqlParameterSource("id", id);
         return this.jdbcTemplate.queryForObject(
-                sql, nameParameters, courseMapper::mapRow);
+                coursesGetById, nameParameters, courseMapper::mapRow);
     }
 
     @Override
     public Course getByName(String name) {
-        String sql = coursesSelect + " WHERE name = :name";
         SqlParameterSource nameParameters = new MapSqlParameterSource(
                 "name", name);
         return this.jdbcTemplate.queryForObject(
-                sql, nameParameters, courseMapper::mapRow);
+                coursesGetByName, nameParameters, courseMapper::mapRow);
     }
 
     @Override
