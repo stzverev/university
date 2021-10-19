@@ -22,16 +22,31 @@ import ua.com.foxminded.university.data.model.Student;
 @Repository
 public class StudentDaoJdbc implements StudentDao {
 
-    @Value("${students.select}")
-    private String studentsSelect;
-
-    @Value("${students.insert}")
-    private String studentsInsert;
+    private final String studentsSelect;
+    private final String studentsInsert;
+    private final String studentsGetByFullNamel;
+    private final String studentsGetById;
 
     @Autowired
     private RowMapper<Student> studentMapper;
 
     private NamedParameterJdbcTemplate jdbcTemplate;
+
+    public StudentDaoJdbc(@Value("${students.select}") String studentsSelect,
+            @Value("${students.insert}") String studentsInsert,
+            @Value(""
+                    + "${students.select}"
+                    + " WHERE students.first_Name = :firstName"
+                    + " AND students.last_name = :lastName")
+            String studentsGetByFullNamel,
+            @Value("${students.select} WHERE students.id = :id")
+            String studentsGetById) {
+        super();
+        this.studentsSelect = studentsSelect;
+        this.studentsInsert = studentsInsert;
+        this.studentsGetByFullNamel = studentsGetByFullNamel;
+        this.studentsGetById = studentsGetById;
+    }
 
     @Autowired
     public void setDataSource(DataSource dataSource) {
@@ -41,23 +56,18 @@ public class StudentDaoJdbc implements StudentDao {
 
     @Override
     public Student getById(long id) {
-        String sql = studentsSelect + " WHERE students.id = :id";
         SqlParameterSource nameParameters = new MapSqlParameterSource("id", id);
         return this.jdbcTemplate.queryForObject(
-                sql, nameParameters, studentMapper::mapRow);
+                studentsGetById, nameParameters, studentMapper::mapRow);
     }
 
     @Override
     public Student getByFullName(String firstName, String lastName) {
-        String sql = ""
-                + studentsSelect
-                + " WHERE students.first_Name = :firstName"
-                + " AND students.last_name = :lastName";
         Map<String, Object> namedParameters = new HashMap<>();
         namedParameters.put("firstName", firstName);
         namedParameters.put("lastName", lastName);
         return jdbcTemplate.queryForObject(
-                sql, namedParameters, studentMapper::mapRow);
+                studentsGetByFullNamel, namedParameters, studentMapper::mapRow);
     }
 
     @Override

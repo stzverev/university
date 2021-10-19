@@ -21,14 +21,11 @@ import ua.com.foxminded.university.data.model.Student;
 @Repository
 public class GroupDaoJdbc implements GroupDao {
 
-    @Value("${groups.select}")
-    private String groupsSelect;
-
-    @Value("${groups.insert}")
-    private String groupsInsert;
-
-    @Value("${students.select}")
-    private String studentsSelect;
+    private final String groupsSelect;
+    private final String groupsInsert;
+    private final String groupsGetById;
+    private final String groupsGetByName;
+    private final String studentsGetByGroupId;
 
     @Autowired
     private RowMapper<Group> groupMapper;
@@ -38,6 +35,23 @@ public class GroupDaoJdbc implements GroupDao {
 
     private NamedParameterJdbcTemplate jdbcTemplate;
 
+    public GroupDaoJdbc(
+            @Value("${groups.select}") String groupsSelect,
+            @Value("${groups.insert}") String groupsInsert,
+            @Value("${groups.select}  WHERE groups.id = :id")
+            String groupsGetById,
+            @Value("${groups.select}  WHERE groups.name = :name")
+            String groupsGetByName,
+            @Value("${students.select} WHERE groups.id = :groupId")
+            String studentsGetByGroupId) {
+        super();
+        this.groupsSelect = groupsSelect;
+        this.groupsInsert = groupsInsert;
+        this.groupsGetById = groupsGetById;
+        this.groupsGetByName = groupsGetByName;
+        this.studentsGetByGroupId = studentsGetByGroupId;
+    }
+
     @Autowired
     public void setDataSource(DataSource dataSource) {
         this.jdbcTemplate = new NamedParameterJdbcTemplate(
@@ -46,19 +60,17 @@ public class GroupDaoJdbc implements GroupDao {
 
     @Override
     public Group getById(long id) {
-        String sql = groupsSelect + " WHERE groups.id = :id";
         SqlParameterSource nameParameters = new MapSqlParameterSource("id", id);
         return this.jdbcTemplate.queryForObject(
-                sql, nameParameters, groupMapper::mapRow);
+                groupsGetById, nameParameters, groupMapper::mapRow);
     }
 
     @Override
     public Group getByName(String name) {
-        String sql = groupsSelect + " WHERE groups.name = :name";
         SqlParameterSource nameParameters = new MapSqlParameterSource(
                 "name", name);
         return this.jdbcTemplate.queryForObject(
-                sql, nameParameters, groupMapper::mapRow);
+                groupsGetByName, nameParameters, groupMapper::mapRow);
     }
 
     @Override
@@ -83,10 +95,10 @@ public class GroupDaoJdbc implements GroupDao {
 
     @Override
     public List<Student> getStudents(Group group) {
-        String sql = studentsSelect + " WHERE groups.id = :groupId";
         SqlParameterSource nameParameters = new MapSqlParameterSource(
                 "groupId", group.getId());
-        return jdbcTemplate.query(sql, nameParameters, studentMapper::mapRow);
+        return jdbcTemplate.query(studentsGetByGroupId,
+                nameParameters, studentMapper::mapRow);
     }
 
 }

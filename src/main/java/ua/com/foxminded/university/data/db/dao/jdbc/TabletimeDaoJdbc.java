@@ -27,16 +27,41 @@ import ua.com.foxminded.university.data.model.Teacher;
 @Repository
 public class TabletimeDaoJdbc implements TabletimeDao {
 
-    @Value("${tabletime.insert}")
-    private String tabletimeInsert;
-
-    @Value("${tabletime.select}")
-    private String tabletimeSelect;
+    private final String tabletimeInsert;
+    private final String getTabletimeForCourse;
+    private final String getTabletimeForGroup;
+    private final String getTabletimeForTeacher;
 
     @Autowired
     private RowMapper<TabletimeRow> tabletimeRowMapper;
 
     private NamedParameterJdbcTemplate jdbcTemplate;
+
+
+
+    public TabletimeDaoJdbc(
+            @Value("${tabletime.insert}") String tabletimeInsert,
+            @Value(""
+                    + "${tabletime.select} WHERE"
+                    + " tabletime.date_time BETWEEN :begin AND :end"
+                    + " AND tabletime.course_id = :courseId")
+            String getTabletimeForCourse,
+            @Value(""
+                    + "${tabletime.select} WHERE"
+                    + " tabletime.date_time BETWEEN :begin AND :end"
+                    + " AND tabletime.group_id = :groupId")
+            String getTabletimeForGroup,
+            @Value(""
+                    + "${tabletime.select} WHERE"
+                    + " tabletime.date_time BETWEEN :begin AND :end"
+                    + " AND tabletime.teacher_id = :teacherId")
+            String getTabletimeForTeacher) {
+        super();
+        this.tabletimeInsert = tabletimeInsert;
+        this.getTabletimeForCourse = getTabletimeForCourse;
+        this.getTabletimeForGroup = getTabletimeForGroup;
+        this.getTabletimeForTeacher = getTabletimeForTeacher;
+    }
 
     @Autowired
     public void setDataSource(DataSource dataSource) {
@@ -61,54 +86,42 @@ public class TabletimeDaoJdbc implements TabletimeDao {
     @Override
     public Tabletime getTabletime(Course course, LocalDateTime begin,
             LocalDateTime end) {
-        String sql = String.format(""
-                + "%s%n WHERE %n"
-                + "tabletime.date_time BETWEEN :begin AND :end %n"
-                + "AND tabletime.course_id = :courseId",
-                tabletimeSelect);
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("begin", Timestamp.valueOf(begin));
         parameters.put("end", Timestamp.valueOf(end));
         parameters.put("courseId", course.getId());
         List<TabletimeRow> list =
                 getJdbcTemplate().query(
-                        sql, parameters, tabletimeRowMapper::mapRow);
+                        getTabletimeForCourse, parameters,
+                        tabletimeRowMapper::mapRow);
         return new Tabletime(begin, end, list);
     }
 
     @Override
     public Tabletime getTabletime(Group group, LocalDateTime begin,
             LocalDateTime end) {
-        String sql = String.format(""
-                + "%s%n WHERE %n"
-                + "tabletime.date_time BETWEEN :begin AND :end %n"
-                + "AND tabletime.group_id = :groupId",
-                tabletimeSelect);
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("begin", Timestamp.valueOf(begin));
         parameters.put("end", Timestamp.valueOf(end));
         parameters.put("groupId", group.getId());
         List<TabletimeRow> list =
                 getJdbcTemplate().query(
-                        sql, parameters, tabletimeRowMapper::mapRow);
+                        getTabletimeForGroup, parameters,
+                        tabletimeRowMapper::mapRow);
         return new Tabletime(begin, end, list);
     }
 
     @Override
     public Tabletime getTabletime(Teacher teacher, LocalDateTime begin,
             LocalDateTime end) {
-        String sql = String.format(""
-                + "%s%n WHERE %n"
-                + "tabletime.date_time BETWEEN :begin AND :end %n"
-                + "AND tabletime.teacher_id = :teacherId",
-                tabletimeSelect);
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("begin", Timestamp.valueOf(begin));
         parameters.put("end", Timestamp.valueOf(end));
         parameters.put("teacherId", teacher.getId());
         List<TabletimeRow> list =
                 getJdbcTemplate().query(
-                        sql, parameters, tabletimeRowMapper::mapRow);
+                        getTabletimeForTeacher, parameters,
+                        tabletimeRowMapper::mapRow);
         return new Tabletime(begin, end, list);
     }
 

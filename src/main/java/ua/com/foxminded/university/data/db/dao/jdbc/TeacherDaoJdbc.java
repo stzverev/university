@@ -24,17 +24,12 @@ import ua.com.foxminded.university.data.model.Teacher;
 @Repository
 public class TeacherDaoJdbc implements TeacherDao {
 
-    @Value("${teachers.select}")
-    private String teachersSelect;
-
-    @Value("${teachers.insert}")
-    private String teachersInsert;
-
-    @Value("${teachers_courses.select}")
-    private String teachersCoursesSelect;
-
-    @Value("${teachers_courses.insert}")
-    private String teacherCoursesInsert;
+    private final String teachersSelect;
+    private final String teachersInsert;
+    private final String teacherCoursesInsert;
+    private final String teachersGetById;
+    private final String teachersGetByFullName;
+    private final String teachersGetCourses;
 
     @Autowired
     private RowMapper<Teacher> teacherMapper;
@@ -44,6 +39,26 @@ public class TeacherDaoJdbc implements TeacherDao {
 
     private NamedParameterJdbcTemplate jdbcTemplate;
 
+    public TeacherDaoJdbc(@Value("${teachers.select}") String teachersSelect,
+            @Value("${teachers.insert}") String teachersInsert,
+            @Value("${teachers_courses.insert}") String teacherCoursesInsert,
+            @Value("${teachers.select} WHERE id = :id") String teachersGetById,
+            @Value(""
+                    + "${teachers.select}"
+                    + " WHERE first_Name = :firstName"
+                    + " AND last_name = :lastName")
+            String teachersGetByFullName,
+            @Value("${teachers_courses.select}  WHERE teachers.id = :id")
+            String teachersGetCourses) {
+        super();
+        this.teachersSelect = teachersSelect;
+        this.teachersInsert = teachersInsert;
+        this.teacherCoursesInsert = teacherCoursesInsert;
+        this.teachersGetById = teachersGetById;
+        this.teachersGetByFullName = teachersGetByFullName;
+        this.teachersGetCourses = teachersGetCourses;
+    }
+
     @Autowired
     public void setDataSource(DataSource dataSource) {
         this.jdbcTemplate = new NamedParameterJdbcTemplate(
@@ -52,29 +67,25 @@ public class TeacherDaoJdbc implements TeacherDao {
 
     @Override
     public Teacher getById(long id) {
-        String sql = teachersSelect + " WHERE id = :id";
         SqlParameterSource nameParameters = new MapSqlParameterSource("id", id);
         return this.jdbcTemplate.queryForObject(
-                sql, nameParameters, teacherMapper::mapRow);
+                teachersGetById, nameParameters, teacherMapper::mapRow);
     }
 
     @Override
     public Teacher getByFullName(String firstName, String lastName) {
-        String sql = teachersSelect +
-                " WHERE first_Name = :firstName AND last_name = :lastName";
         Map<String, Object> namedParameters = new HashMap<>();
         namedParameters.put("firstName", firstName);
         namedParameters.put("lastName", lastName);
         return jdbcTemplate.queryForObject(
-                sql, namedParameters, teacherMapper::mapRow);
+                teachersGetByFullName, namedParameters, teacherMapper::mapRow);
     }
 
     @Override
     public List<Course> getCourses(Teacher teacher) {
-        String sql = teachersCoursesSelect + " WHERE teachers.id = :id";
         MapSqlParameterSource namedParameters =
                 new MapSqlParameterSource("id", teacher.getId());
-        return jdbcTemplate.query(sql, namedParameters,
+        return jdbcTemplate.query(teachersGetCourses, namedParameters,
                 courseMapper::mapRow);
     }
 
