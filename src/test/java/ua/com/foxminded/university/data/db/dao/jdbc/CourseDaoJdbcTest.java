@@ -7,25 +7,25 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import ua.com.foxminded.university.data.Config;
 import ua.com.foxminded.university.data.DataInitializer;
 import ua.com.foxminded.university.data.model.Course;
 
+@SpringJUnitConfig(Config.class)
 class CourseDaoJdbcTest {
 
+    @Autowired
     private CourseDaoJdbc courseDao;
+
+    @Autowired
+    private  DataInitializer dataInitializer;
 
     @BeforeEach
     private void init() {
-        AnnotationConfigApplicationContext context =
-                new AnnotationConfigApplicationContext(Config.class);
-        DataInitializer dataInitializer =
-                context.getBean(DataInitializer.class);
         dataInitializer.loadData();
-        courseDao = context.getBean(CourseDaoJdbc.class);
-        context.close();
     }
 
     @Test

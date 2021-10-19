@@ -8,28 +8,29 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import ua.com.foxminded.university.data.Config;
 import ua.com.foxminded.university.data.DataInitializer;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.Student;
 
+@SpringJUnitConfig(Config.class)
 class GroupDaoJdbcTest {
 
+    @Autowired
     private GroupDaoJdbc groupDao;
+
+    @Autowired
     private StudentDaoJdbc studentDao;
+
+    @Autowired
+    private DataInitializer dataInitializer;
 
     @BeforeEach
     private void init() {
-        AnnotationConfigApplicationContext context =
-                new AnnotationConfigApplicationContext(Config.class);
-        DataInitializer dataInitializer =
-                context.getBean(DataInitializer.class);
         dataInitializer.loadData();
-        groupDao = context.getBean(GroupDaoJdbc.class);
-        studentDao = context.getBean(StudentDaoJdbc.class);
-        context.close();
     }
 
     @Test
