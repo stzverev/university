@@ -78,7 +78,7 @@ public class TabletimeDaoJdbc implements TabletimeDao {
     }
 
     @Override
-    public void saveTabletime(Tabletime tabletime) {
+    public void save(Tabletime tabletime) {
         List<Map<String, Object>> rows = tabletime.getRows()
                 .stream()
                 .map(this::mapParam)

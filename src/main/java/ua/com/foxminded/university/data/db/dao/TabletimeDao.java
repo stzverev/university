@@ -9,7 +9,7 @@ import ua.com.foxminded.university.data.model.Teacher;
 
 public interface TabletimeDao {
 
-    void saveTabletime(Tabletime tabletime);
+    void save(Tabletime tabletime);
 
     Tabletime getTabletime(Course course, LocalDateTime begin,
             LocalDateTime end);

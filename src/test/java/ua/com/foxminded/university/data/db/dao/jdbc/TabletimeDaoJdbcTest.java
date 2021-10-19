@@ -55,7 +55,7 @@ class TabletimeDaoJdbcTest {
         row.setDateTime(dateTime);
         List<TabletimeRow> rows = Collections.singletonList(row);
         Tabletime tabletime = new Tabletime(dateTime, dateTime, rows);
-        tabletimeDaoJdbc.saveTabletime(tabletime);
+        tabletimeDaoJdbc.save(tabletime);
         List<TabletimeRow> expected = tabletime.getRows();
 
         LocalDateTime begin = LocalDateTime.of(2021, 10, 11, 0, 0, 0);
@@ -80,7 +80,7 @@ class TabletimeDaoJdbcTest {
         row.setDateTime(dateTime);
         List<TabletimeRow> rows = Collections.singletonList(row);
         Tabletime tabletime = new Tabletime(dateTime, dateTime, rows);
-        tabletimeDaoJdbc.saveTabletime(tabletime);
+        tabletimeDaoJdbc.save(tabletime);
         List<TabletimeRow> expected = tabletime.getRows();
 
         LocalDateTime begin = LocalDateTime.of(2021, 10, 11, 0, 0, 0);
@@ -105,7 +105,7 @@ class TabletimeDaoJdbcTest {
         row.setDateTime(dateTime);
         List<TabletimeRow> rows = Collections.singletonList(row);
         Tabletime tabletime = new Tabletime(dateTime, dateTime, rows);
-        tabletimeDaoJdbc.saveTabletime(tabletime);
+        tabletimeDaoJdbc.save(tabletime);
         List<TabletimeRow> expected = tabletime.getRows();
 
         LocalDateTime begin = LocalDateTime.of(2021, 10, 11, 0, 0, 0);
