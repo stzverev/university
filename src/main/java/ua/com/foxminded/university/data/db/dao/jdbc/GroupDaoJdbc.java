@@ -26,6 +26,7 @@ public class GroupDaoJdbc implements GroupDao {
     private final String groupsGetById;
     private final String groupsGetByName;
     private final String studentsGetByGroupId;
+    private final String groupsUpdate;
 
     @Autowired
     private RowMapper<Group> groupMapper;
@@ -36,20 +37,30 @@ public class GroupDaoJdbc implements GroupDao {
     private NamedParameterJdbcTemplate jdbcTemplate;
 
     public GroupDaoJdbc(
-            @Value("${groups.select}") String groupsSelect,
-            @Value("${groups.insert}") String groupsInsert,
+            @Value("${groups.select}")
+            String groupsSelect,
+
+            @Value("${groups.insert}")
+            String groupsInsert,
+
             @Value("${groups.select}  WHERE groups.id = :id")
             String groupsGetById,
+
             @Value("${groups.select}  WHERE groups.name = :name")
             String groupsGetByName,
+
             @Value("${students.select} WHERE groups.id = :groupId")
-            String studentsGetByGroupId) {
+            String studentsGetByGroupId,
+
+            @Value("${groups.update}")
+            String groupsUpdate) {
         super();
         this.groupsSelect = groupsSelect;
         this.groupsInsert = groupsInsert;
         this.groupsGetById = groupsGetById;
         this.groupsGetByName = groupsGetByName;
         this.studentsGetByGroupId = studentsGetByGroupId;
+        this.groupsUpdate = groupsUpdate;
     }
 
     @Autowired
@@ -99,6 +110,13 @@ public class GroupDaoJdbc implements GroupDao {
                 "groupId", group.getId());
         return jdbcTemplate.query(studentsGetByGroupId,
                 nameParameters, studentMapper::mapRow);
+    }
+
+    @Override
+    public void update(Group group) {
+        SqlParameterSource namedParameters = new BeanPropertySqlParameterSource(
+                group);
+        this.jdbcTemplate.update(groupsUpdate, namedParameters);
     }
 
 }

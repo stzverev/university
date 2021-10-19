@@ -42,6 +42,23 @@ class CourseDaoJdbcTest {
     }
 
     @Test
+    void shouldGetByNameCourseWhenUpdateCourse() {
+        String name = "Math";
+        String newName = "Math2";
+        Course course = new Course();
+        course.setName(name);
+        courseDao.save(course);
+        course = courseDao.getByName(name);
+        course.setName(newName);
+        courseDao.update(course);
+        Course expected = course;
+
+        Course actual = courseDao.getByName(newName);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
     void shouldGetListCoursesWhenSaveList() {
         List<Course> courses = new ArrayList<>();
         Course course1 = new Course();

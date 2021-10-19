@@ -24,18 +24,28 @@ public class CourseDaoJdbc implements CourseDao {
     private final String coursesSelect;
     private final String coursesGetById;
     private final String coursesGetByName;
+    private final String coursesUpdate;
 
     public CourseDaoJdbc(
-            @Value("${courses.insert}") String coursesInsert,
-            @Value("${courses.select}") String coursesSelect,
+            @Value("${courses.insert}")
+            String coursesInsert,
+
+            @Value("${courses.select}")
+            String coursesSelect,
+
             @Value("${courses.select} WHERE id = :id")
             String coursesGetById,
+
             @Value("${courses.select} WHERE name = :name")
-            String coursesGetByName) {
+            String coursesGetByName,
+
+            @Value("${courses.update}")
+            String coursesUpdate) {
         this.coursesInsert = coursesInsert;
         this.coursesSelect = coursesSelect;
         this.coursesGetById = coursesGetById;
         this.coursesGetByName = coursesGetByName;
+        this.coursesUpdate = coursesUpdate;
     }
 
     @Autowired
@@ -82,6 +92,13 @@ public class CourseDaoJdbc implements CourseDao {
         SqlParameterSource[] batch = SqlParameterSourceUtils
                 .createBatch(courses);
         this.jdbcTemplate.batchUpdate(coursesInsert, batch);
+    }
+
+    @Override
+    public void update(Course course) {
+        SqlParameterSource namedParameters = new BeanPropertySqlParameterSource(
+                course);
+        this.jdbcTemplate.update(coursesUpdate, namedParameters);
     }
 
 }

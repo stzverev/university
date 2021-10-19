@@ -47,6 +47,23 @@ class GroupDaoJdbcTest {
     }
 
     @Test
+    void shouldGetByNameGroupWhenUpdateGroup() {
+        String name = "MI6";
+        String newName = "MI7";
+        Group group = new Group();
+        group.setName(name);
+        groupDao.save(group);
+        group = groupDao.getByName(name);
+        group.setName(newName);
+        groupDao.update(group);
+        Group expected = group;
+
+        Group actual = groupDao.getByName(newName);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
     void shouldGetListGroupsWhenSaveList() {
         List<Group> groups = new ArrayList<>();
         Group group1 = new Group();

@@ -26,26 +26,37 @@ public class StudentDaoJdbc implements StudentDao {
     private final String studentsInsert;
     private final String studentsGetByFullNamel;
     private final String studentsGetById;
+    private final String studentsUpdate;
 
     @Autowired
     private RowMapper<Student> studentMapper;
 
     private NamedParameterJdbcTemplate jdbcTemplate;
 
-    public StudentDaoJdbc(@Value("${students.select}") String studentsSelect,
-            @Value("${students.insert}") String studentsInsert,
+    public StudentDaoJdbc(
+            @Value("${students.select}")
+            String studentsSelect,
+
+            @Value("${students.insert}")
+            String studentsInsert,
+
             @Value(""
                     + "${students.select}"
                     + " WHERE students.first_Name = :firstName"
                     + " AND students.last_name = :lastName")
             String studentsGetByFullNamel,
+
             @Value("${students.select} WHERE students.id = :id")
-            String studentsGetById) {
+            String studentsGetById,
+
+            @Value("${students.update}")
+            String studentsUpdate) {
         super();
         this.studentsSelect = studentsSelect;
         this.studentsInsert = studentsInsert;
         this.studentsGetByFullNamel = studentsGetByFullNamel;
         this.studentsGetById = studentsGetById;
+        this.studentsUpdate = studentsUpdate;
     }
 
     @Autowired
@@ -93,7 +104,23 @@ public class StudentDaoJdbc implements StudentDao {
         this.jdbcTemplate.batchUpdate(studentsInsert, batch);
     }
 
+    @Override
+    public void update(Student student) {
+        Map<String, Object> namedParameters = parametersForUpdate(student);
+        this.jdbcTemplate.update(studentsUpdate, namedParameters);
+    }
+
     private Map<String, Object> parametersForSave(Student student) {
+        return commonParameters(student);
+    }
+
+    private Map<String, Object> parametersForUpdate(Student student) {
+        Map<String, Object> namedParameters = commonParameters(student);
+        namedParameters.put("id", student.getId());
+        return namedParameters;
+    }
+
+    private Map<String, Object> commonParameters(Student student) {
         Map<String, Object> namedParameters = new HashMap<>();
         namedParameters.put("firstName", student.getFirstName());
         namedParameters.put("lastName", student.getLastName());

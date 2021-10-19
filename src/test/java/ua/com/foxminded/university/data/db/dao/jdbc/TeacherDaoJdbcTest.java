@@ -48,6 +48,25 @@ class TeacherDaoJdbcTest {
     }
 
     @Test
+    void shouldGetByNameTeacherWhenUpdateTeacher() {
+        String firstName = "Sheldon";
+        String lastName = "Cooper";
+        String newFirstName = "Sh2";
+        Teacher teacher = new Teacher();
+        teacher.setFirstName(firstName);
+        teacher.setLastName(lastName);
+        teacherDao.save(teacher);
+        teacher = teacherDao.getByFullName(firstName, lastName);
+        teacher.setFirstName(newFirstName);
+        teacherDao.update(teacher);
+        Teacher expected = teacher;
+
+        Teacher actual = teacherDao.getByFullName(newFirstName, lastName);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
     void shouldGetListTeachersWhenSaveList() {
         List<Teacher> teachers = new ArrayList<>();
         Teacher teacher1 = new Teacher();

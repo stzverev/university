@@ -40,17 +40,21 @@ public class TabletimeDaoJdbc implements TabletimeDao {
 
 
     public TabletimeDaoJdbc(
-            @Value("${tabletime.insert}") String tabletimeInsert,
+            @Value("${tabletime.insert}")
+            String tabletimeInsert,
+
             @Value(""
                     + "${tabletime.select} WHERE"
                     + " tabletime.date_time BETWEEN :begin AND :end"
                     + " AND tabletime.course_id = :courseId")
             String getTabletimeForCourse,
+
             @Value(""
                     + "${tabletime.select} WHERE"
                     + " tabletime.date_time BETWEEN :begin AND :end"
                     + " AND tabletime.group_id = :groupId")
             String getTabletimeForGroup,
+
             @Value(""
                     + "${tabletime.select} WHERE"
                     + " tabletime.date_time BETWEEN :begin AND :end"

@@ -50,6 +50,27 @@ class StudentDaoJdbcTest {
     }
 
     @Test
+    void shouldGetByNameStudentWhenUpdateStudent() {
+        Group group = saveAndGetTestGroup();
+        String firstName = "Albert";
+        String lastName = "Einstein";
+        String newFirstName = "Albert2";
+        Student student = new Student();
+        student.setFirstName(firstName);
+        student.setLastName(lastName);
+        student.setGroup(group);
+        studentDao.save(student);
+        student = studentDao.getByFullName(firstName, lastName);
+        student.setFirstName(newFirstName);
+        studentDao.update(student);
+        Student expected = student;
+
+        Student actual = studentDao.getByFullName(newFirstName, lastName);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
     void shouldGetListStudentsWhenSaveList() {
         Group group = saveAndGetTestGroup();
         List<Student> students = new ArrayList<>();

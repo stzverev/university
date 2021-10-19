@@ -30,6 +30,7 @@ public class TeacherDaoJdbc implements TeacherDao {
     private final String teachersGetById;
     private final String teachersGetByFullName;
     private final String teachersGetCourses;
+    private final String teachersUpdate;
 
     @Autowired
     private RowMapper<Teacher> teacherMapper;
@@ -39,17 +40,30 @@ public class TeacherDaoJdbc implements TeacherDao {
 
     private NamedParameterJdbcTemplate jdbcTemplate;
 
-    public TeacherDaoJdbc(@Value("${teachers.select}") String teachersSelect,
-            @Value("${teachers.insert}") String teachersInsert,
-            @Value("${teachers_courses.insert}") String teacherCoursesInsert,
-            @Value("${teachers.select} WHERE id = :id") String teachersGetById,
+    public TeacherDaoJdbc(
+            @Value("${teachers.select}")
+            String teachersSelect,
+
+            @Value("${teachers.insert}")
+            String teachersInsert,
+
+            @Value("${teachers_courses.insert}")
+            String teacherCoursesInsert,
+
+            @Value("${teachers.select} WHERE id = :id")
+            String teachersGetById,
+
             @Value(""
                     + "${teachers.select}"
                     + " WHERE first_Name = :firstName"
                     + " AND last_name = :lastName")
             String teachersGetByFullName,
+
             @Value("${teachers_courses.select}  WHERE teachers.id = :id")
-            String teachersGetCourses) {
+            String teachersGetCourses,
+
+            @Value("${teachers.update}")
+            String teachersUpdate) {
         super();
         this.teachersSelect = teachersSelect;
         this.teachersInsert = teachersInsert;
@@ -57,6 +71,7 @@ public class TeacherDaoJdbc implements TeacherDao {
         this.teachersGetById = teachersGetById;
         this.teachersGetByFullName = teachersGetByFullName;
         this.teachersGetCourses = teachersGetCourses;
+        this.teachersUpdate = teachersUpdate;
     }
 
     @Autowired
@@ -107,6 +122,13 @@ public class TeacherDaoJdbc implements TeacherDao {
         SqlParameterSource[] batch = SqlParameterSourceUtils
                 .createBatch(teachers);
         this.jdbcTemplate.batchUpdate(teachersInsert, batch);
+    }
+
+    @Override
+    public void update(Teacher teacher) {
+        SqlParameterSource namedParameters = new BeanPropertySqlParameterSource(
+                teacher);
+        this.jdbcTemplate.update(teachersUpdate, namedParameters);
     }
 
     @Override
