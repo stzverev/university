@@ -2,7 +2,10 @@ package ua.com.foxminded.university.data.db.dao.jdbc.mappers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
@@ -14,7 +17,7 @@ import ua.com.foxminded.university.data.model.TabletimeRow;
 import ua.com.foxminded.university.data.model.Teacher;
 
 @Component
-public class TabletimeRowMapper implements RowMapper<TabletimeRow> {
+public class TabletimeRowMapper implements GenericMapper<TabletimeRow> {
 
     @Autowired
     private RowMapper<Course> courseMapper;
@@ -37,6 +40,16 @@ public class TabletimeRowMapper implements RowMapper<TabletimeRow> {
         tabletimeRow.setGroup(group);
         tabletimeRow.setTeacher(teacher);
         return tabletimeRow;
+    }
+
+    @Override
+    public Map<String, Object> mapToQuery(TabletimeRow row) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("dateTime", Timestamp.valueOf(row.getDateTime()));
+        map.put("groupId", row.getGroup().getId());
+        map.put("teacherId", row.getTeacher().getId());
+        map.put("courseId", row.getCourse().getId());
+        return map;
     }
 
 }

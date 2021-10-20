@@ -1,9 +1,12 @@
 package ua.com.foxminded.university.data.db.dao.jdbc;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
@@ -18,7 +21,9 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
 import org.springframework.stereotype.Repository;
 
 import ua.com.foxminded.university.data.db.dao.TeacherDao;
+import ua.com.foxminded.university.data.db.dao.jdbc.mappers.GenericMapper;
 import ua.com.foxminded.university.data.model.Course;
+import ua.com.foxminded.university.data.model.TabletimeRow;
 import ua.com.foxminded.university.data.model.Teacher;
 
 @Repository
@@ -31,12 +36,18 @@ public class TeacherDaoJdbc implements TeacherDao {
     private final String teachersGetByFullName;
     private final String teachersGetCourses;
     private final String teachersUpdate;
+    private final String tabletimeInsert;
+    private final String getTabletimeForTeacher;
+    private final String tabletimeUpdate;
 
     @Autowired
     private RowMapper<Teacher> teacherMapper;
 
     @Autowired
     private RowMapper<Course> courseMapper;
+
+    @Autowired
+    private GenericMapper<TabletimeRow> tabletimeRowMapper;
 
     private NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -63,7 +74,19 @@ public class TeacherDaoJdbc implements TeacherDao {
             String teachersGetCourses,
 
             @Value("${teachers.update}")
-            String teachersUpdate) {
+            String teachersUpdate,
+
+            @Value("${tabletime.insert}")
+            String tabletimeInsert,
+
+            @Value(""
+                    + "${tabletime.select} WHERE"
+                    + " tabletime.date_time BETWEEN :begin AND :end"
+                    + " AND tabletime.teacher_id = :teacherId")
+            String getTabletimeForTeacher,
+
+            @Value("${tabletime.update} WHERE teacher_id = :teacherId")
+            String tabletimeUpdate) {
         super();
         this.teachersSelect = teachersSelect;
         this.teachersInsert = teachersInsert;
@@ -72,6 +95,9 @@ public class TeacherDaoJdbc implements TeacherDao {
         this.teachersGetByFullName = teachersGetByFullName;
         this.teachersGetCourses = teachersGetCourses;
         this.teachersUpdate = teachersUpdate;
+        this.tabletimeInsert = tabletimeInsert;
+        this.getTabletimeForTeacher = getTabletimeForTeacher;
+        this.tabletimeUpdate = tabletimeUpdate;
     }
 
     @Autowired
@@ -143,6 +169,40 @@ public class TeacherDaoJdbc implements TeacherDao {
         }
         SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(list);
         jdbcTemplate.batchUpdate(teacherCoursesInsert, batch);
+    }
+
+    @Override
+    public void saveTabletime(List<TabletimeRow> rows) {
+        List<Map<String, Object>> mapRows = rows
+                .stream()
+                .map(tabletimeRowMapper::mapToQuery)
+                .collect(Collectors.toList());
+        SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(
+                mapRows);
+        jdbcTemplate.batchUpdate(tabletimeInsert, batch);
+    }
+
+    @Override
+    public void updateTabletime(List<TabletimeRow> rows) {
+        List<Map<String, Object>> mapRows = rows
+                .stream()
+                .map(tabletimeRowMapper::mapToQuery)
+                .collect(Collectors.toList());
+        SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(
+                mapRows);
+        jdbcTemplate.batchUpdate(tabletimeUpdate, batch);
+    }
+
+    @Override
+    public List<TabletimeRow> getTabletime(Teacher teacher, LocalDateTime begin,
+            LocalDateTime end) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("begin", Timestamp.valueOf(begin));
+        parameters.put("end", Timestamp.valueOf(end));
+        parameters.put("teacherId", teacher.getId());
+        return jdbcTemplate.query(
+                getTabletimeForTeacher, parameters,
+                tabletimeRowMapper::mapRow);
     }
 
 }

@@ -1,6 +1,11 @@
 package ua.com.foxminded.university.data.db.dao.jdbc;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
@@ -15,7 +20,9 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
 import org.springframework.stereotype.Repository;
 
 import ua.com.foxminded.university.data.db.dao.CourseDao;
+import ua.com.foxminded.university.data.db.dao.jdbc.mappers.GenericMapper;
 import ua.com.foxminded.university.data.model.Course;
+import ua.com.foxminded.university.data.model.TabletimeRow;
 
 @Repository
 public class CourseDaoJdbc implements CourseDao {
@@ -25,6 +32,17 @@ public class CourseDaoJdbc implements CourseDao {
     private final String coursesGetById;
     private final String coursesGetByName;
     private final String coursesUpdate;
+    private final String tabletimeInsert;
+    private final String getTabletimeForCourse;
+    private final String tabletimeUpdate;
+
+    @Autowired
+    private RowMapper<Course> courseMapper;
+
+    @Autowired
+    private GenericMapper<TabletimeRow> tabletimeRowMapper;
+
+    private NamedParameterJdbcTemplate jdbcTemplate;
 
     public CourseDaoJdbc(
             @Value("${courses.insert}")
@@ -40,18 +58,28 @@ public class CourseDaoJdbc implements CourseDao {
             String coursesGetByName,
 
             @Value("${courses.update}")
-            String coursesUpdate) {
+            String coursesUpdate,
+
+            @Value("${tabletime.insert}")
+            String tabletimeInsert,
+
+            @Value(""
+                    + "${tabletime.select} WHERE"
+                    + " tabletime.date_time BETWEEN :begin AND :end"
+                    + " AND tabletime.course_id = :courseId")
+            String getTabletimeForCourse,
+
+            @Value("${tabletime.update} WHERE course_id = :courseId")
+            String tabletimeUpdate) {
         this.coursesInsert = coursesInsert;
         this.coursesSelect = coursesSelect;
         this.coursesGetById = coursesGetById;
         this.coursesGetByName = coursesGetByName;
         this.coursesUpdate = coursesUpdate;
+        this.tabletimeInsert = tabletimeInsert;
+        this.getTabletimeForCourse = getTabletimeForCourse;
+        this.tabletimeUpdate = tabletimeUpdate;
     }
-
-    @Autowired
-    private RowMapper<Course> courseMapper;
-
-    private NamedParameterJdbcTemplate jdbcTemplate;
 
     @Autowired
     public void setDataSource(DataSource dataSource) {
@@ -99,6 +127,38 @@ public class CourseDaoJdbc implements CourseDao {
         SqlParameterSource namedParameters = new BeanPropertySqlParameterSource(
                 course);
         this.jdbcTemplate.update(coursesUpdate, namedParameters);
+    }
+
+    @Override
+    public void saveTabletime(List<TabletimeRow> tabletimeRows) {
+        List<Map<String, Object>> rows = tabletimeRows
+                .stream()
+                .map(tabletimeRowMapper::mapToQuery)
+                .collect(Collectors.toList());
+        SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(rows);
+        jdbcTemplate.batchUpdate(tabletimeInsert, batch);
+    }
+
+    @Override
+    public List<TabletimeRow> getTabletime(Course course, LocalDateTime begin,
+            LocalDateTime end) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("begin", Timestamp.valueOf(begin));
+        parameters.put("end", Timestamp.valueOf(end));
+        parameters.put("courseId", course.getId());
+        return jdbcTemplate.query(
+                getTabletimeForCourse, parameters,
+                tabletimeRowMapper::mapRow);
+    }
+
+    @Override
+    public void updateTabletime(List<TabletimeRow> tabletimeRows) {
+        List<Map<String, Object>> rows = tabletimeRows
+                .stream()
+                .map(tabletimeRowMapper::mapToQuery)
+                .collect(Collectors.toList());
+        SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(rows);
+        jdbcTemplate.batchUpdate(tabletimeUpdate, batch);
     }
 
 }

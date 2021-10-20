@@ -2,7 +2,9 @@ package ua.com.foxminded.university.data.db.dao.jdbc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +15,8 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import ua.com.foxminded.university.data.Config;
 import ua.com.foxminded.university.data.DataInitializer;
 import ua.com.foxminded.university.data.model.Course;
+import ua.com.foxminded.university.data.model.Group;
+import ua.com.foxminded.university.data.model.TabletimeRow;
 import ua.com.foxminded.university.data.model.Teacher;
 
 @SpringJUnitConfig(Config.class)
@@ -23,6 +27,9 @@ class TeacherDaoJdbcTest {
 
     @Autowired
     private CourseDaoJdbc courseDao;
+
+    @Autowired
+    private GroupDaoJdbc groupDao;
 
     @Autowired
     private DataInitializer dataInitializer;
@@ -116,6 +123,30 @@ class TeacherDaoJdbcTest {
         assertEquals(expected, actual);
     }
 
+    @Test
+    void shouldGetTabletimeForTeacherWhenSaveTabletimeThenOk() {
+        LocalDateTime dateTime = LocalDateTime.of(2021, 10, 11, 9, 0);
+        Course course = saveAndGetCourse("Math");
+        Group group = saveAndGetGroup("FJ-42");
+        Teacher teacher = saveAndGetTeacher("Sheldon", "Cooper");
+        TabletimeRow row = new TabletimeRow();
+        row.setTeacher(teacher);
+        row.setCourse(course);
+        row.setGroup(group);
+        row.setDateTime(dateTime);
+        List<TabletimeRow> rows = Collections.singletonList(row);
+        teacherDao.saveTabletime(rows);
+        List<TabletimeRow> expected = rows;
+
+        LocalDateTime begin = LocalDateTime.of(2021, 10, 11, 0, 0, 0);
+        LocalDateTime end = LocalDateTime.of(2021, 10, 11, 23, 59, 59);
+        List<TabletimeRow> tabletimeRowsGet = teacherDao.getTabletime(teacher,
+                begin, end);
+        List<TabletimeRow> actual = tabletimeRowsGet;
+
+        assertEquals(expected, actual);
+    }
+
     private Teacher saveAndGetTeacher(String firstName, String lastName) {
         Teacher teacher = new Teacher();
         teacher.setFirstName(firstName);
@@ -124,11 +155,20 @@ class TeacherDaoJdbcTest {
         return teacherDao.getByFullName(firstName, lastName);
     }
 
+    private Group saveAndGetGroup(String name) {
+        Group group = new Group();
+        group.setName(name);
+        groupDao.save(group);
+        return groupDao.getByName(name);
+    }
+
     private Course saveAndGetCourse(String courseName) {
         Course course = new Course();
         course.setName(courseName);
         courseDao.save(course);
         return courseDao.getByName(courseName);
     }
+
+
 
 }
