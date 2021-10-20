@@ -186,7 +186,7 @@ public class TeacherDaoJdbc implements TeacherDao {
     public void updateTabletime(List<TabletimeRow> rows) {
         List<Map<String, Object>> mapRows = rows
                 .stream()
-                .map(tabletimeRowMapper::mapToSave)
+                .map(tabletimeRowMapper::mapToUpdate)
                 .collect(Collectors.toList());
         SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(
                 mapRows);

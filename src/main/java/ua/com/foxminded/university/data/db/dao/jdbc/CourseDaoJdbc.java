@@ -155,7 +155,7 @@ public class CourseDaoJdbc implements CourseDao {
     public void updateTabletime(List<TabletimeRow> tabletimeRows) {
         List<Map<String, Object>> rows = tabletimeRows
                 .stream()
-                .map(tabletimeRowMapper::mapToSave)
+                .map(tabletimeRowMapper::mapToUpdate)
                 .collect(Collectors.toList());
         SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(rows);
         jdbcTemplate.batchUpdate(tabletimeUpdate, batch);
