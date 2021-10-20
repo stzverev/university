@@ -133,7 +133,7 @@ public class CourseDaoJdbc implements CourseDao {
     public void saveTabletime(List<TabletimeRow> tabletimeRows) {
         List<Map<String, Object>> rows = tabletimeRows
                 .stream()
-                .map(tabletimeRowMapper::mapToQuery)
+                .map(tabletimeRowMapper::mapToSave)
                 .collect(Collectors.toList());
         SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(rows);
         jdbcTemplate.batchUpdate(tabletimeInsert, batch);
@@ -155,7 +155,7 @@ public class CourseDaoJdbc implements CourseDao {
     public void updateTabletime(List<TabletimeRow> tabletimeRows) {
         List<Map<String, Object>> rows = tabletimeRows
                 .stream()
-                .map(tabletimeRowMapper::mapToQuery)
+                .map(tabletimeRowMapper::mapToSave)
                 .collect(Collectors.toList());
         SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(rows);
         jdbcTemplate.batchUpdate(tabletimeUpdate, batch);

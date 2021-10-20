@@ -6,6 +6,8 @@ import org.springframework.jdbc.core.RowMapper;
 
 public interface GenericMapper<T> extends RowMapper<T> {
 
-    Map<String, Object> mapToQuery(T row);
+    Map<String, Object> mapToSave(T object);
+
+    Map<String, Object> mapToUpdate(T object);
 
 }

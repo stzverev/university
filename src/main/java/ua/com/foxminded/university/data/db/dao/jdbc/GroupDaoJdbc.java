@@ -163,7 +163,7 @@ public class GroupDaoJdbc implements GroupDao {
     public void saveTabletime(List<TabletimeRow> rows) {
         List<Map<String, Object>> mapRows = rows
                 .stream()
-                .map(tabletimeRowMapper::mapToQuery)
+                .map(tabletimeRowMapper::mapToSave)
                 .collect(Collectors.toList());
         SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(
                 mapRows);
@@ -175,7 +175,7 @@ public class GroupDaoJdbc implements GroupDao {
     public void updateTabletime(List<TabletimeRow> rows) {
         List<Map<String, Object>> mapRows = rows
                 .stream()
-                .map(tabletimeRowMapper::mapToQuery)
+                .map(tabletimeRowMapper::mapToSave)
                 .collect(Collectors.toList());
         SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(
                 mapRows);

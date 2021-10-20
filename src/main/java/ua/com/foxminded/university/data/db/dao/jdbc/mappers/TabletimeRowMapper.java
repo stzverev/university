@@ -43,13 +43,18 @@ public class TabletimeRowMapper implements GenericMapper<TabletimeRow> {
     }
 
     @Override
-    public Map<String, Object> mapToQuery(TabletimeRow row) {
+    public Map<String, Object> mapToSave(TabletimeRow row) {
         Map<String, Object> map = new HashMap<>();
         map.put("dateTime", Timestamp.valueOf(row.getDateTime()));
         map.put("groupId", row.getGroup().getId());
         map.put("teacherId", row.getTeacher().getId());
         map.put("courseId", row.getCourse().getId());
         return map;
+    }
+
+    @Override
+    public Map<String, Object> mapToUpdate(TabletimeRow row) {
+        return mapToSave(row);
     }
 
 }
