@@ -104,13 +104,7 @@ class CourseDaoJdbcTest {
         Course course = saveAndGetCourse("Math");
         Group group = saveAndGetGroup("FJ-42");
         Teacher teacher = saveAndGetTeacher("Sheldon", "Cooper");
-        TabletimeRow row = new TabletimeRow();
-        row.setTeacher(teacher);
-        row.setCourse(course);
-        row.setGroup(group);
-        row.setDateTime(dateTime);
-        List<TabletimeRow> rows = Collections.singletonList(row);
-        courseDao.saveTabletime(rows);
+        List<TabletimeRow> rows = saveAndGetTabletimeRow(dateTime, course, group, teacher);
         List<TabletimeRow> expected = rows;
 
         LocalDateTime begin = LocalDateTime.of(2021, 10, 11, 0, 0, 0);
@@ -120,6 +114,39 @@ class CourseDaoJdbcTest {
         List<TabletimeRow> actual = tabletimeRowsGet;
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    void shouldGetTabletimeForCourseWhenUpdateTabletimeThenOk() {
+        Course course = saveAndGetCourse("Math");
+        Group group = saveAndGetGroup("FJ-42");
+        Teacher teacher = saveAndGetTeacher("Sheldon", "Cooper");
+        saveAndGetTabletimeRow(
+                LocalDateTime.of(2021, 10, 11, 9, 0),
+                course, group, teacher);
+        List<TabletimeRow> expected = courseDao.getTabletime(course,
+                LocalDateTime.of(2021, 10, 11, 0, 0, 0),
+                LocalDateTime.of(2021, 10, 11, 23, 59, 59));
+        expected.get(0).setDateTime(
+                LocalDateTime.of(2021, 10, 12, 10, 0));
+        courseDao.updateTabletime(expected);
+        List<TabletimeRow> actual = courseDao.getTabletime(course,
+                LocalDateTime.of(2021, 10, 12, 0, 0, 0),
+                LocalDateTime.of(2021, 10, 12, 23, 59, 59));;
+
+        assertEquals(expected, actual);
+    }
+
+    private List<TabletimeRow> saveAndGetTabletimeRow(LocalDateTime dateTime, Course course, Group group,
+            Teacher teacher) {
+        TabletimeRow row = new TabletimeRow();
+        row.setTeacher(teacher);
+        row.setCourse(course);
+        row.setGroup(group);
+        row.setDateTime(dateTime);
+        List<TabletimeRow> rows = Collections.singletonList(row);
+        courseDao.saveTabletime(rows);
+        return rows;
     }
 
     private Teacher saveAndGetTeacher(String firstName, String lastName) {

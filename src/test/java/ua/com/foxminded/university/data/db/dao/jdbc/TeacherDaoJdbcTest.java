@@ -147,6 +147,39 @@ class TeacherDaoJdbcTest {
         assertEquals(expected, actual);
     }
 
+    @Test
+    void shouldGetTabletimeForTeacherWhenUpdateTabletimeThenOk() {
+        Course course = saveAndGetCourse("Math");
+        Group group = saveAndGetGroup("FJ-42");
+        Teacher teacher = saveAndGetTeacher("Sheldon", "Cooper");
+        saveAndGetTabletimeRow(
+                LocalDateTime.of(2021, 10, 11, 9, 0),
+                course, group, teacher);
+        List<TabletimeRow> expected = teacherDao.getTabletime(teacher,
+                LocalDateTime.of(2021, 10, 11, 0, 0, 0),
+                LocalDateTime.of(2021, 10, 11, 23, 59, 59));
+        expected.get(0).setDateTime(
+                LocalDateTime.of(2021, 10, 12, 10, 0));
+        teacherDao.updateTabletime(expected);
+        List<TabletimeRow> actual = teacherDao.getTabletime(teacher,
+                LocalDateTime.of(2021, 10, 12, 0, 0, 0),
+                LocalDateTime.of(2021, 10, 12, 23, 59, 59));;
+
+        assertEquals(expected, actual);
+    }
+
+    private List<TabletimeRow> saveAndGetTabletimeRow(LocalDateTime dateTime, Course course, Group group,
+            Teacher teacher) {
+        TabletimeRow row = new TabletimeRow();
+        row.setTeacher(teacher);
+        row.setCourse(course);
+        row.setGroup(group);
+        row.setDateTime(dateTime);
+        List<TabletimeRow> rows = Collections.singletonList(row);
+        teacherDao.saveTabletime(rows);
+        return rows;
+    }
+
     private Teacher saveAndGetTeacher(String firstName, String lastName) {
         Teacher teacher = new Teacher();
         teacher.setFirstName(firstName);
