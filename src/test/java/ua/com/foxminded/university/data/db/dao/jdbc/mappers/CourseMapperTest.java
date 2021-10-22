@@ -1,6 +1,7 @@
 package ua.com.foxminded.university.data.db.dao.jdbc.mappers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.sql.ResultSet;
@@ -8,7 +9,6 @@ import java.sql.SQLException;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -41,7 +41,7 @@ class CourseMapperTest {
     }
 
     private ResultSet getCourseResultSetMock(Course course) throws SQLException {
-        ResultSet resultSet = Mockito.mock(ResultSet.class);
+        ResultSet resultSet = mock(ResultSet.class);
         when(resultSet.getLong("course_id")).thenReturn(course.getId());
         when(resultSet.getString("course_name")).thenReturn(course.getName());
         return resultSet;
