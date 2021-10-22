@@ -15,8 +15,12 @@ import ua.com.foxminded.university.data.model.Student;
 @Component
 public class StudentMapper implements GenericMapper<Student> {
 
-    @Autowired
     private RowMapper<Group> groupMapper;
+
+    @Autowired
+    public void setGroupMapper(RowMapper<Group> groupMapper) {
+        this.groupMapper = groupMapper;
+    }
 
     @Override
     public Student mapRow(ResultSet rs, int rowNum) throws SQLException {

@@ -19,14 +19,24 @@ import ua.com.foxminded.university.data.model.Teacher;
 @Component
 public class TabletimeRowMapper implements GenericMapper<TabletimeRow> {
 
-    @Autowired
     private RowMapper<Course> courseMapper;
-
-    @Autowired
     private RowMapper<Group> groupMapper;
+    private RowMapper<Teacher> teacherMapper;
 
     @Autowired
-    private RowMapper<Teacher> teacherMapper;
+    public void setCourseMapper(RowMapper<Course> courseMapper) {
+        this.courseMapper = courseMapper;
+    }
+
+    @Autowired
+    public void setGroupMapper(RowMapper<Group> groupMapper) {
+        this.groupMapper = groupMapper;
+    }
+
+    @Autowired
+    public void setTeacherMapper(RowMapper<Teacher> teacherMapper) {
+        this.teacherMapper = teacherMapper;
+    }
 
     @Override
     public TabletimeRow mapRow(ResultSet rs, int rowNum) throws SQLException {

@@ -29,75 +29,92 @@ import ua.com.foxminded.university.data.model.Teacher;
 @Repository
 public class TeacherDaoJdbc implements TeacherDao {
 
-    private final String teachersSelect;
-    private final String teachersInsert;
-    private final String teacherCoursesInsert;
-    private final String teachersGetById;
-    private final String teachersGetByFullName;
-    private final String teachersGetCourses;
-    private final String teachersUpdate;
-    private final String tabletimeInsert;
-    private final String getTabletimeForTeacher;
-    private final String tabletimeUpdate;
+    private String teachersSelect;
+    private String teachersInsert;
+    private String teacherCoursesInsert;
+    private String teachersGetById;
+    private String teachersGetByFullName;
+    private String teachersGetCourses;
+    private String teachersUpdate;
+    private String tabletimeInsert;
+    private String getTabletimeForTeacher;
+    private String tabletimeUpdate;
 
-    @Autowired
     private RowMapper<Teacher> teacherMapper;
-
-    @Autowired
     private RowMapper<Course> courseMapper;
-
-    @Autowired
     private GenericMapper<TabletimeRow> tabletimeRowMapper;
-
     private NamedParameterJdbcTemplate jdbcTemplate;
 
-    public TeacherDaoJdbc(
-            @Value("${teachers.select}")
-            String teachersSelect,
-
-            @Value("${teachers.insert}")
-            String teachersInsert,
-
-            @Value("${teachers_courses.insert}")
-            String teacherCoursesInsert,
-
-            @Value("${teachers.select} WHERE id = :id")
-            String teachersGetById,
-
-            @Value(""
-                    + "${teachers.select}"
-                    + " WHERE first_Name = :firstName"
-                    + " AND last_name = :lastName")
-            String teachersGetByFullName,
-
-            @Value("${teachers_courses.select}  WHERE teachers.id = :id")
-            String teachersGetCourses,
-
-            @Value("${teachers.update}")
-            String teachersUpdate,
-
-            @Value("${tabletime.insert}")
-            String tabletimeInsert,
-
-            @Value(""
-                    + "${tabletime.select} WHERE"
-                    + " tabletime.date_time BETWEEN :begin AND :end"
-                    + " AND tabletime.teacher_id = :teacherId")
-            String getTabletimeForTeacher,
-
-            @Value("${tabletime.update} WHERE teacher_id = :teacherId")
-            String tabletimeUpdate) {
-        super();
+    @Value("${teachers.select}")
+    public void setTeachersSelect(String teachersSelect) {
         this.teachersSelect = teachersSelect;
+    }
+
+    @Value("${teachers.insert}")
+    public void setTeachersInsert(String teachersInsert) {
         this.teachersInsert = teachersInsert;
+    }
+
+    @Value("${teachers_courses.insert}")
+    public void setTeacherCoursesInsert(String teacherCoursesInsert) {
         this.teacherCoursesInsert = teacherCoursesInsert;
+    }
+
+    @Value("${teachers.select} WHERE id = :id")
+    public void setTeachersGetById(String teachersGetById) {
         this.teachersGetById = teachersGetById;
+    }
+
+    @Value(""
+            + "${teachers.select}"
+            + " WHERE first_Name = :firstName"
+            + " AND last_name = :lastName")
+    public void setTeachersGetByFullName(String teachersGetByFullName) {
         this.teachersGetByFullName = teachersGetByFullName;
+    }
+
+    @Value("${teachers_courses.select}  WHERE teachers.id = :id")
+    public void setTeachersGetCourses(String teachersGetCourses) {
         this.teachersGetCourses = teachersGetCourses;
+    }
+
+    @Value("${teachers.update}")
+    public void setTeachersUpdate(String teachersUpdate) {
         this.teachersUpdate = teachersUpdate;
+    }
+
+    @Value("${tabletime.insert}")
+    public void setTabletimeInsert(String tabletimeInsert) {
         this.tabletimeInsert = tabletimeInsert;
+    }
+
+    @Value(""
+            + "${tabletime.select} WHERE"
+            + " tabletime.date_time BETWEEN :begin AND :end"
+            + " AND tabletime.teacher_id = :teacherId")
+    public void setGetTabletimeForTeacher(String getTabletimeForTeacher) {
         this.getTabletimeForTeacher = getTabletimeForTeacher;
+    }
+
+    @Value("${tabletime.update} WHERE teacher_id = :teacherId")
+    public void setTabletimeUpdate(String tabletimeUpdate) {
         this.tabletimeUpdate = tabletimeUpdate;
+    }
+
+    @Autowired
+    public void setTeacherMapper(RowMapper<Teacher> teacherMapper) {
+        this.teacherMapper = teacherMapper;
+    }
+
+    @Autowired
+    public void setCourseMapper(RowMapper<Course> courseMapper) {
+        this.courseMapper = courseMapper;
+    }
+
+    @Autowired
+    public void setTabletimeRowMapper(
+            GenericMapper<TabletimeRow> tabletimeRowMapper) {
+        this.tabletimeRowMapper = tabletimeRowMapper;
     }
 
     @Autowired
