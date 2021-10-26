@@ -16,7 +16,7 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
 import org.springframework.stereotype.Repository;
 
 import ua.com.foxminded.university.data.db.dao.StudentDao;
-import ua.com.foxminded.university.data.db.dao.jdbc.mappers.GenericMapper;
+import ua.com.foxminded.university.data.db.dao.jdbc.mappers.BilateralMapper;
 import ua.com.foxminded.university.data.model.Student;
 
 @Repository
@@ -28,7 +28,7 @@ public class StudentDaoJdbc implements StudentDao {
     private static String STUDENTS_SELECT_BY_ID;
     private static String STUDENTS_UPDATE;
 
-    private GenericMapper<Student> studentMapper;
+    private BilateralMapper<Student> studentMapper;
     private NamedParameterJdbcTemplate jdbcTemplate;
 
     @Value("${students.select}")
@@ -60,7 +60,7 @@ public class StudentDaoJdbc implements StudentDao {
     }
 
     @Autowired
-    public void setStudentMapper(GenericMapper<Student> studentMapper) {
+    public void setStudentMapper(BilateralMapper<Student> studentMapper) {
         this.studentMapper = studentMapper;
     }
 

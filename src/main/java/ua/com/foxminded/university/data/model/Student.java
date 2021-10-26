@@ -2,19 +2,10 @@ package ua.com.foxminded.university.data.model;
 
 public class Student extends Person {
 
-    private long id;
     private Group group;
-
-    public long getId() {
-        return id;
-    }
 
     public Group getGroup() {
         return group;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public void setGroup(Group group) {

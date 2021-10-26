@@ -21,7 +21,7 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
 import org.springframework.stereotype.Repository;
 
 import ua.com.foxminded.university.data.db.dao.TeacherDao;
-import ua.com.foxminded.university.data.db.dao.jdbc.mappers.GenericMapper;
+import ua.com.foxminded.university.data.db.dao.jdbc.mappers.BilateralMapper;
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.TabletimeRow;
 import ua.com.foxminded.university.data.model.Teacher;
@@ -29,40 +29,41 @@ import ua.com.foxminded.university.data.model.Teacher;
 @Repository
 public class TeacherDaoJdbc implements TeacherDao {
 
-    private String teachersSelect;
-    private String teachersInsert;
-    private String teacherCoursesInsert;
-    private String teachersGetById;
-    private String teachersGetByFullName;
-    private String teachersGetCourses;
-    private String teachersUpdate;
-    private String tabletimeInsert;
-    private String getTabletimeForTeacher;
-    private String tabletimeUpdate;
+    private static String TEACHERS_SELECT;
+    private static String TEACHERS_INSERT;
+    private static String TEACHERS_COURSES_INSERT;
+    private static String TEACHERS_SELECT_BY_ID;
+    private static String TEACHERS_SELECT_BY_FULL_NAME;
+    private static String TEACHERS_COURSES_SELECT_BY_TEACHERID;
+    private static String TEACHERS_UPDATE;
+    private static String TABLETIME_INSERT;
+    private static String TABLETIME_SELECT_BY_PERIOD_AND_TEACHER_ID;
+    private static String TABLETIME_UPDATE;
+    private static String TEACHERS_COURSES_DELETE;
 
     private RowMapper<Teacher> teacherMapper;
     private RowMapper<Course> courseMapper;
-    private GenericMapper<TabletimeRow> tabletimeRowMapper;
+    private BilateralMapper<TabletimeRow> tabletimeRowMapper;
     private NamedParameterJdbcTemplate jdbcTemplate;
 
     @Value("${teachers.select}")
     public void setTeachersSelect(String teachersSelect) {
-        this.teachersSelect = teachersSelect;
+        TeacherDaoJdbc.TEACHERS_SELECT = teachersSelect;
     }
 
     @Value("${teachers.insert}")
     public void setTeachersInsert(String teachersInsert) {
-        this.teachersInsert = teachersInsert;
+        TeacherDaoJdbc.TEACHERS_INSERT = teachersInsert;
     }
 
     @Value("${teachers_courses.insert}")
     public void setTeacherCoursesInsert(String teacherCoursesInsert) {
-        this.teacherCoursesInsert = teacherCoursesInsert;
+        TeacherDaoJdbc.TEACHERS_COURSES_INSERT = teacherCoursesInsert;
     }
 
     @Value("${teachers.select} WHERE id = :id")
     public void setTeachersGetById(String teachersGetById) {
-        this.teachersGetById = teachersGetById;
+        TeacherDaoJdbc.TEACHERS_SELECT_BY_ID = teachersGetById;
     }
 
     @Value(""
@@ -70,22 +71,23 @@ public class TeacherDaoJdbc implements TeacherDao {
             + " WHERE first_Name = :firstName"
             + " AND last_name = :lastName")
     public void setTeachersGetByFullName(String teachersGetByFullName) {
-        this.teachersGetByFullName = teachersGetByFullName;
+        TeacherDaoJdbc.TEACHERS_SELECT_BY_FULL_NAME = teachersGetByFullName;
     }
 
     @Value("${teachers_courses.select}  WHERE teachers.id = :id")
     public void setTeachersGetCourses(String teachersGetCourses) {
-        this.teachersGetCourses = teachersGetCourses;
+        TeacherDaoJdbc.TEACHERS_COURSES_SELECT_BY_TEACHERID =
+                teachersGetCourses;
     }
 
     @Value("${teachers.update}")
     public void setTeachersUpdate(String teachersUpdate) {
-        this.teachersUpdate = teachersUpdate;
+        TeacherDaoJdbc.TEACHERS_UPDATE = teachersUpdate;
     }
 
     @Value("${tabletime.insert}")
     public void setTabletimeInsert(String tabletimeInsert) {
-        this.tabletimeInsert = tabletimeInsert;
+        TeacherDaoJdbc.TABLETIME_INSERT = tabletimeInsert;
     }
 
     @Value(""
@@ -93,12 +95,21 @@ public class TeacherDaoJdbc implements TeacherDao {
             + " tabletime.date_time BETWEEN :begin AND :end"
             + " AND tabletime.teacher_id = :teacherId")
     public void setGetTabletimeForTeacher(String getTabletimeForTeacher) {
-        this.getTabletimeForTeacher = getTabletimeForTeacher;
+        TeacherDaoJdbc.TABLETIME_SELECT_BY_PERIOD_AND_TEACHER_ID =
+                getTabletimeForTeacher;
     }
 
     @Value("${tabletime.update} WHERE teacher_id = :teacherId")
     public void setTabletimeUpdate(String tabletimeUpdate) {
-        this.tabletimeUpdate = tabletimeUpdate;
+        TeacherDaoJdbc.TABLETIME_UPDATE = tabletimeUpdate;
+    }
+
+    @Value(""
+            + "${teachers_courses.delete}"
+            + " WHERE teacher_id = :teacherId"
+            + " AND course_id = :courseId")
+    public void setTeachersCoursesDelete(String teachersCoursesDelete) {
+        TeacherDaoJdbc.TEACHERS_COURSES_DELETE = teachersCoursesDelete;
     }
 
     @Autowired
@@ -113,7 +124,7 @@ public class TeacherDaoJdbc implements TeacherDao {
 
     @Autowired
     public void setTabletimeRowMapper(
-            GenericMapper<TabletimeRow> tabletimeRowMapper) {
+            BilateralMapper<TabletimeRow> tabletimeRowMapper) {
         this.tabletimeRowMapper = tabletimeRowMapper;
     }
 
@@ -127,7 +138,7 @@ public class TeacherDaoJdbc implements TeacherDao {
     public Teacher getById(long id) {
         SqlParameterSource nameParameters = new MapSqlParameterSource("id", id);
         return this.jdbcTemplate.queryForObject(
-                teachersGetById, nameParameters, teacherMapper::mapRow);
+                TEACHERS_SELECT_BY_ID, nameParameters, teacherMapper::mapRow);
     }
 
     @Override
@@ -136,20 +147,21 @@ public class TeacherDaoJdbc implements TeacherDao {
         namedParameters.put("firstName", firstName);
         namedParameters.put("lastName", lastName);
         return jdbcTemplate.queryForObject(
-                teachersGetByFullName, namedParameters, teacherMapper::mapRow);
+                TEACHERS_SELECT_BY_FULL_NAME, namedParameters,
+                teacherMapper::mapRow);
     }
 
     @Override
     public List<Course> getCourses(Teacher teacher) {
         MapSqlParameterSource namedParameters =
                 new MapSqlParameterSource("id", teacher.getId());
-        return jdbcTemplate.query(teachersGetCourses, namedParameters,
-                courseMapper::mapRow);
+        return jdbcTemplate.query(TEACHERS_COURSES_SELECT_BY_TEACHERID,
+                namedParameters, courseMapper::mapRow);
     }
 
     @Override
     public List<Teacher> getAll() {
-        return this.jdbcTemplate.query(teachersSelect,
+        return this.jdbcTemplate.query(TEACHERS_SELECT,
                 teacherMapper::mapRow);
     }
 
@@ -157,25 +169,25 @@ public class TeacherDaoJdbc implements TeacherDao {
     public void save(Teacher teacher) {
         SqlParameterSource namedParameters = new BeanPropertySqlParameterSource(
                 teacher);
-        this.jdbcTemplate.update(teachersInsert, namedParameters);
+        this.jdbcTemplate.update(TEACHERS_INSERT, namedParameters);
     }
 
     @Override
     public void save(List<Teacher> teachers) {
         SqlParameterSource[] batch = SqlParameterSourceUtils
                 .createBatch(teachers);
-        this.jdbcTemplate.batchUpdate(teachersInsert, batch);
+        this.jdbcTemplate.batchUpdate(TEACHERS_INSERT, batch);
     }
 
     @Override
     public void update(Teacher teacher) {
         SqlParameterSource namedParameters = new BeanPropertySqlParameterSource(
                 teacher);
-        this.jdbcTemplate.update(teachersUpdate, namedParameters);
+        this.jdbcTemplate.update(TEACHERS_UPDATE, namedParameters);
     }
 
     @Override
-    public void saveCourses(Teacher teacher) {
+    public void addToCourses(Teacher teacher) {
         List<Map<String, Long>> list = new ArrayList<>();
 
         for (Course course : teacher.getCourses()) {
@@ -185,18 +197,18 @@ public class TeacherDaoJdbc implements TeacherDao {
             list.add(map);
         }
         SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(list);
-        jdbcTemplate.batchUpdate(teacherCoursesInsert, batch);
+        jdbcTemplate.batchUpdate(TEACHERS_COURSES_INSERT, batch);
     }
 
     @Override
-    public void saveTabletime(List<TabletimeRow> rows) {
+    public void addTabletimeRows(List<TabletimeRow> rows) {
         List<Map<String, Object>> mapRows = rows
                 .stream()
                 .map(tabletimeRowMapper::mapToSave)
                 .collect(Collectors.toList());
         SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(
                 mapRows);
-        jdbcTemplate.batchUpdate(tabletimeInsert, batch);
+        jdbcTemplate.batchUpdate(TABLETIME_INSERT, batch);
     }
 
     @Override
@@ -207,7 +219,7 @@ public class TeacherDaoJdbc implements TeacherDao {
                 .collect(Collectors.toList());
         SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(
                 mapRows);
-        jdbcTemplate.batchUpdate(tabletimeUpdate, batch);
+        jdbcTemplate.batchUpdate(TABLETIME_UPDATE, batch);
     }
 
     @Override
@@ -218,8 +230,16 @@ public class TeacherDaoJdbc implements TeacherDao {
         parameters.put("end", Timestamp.valueOf(end));
         parameters.put("teacherId", teacher.getId());
         return jdbcTemplate.query(
-                getTabletimeForTeacher, parameters,
+                TABLETIME_SELECT_BY_PERIOD_AND_TEACHER_ID, parameters,
                 tabletimeRowMapper::mapRow);
+    }
+
+    @Override
+    public void removeCourse(Teacher teacher, Course course) {
+        Map<String, Long> parameters = new HashMap<>();
+        parameters.put("teacherId", teacher.getId());
+        parameters.put("courseId", course.getId());
+        jdbcTemplate.update(TEACHERS_COURSES_DELETE, parameters);
     }
 
 }

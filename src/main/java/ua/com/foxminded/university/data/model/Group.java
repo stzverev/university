@@ -1,28 +1,30 @@
 package ua.com.foxminded.university.data.model;
 
-public class Group {
+import java.util.List;
 
-    private long id;
+public class Group extends AbstractEntity {
+
     private String name;
+    private List<Course> courses;
 
     public Group() {
         super();
-    }
-
-    public long getId() {
-        return id;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setId(long id) {
-        this.id = id;
-    }
-
     public void setName(String name) {
         this.name = name;
+    }
+
+    public List<Course> getCourses() {
+        return courses;
+    }
+
+    public void setCourses(List<Course> courses) {
+        this.courses = courses;
     }
 
     @Override

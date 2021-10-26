@@ -1,6 +1,6 @@
 package ua.com.foxminded.university.data.model;
 
-public abstract class Person {
+public abstract class Person extends AbstractEntity {
 
     private String firstName;
     private String lastName;

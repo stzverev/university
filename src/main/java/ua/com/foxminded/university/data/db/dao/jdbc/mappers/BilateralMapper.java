@@ -4,7 +4,7 @@ import java.util.Map;
 
 import org.springframework.jdbc.core.RowMapper;
 
-public interface GenericMapper<T> extends RowMapper<T> {
+public interface BilateralMapper<T> extends RowMapper<T> {
 
     Map<String, Object> mapToSave(T object);
 

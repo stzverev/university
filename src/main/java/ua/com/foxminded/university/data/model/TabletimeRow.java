@@ -4,15 +4,10 @@ import java.time.LocalDateTime;
 
 public class TabletimeRow {
 
-    private long id;
     private LocalDateTime dateTime;
     private Group group;
     private Course course;
     private Teacher teacher;
-
-    public long getId() {
-        return id;
-    }
 
     public LocalDateTime getDateTime() {
         return dateTime;
@@ -28,10 +23,6 @@ public class TabletimeRow {
 
     public Teacher getTeacher() {
         return teacher;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public void setDateTime(LocalDateTime dateTime) {

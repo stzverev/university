@@ -20,9 +20,11 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
 import org.springframework.stereotype.Repository;
 
 import ua.com.foxminded.university.data.db.dao.CourseDao;
-import ua.com.foxminded.university.data.db.dao.jdbc.mappers.GenericMapper;
+import ua.com.foxminded.university.data.db.dao.jdbc.mappers.BilateralMapper;
 import ua.com.foxminded.university.data.model.Course;
+import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.TabletimeRow;
+import ua.com.foxminded.university.data.model.Teacher;
 
 @Repository
 public class CourseDaoJdbc implements CourseDao {
@@ -35,9 +37,13 @@ public class CourseDaoJdbc implements CourseDao {
     private static String TABLETIME_INSERT;
     private static String TABLETIME_SELECT_BY_COURSE;
     private static String TABLETIME_UPDATE;
+    private static String TEACHERS_COURSES_SELECT_BY_COURSE_ID;
+    private static String GROUPS_COURSES_SELECT_BY_COURSE_ID;
 
     private RowMapper<Course> courseMapper;
-    private GenericMapper<TabletimeRow> tabletimeRowMapper;
+    private RowMapper<Teacher> teacherMapper;
+    private RowMapper<Group> groupMapper;
+    private BilateralMapper<TabletimeRow> tabletimeRowMapper;
     private NamedParameterJdbcTemplate jdbcTemplate;
 
     @Value("${courses.insert}")
@@ -70,10 +76,27 @@ public class CourseDaoJdbc implements CourseDao {
         CourseDaoJdbc.TABLETIME_INSERT = tabletimeInsert;
     }
 
+    @Value("${teachers_courses.select} WHERE course_id = :id")
+    public void setTeacherCoursesSelect(String teachersCoursesSelect) {
+        CourseDaoJdbc.TEACHERS_COURSES_SELECT_BY_COURSE_ID =
+                teachersCoursesSelect;
+    }
+
+    @Value("${groups_courses.select} WHERE course_id = :id")
+    public void setGroupCoursesSelect(String groupCoursesSelect) {
+        CourseDaoJdbc.GROUPS_COURSES_SELECT_BY_COURSE_ID = groupCoursesSelect;
+    }
+
     @Autowired
     public void setTabletimeRowMapper(
-            GenericMapper<TabletimeRow> tabletimeRowMapper) {
+            BilateralMapper<TabletimeRow> tabletimeRowMapper) {
         this.tabletimeRowMapper = tabletimeRowMapper;
+    }
+
+    @Autowired
+    public void setTeacherMapper(
+            RowMapper<Teacher> teacherMapper) {
+        this.teacherMapper = teacherMapper;
     }
 
     @Value(""
@@ -92,6 +115,11 @@ public class CourseDaoJdbc implements CourseDao {
     @Autowired
     public void setCourseMapper(RowMapper<Course> courseMapper) {
         this.courseMapper = courseMapper;
+    }
+
+    @Autowired
+    public void setGroupMapper(RowMapper<Group> groupMapper) {
+        this.groupMapper = groupMapper;
     }
 
     @Autowired
@@ -172,6 +200,22 @@ public class CourseDaoJdbc implements CourseDao {
                 .collect(Collectors.toList());
         SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(rows);
         jdbcTemplate.batchUpdate(TABLETIME_UPDATE, batch);
+    }
+
+    @Override
+    public List<Teacher> getTeachers(Course course) {
+        MapSqlParameterSource parameters = new MapSqlParameterSource(
+                "id", course.getId());
+        return jdbcTemplate.query(TEACHERS_COURSES_SELECT_BY_COURSE_ID,
+                parameters, teacherMapper);
+    }
+
+    @Override
+    public List<Group> getGroups(Course course) {
+        MapSqlParameterSource parameters = new MapSqlParameterSource(
+                "id", course.getId());
+        return jdbcTemplate.query(GROUPS_COURSES_SELECT_BY_COURSE_ID,
+                parameters, groupMapper);
     }
 
 }

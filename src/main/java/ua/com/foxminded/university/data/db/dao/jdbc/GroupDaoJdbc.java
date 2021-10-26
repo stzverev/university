@@ -20,7 +20,8 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
 import org.springframework.stereotype.Repository;
 
 import ua.com.foxminded.university.data.db.dao.GroupDao;
-import ua.com.foxminded.university.data.db.dao.jdbc.mappers.GenericMapper;
+import ua.com.foxminded.university.data.db.dao.jdbc.mappers.BilateralMapper;
+import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.Student;
 import ua.com.foxminded.university.data.model.TabletimeRow;
@@ -37,10 +38,14 @@ public class GroupDaoJdbc implements GroupDao {
     private static String TABLETIME_INSERT;
     private static String TABLETIME_FOR_GROUP;
     private static String TABLETIME_UPDATE;
+    private static String GROUPS_COURSES_SELECT_BY_GROUPID;
+    private static String GROUPS_COURSES_INSERT;
+    private static String GROUPS_COURSES_DELETE;
 
     private RowMapper<Group> groupMapper;
     private RowMapper<Student> studentMapper;
-    private GenericMapper<TabletimeRow> tabletimeRowMapper;
+    private RowMapper<Course> courseMapper;
+    private BilateralMapper<TabletimeRow> tabletimeRowMapper;
     private NamedParameterJdbcTemplate jdbcTemplate;
 
     @Value("${groups.select}")
@@ -91,6 +96,26 @@ public class GroupDaoJdbc implements GroupDao {
         GroupDaoJdbc.TABLETIME_UPDATE = tabletimeUpdate;
     }
 
+    @Value("${groups_courses.select} WHERE group_id = :id")
+    public void setGroupsCoursesSelectByGroupId(
+            String groupsCoursesSelectByGroupId) {
+        GroupDaoJdbc.GROUPS_COURSES_SELECT_BY_GROUPID =
+                groupsCoursesSelectByGroupId;
+    }
+
+    @Value("${groups_courses.insert}")
+    public void setGroupsCoursesInsert(String groupsCoursesInsert) {
+        GroupDaoJdbc.GROUPS_COURSES_INSERT = groupsCoursesInsert;
+    }
+
+    @Value(""
+            + "${groups_courses.delete}"
+            + " WHERE group_id = :groupId"
+            + " AND course_id = :courseId")
+    public void setGroupsCoursesDelete(String groupsCoursesDelete) {
+        GROUPS_COURSES_DELETE = groupsCoursesDelete;
+    }
+
     @Autowired
     public void setGroupMapper(RowMapper<Group> groupMapper) {
         this.groupMapper = groupMapper;
@@ -103,8 +128,13 @@ public class GroupDaoJdbc implements GroupDao {
 
     @Autowired
     public void setTabletimeRowMapper(
-            GenericMapper<TabletimeRow> tabletimeRowMapper) {
+            BilateralMapper<TabletimeRow> tabletimeRowMapper) {
         this.tabletimeRowMapper = tabletimeRowMapper;
+    }
+
+    @Autowired
+    public void setCourseMapper(RowMapper<Course> courseMapper) {
+        this.courseMapper = courseMapper;
     }
 
     @Autowired
@@ -196,6 +226,38 @@ public class GroupDaoJdbc implements GroupDao {
         SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(
                 mapRows);
         jdbcTemplate.batchUpdate(TABLETIME_UPDATE, batch);
+    }
+
+    @Override
+    public List<Course> getCourses(Group group) {
+        MapSqlParameterSource parameters = new MapSqlParameterSource(
+                "id", group.getId());
+        return jdbcTemplate.query(GROUPS_COURSES_SELECT_BY_GROUPID,
+                parameters, courseMapper);
+    }
+
+    @Override
+    public void addToCourses(Group group) {
+        List<Map<String, Long>> parameters = group.getCourses()
+                .stream()
+                .map(it -> {
+                    Map<String, Long> map = new HashMap<>();
+                    map.put("groupId", group.getId());
+                    map.put("courseId", it.getId());
+                    return map;
+                })
+                .collect(Collectors.toList());
+        SqlParameterSource[] batch = SqlParameterSourceUtils
+                .createBatch(parameters);
+        jdbcTemplate.batchUpdate(GROUPS_COURSES_INSERT, batch);
+    }
+
+    @Override
+    public void deleteFromCourse(Group group, Course course) {
+        Map<String, Long> parameters = new HashMap<>();
+        parameters.put("groupId", group.getId());
+        parameters.put("courseId", course.getId());
+        jdbcTemplate.update(GROUPS_COURSES_DELETE, parameters);
     }
 
 }

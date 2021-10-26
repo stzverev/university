@@ -17,7 +17,7 @@ import ua.com.foxminded.university.data.model.TabletimeRow;
 import ua.com.foxminded.university.data.model.Teacher;
 
 @Component
-public class TabletimeRowMapper implements GenericMapper<TabletimeRow> {
+public class TabletimeRowMapper implements BilateralMapper<TabletimeRow> {
 
     private RowMapper<Course> courseMapper;
     private RowMapper<Group> groupMapper;
