@@ -14,7 +14,7 @@ public interface GroupDao extends GenericDao<Group> {
 
     List<Student> getStudents(Group group);
 
-    void saveTabletime(List<TabletimeRow> rows);
+    void addTabletimeRows(List<TabletimeRow> rows);
 
     void updateTabletime(List<TabletimeRow> rows);
 

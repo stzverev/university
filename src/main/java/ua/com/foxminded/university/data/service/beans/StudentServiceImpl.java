@@ -1,4 +1,4 @@
-package ua.com.foxminded.university.data.service;
+package ua.com.foxminded.university.data.service.beans;
 
 import java.util.List;
 
@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import ua.com.foxminded.university.data.db.dao.StudentDao;
 import ua.com.foxminded.university.data.model.Student;
+import ua.com.foxminded.university.data.service.StudentService;
 
 @Service
 public class StudentServiceImpl implements StudentService {

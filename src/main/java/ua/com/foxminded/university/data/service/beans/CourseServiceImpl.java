@@ -1,4 +1,4 @@
-package ua.com.foxminded.university.data.service;
+package ua.com.foxminded.university.data.service.beans;
 
 import java.util.Collections;
 import java.util.List;
@@ -12,6 +12,7 @@ import ua.com.foxminded.university.data.db.dao.TeacherDao;
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.Teacher;
+import ua.com.foxminded.university.data.service.CourseService;
 
 @Service
 public class CourseServiceImpl implements CourseService {

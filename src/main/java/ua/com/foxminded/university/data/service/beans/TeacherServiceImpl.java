@@ -1,19 +1,27 @@
-package ua.com.foxminded.university.data.service;
+package ua.com.foxminded.university.data.service.beans;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import ua.com.foxminded.university.data.db.dao.TeacherDao;
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.TabletimeRow;
 import ua.com.foxminded.university.data.model.Teacher;
+import ua.com.foxminded.university.data.service.TeacherService;
 
 @Service
 public class TeacherServiceImpl implements TeacherService {
 
     private TeacherDao teacherDao;
+
+    @Autowired
+    public TeacherServiceImpl(TeacherDao teacherDao) {
+        super();
+        this.teacherDao = teacherDao;
+    }
 
     @Override
     public void save(Teacher students) {

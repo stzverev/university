@@ -1,5 +1,6 @@
-package ua.com.foxminded.university.data.service;
+package ua.com.foxminded.university.data.service.beans;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,8 @@ import org.springframework.stereotype.Service;
 import ua.com.foxminded.university.data.db.dao.GroupDao;
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
+import ua.com.foxminded.university.data.model.TabletimeRow;
+import ua.com.foxminded.university.data.service.GroupService;
 
 @Service
 public class GroupServiceImpl implements GroupService {
@@ -48,6 +51,17 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public void removeFromCourse(Group group, Course course) {
         groupDao.deleteFromCourse(group, course);
+    }
+
+    @Override
+    public List<TabletimeRow> getTabletime(Group group, LocalDateTime begin,
+            LocalDateTime end) {
+        return groupDao.getTabletime(group, begin, end);
+    }
+
+    @Override
+    public void addTabletimeRows(List<TabletimeRow> tabletimeRows) {
+        groupDao.addTabletimeRows(tabletimeRows);
     }
 
 }

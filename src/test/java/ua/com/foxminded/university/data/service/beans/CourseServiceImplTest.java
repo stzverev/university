@@ -1,4 +1,4 @@
-package ua.com.foxminded.university.data.service;
+package ua.com.foxminded.university.data.service.beans;
 
 import static org.mockito.Mockito.verify;
 
@@ -21,6 +21,7 @@ import ua.com.foxminded.university.data.db.dao.TeacherDao;
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.Teacher;
+import ua.com.foxminded.university.data.service.beans.CourseServiceImpl;
 
 @SpringJUnitConfig(Config.class)
 @ExtendWith(SpringExtension.class)

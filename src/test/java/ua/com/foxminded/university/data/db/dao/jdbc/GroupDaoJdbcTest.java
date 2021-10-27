@@ -136,7 +136,7 @@ class GroupDaoJdbcTest {
         row.setGroup(group);
         row.setDateTime(dateTime);
         List<TabletimeRow> rows = Collections.singletonList(row);
-        groupDao.saveTabletime(rows);
+        groupDao.addTabletimeRows(rows);
         List<TabletimeRow> expected = rows;
 
         LocalDateTime begin = LocalDateTime.of(2021, 10, 11, 0, 0, 0);
@@ -190,7 +190,7 @@ class GroupDaoJdbcTest {
         row.setGroup(group);
         row.setDateTime(dateTime);
         List<TabletimeRow> rows = Collections.singletonList(row);
-        groupDao.saveTabletime(rows);
+        groupDao.addTabletimeRows(rows);
         return rows;
     }
 

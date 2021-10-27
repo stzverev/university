@@ -6,7 +6,7 @@ import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.Teacher;
 
-interface CourseService extends CommonService<Course> {
+public interface CourseService extends CommonService<Course> {
 
     List<Teacher> getTeachers(Course course);
 

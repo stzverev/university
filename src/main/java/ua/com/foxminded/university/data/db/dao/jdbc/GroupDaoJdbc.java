@@ -206,7 +206,7 @@ public class GroupDaoJdbc implements GroupDao {
     }
 
     @Override
-    public void saveTabletime(List<TabletimeRow> rows) {
+    public void addTabletimeRows(List<TabletimeRow> rows) {
         List<Map<String, Object>> mapRows = rows
                 .stream()
                 .map(tabletimeRowMapper::mapToSave)
