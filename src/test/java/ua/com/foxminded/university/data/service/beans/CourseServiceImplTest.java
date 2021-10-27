@@ -113,7 +113,7 @@ class CourseServiceImplTest {
     void shouldRemoveTeacherWhenRemoveTeacher() {
         Course course = new Course();
         Teacher teacher = new Teacher();
-        courseService.removeTeacher(course, teacher);
+        courseService.removeTeacherFromCourse(course, teacher);
         verify(teacherDao).removeCourse(teacher, course);
     }
 

@@ -81,7 +81,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public void removeTeacher(Course course, Teacher teacher) {
+    public void removeTeacherFromCourse(Course course, Teacher teacher) {
         teacherDao.removeCourse(teacher, course);
     }
 
