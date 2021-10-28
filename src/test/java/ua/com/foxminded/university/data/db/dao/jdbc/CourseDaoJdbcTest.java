@@ -34,7 +34,7 @@ class CourseDaoJdbcTest {
     private GroupDaoJdbc groupDao;
 
     @Autowired
-    private  DataInitializer dataInitializer;
+    private DataInitializer dataInitializer;
 
     @BeforeEach
     private void init() {

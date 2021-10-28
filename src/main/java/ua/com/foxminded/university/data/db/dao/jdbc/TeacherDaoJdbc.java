@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -20,97 +19,73 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
 import org.springframework.stereotype.Repository;
 
+import ua.com.foxminded.university.data.PropertyFile;
 import ua.com.foxminded.university.data.db.dao.TeacherDao;
 import ua.com.foxminded.university.data.db.dao.jdbc.mappers.BilateralMapper;
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.TabletimeRow;
 import ua.com.foxminded.university.data.model.Teacher;
+import ua.com.foxminded.university.data.service.PropertyReader;
 
 @Repository
 public class TeacherDaoJdbc implements TeacherDao {
 
-    private static String TEACHERS_SELECT;
-    private static String TEACHERS_INSERT;
-    private static String TEACHERS_COURSES_INSERT;
-    private static String TEACHERS_SELECT_BY_ID;
-    private static String TEACHERS_SELECT_BY_FULL_NAME;
-    private static String TEACHERS_COURSES_SELECT_BY_TEACHERID;
-    private static String TEACHERS_UPDATE;
-    private static String TABLETIME_INSERT;
-    private static String TABLETIME_SELECT_BY_PERIOD_AND_TEACHER_ID;
-    private static String TABLETIME_UPDATE;
-    private static String TEACHERS_COURSES_DELETE;
+    private static final String TEACHERS_SELECT = PropertyReader
+            .getProperties(PropertyFile.QUERIES)
+            .getProperty("teachers.select");
+
+    private static final String TEACHERS_INSERT = PropertyReader
+            .getProperties(PropertyFile.QUERIES)
+            .getProperty("teachers.insert");
+
+    private static final String TEACHERS_COURSES_INSERT = PropertyReader
+            .getProperties(PropertyFile.QUERIES)
+            .getProperty("teachers_courses.insert");
+
+    private static final String TEACHERS_SELECT_BY_ID = PropertyReader
+            .getProperties(PropertyFile.QUERIES)
+            .getProperty("teachers.select") + " WHERE id = :id";
+
+    private static final String TEACHERS_SELECT_BY_FULL_NAME = PropertyReader
+            .getProperties(PropertyFile.QUERIES)
+            .getProperty("teachers.select")
+                + " WHERE first_Name = :firstName"
+                + " AND last_name = :lastName";
+
+    private static final String TEACHERS_COURSES_SELECT_BY_TEACHERID =
+            PropertyReader.getProperties(PropertyFile.QUERIES)
+            .getProperty("teachers_courses.select")
+                + " WHERE teachers.id = :id";
+
+    private static final String TEACHERS_UPDATE = PropertyReader
+            .getProperties(PropertyFile.QUERIES)
+            .getProperty("teachers.update");
+
+    private static final String TABLETIME_INSERT = PropertyReader
+            .getProperties(PropertyFile.QUERIES)
+            .getProperty("tabletime.insert");
+
+    private static final String TABLETIME_SELECT_BY_PERIOD_AND_TEACHER_ID =
+            PropertyReader.getProperties(PropertyFile.QUERIES)
+            .getProperty("tabletime.select")
+            + " WHERE tabletime.date_time BETWEEN :begin AND :end"
+            + " AND tabletime.teacher_id = :teacherId";
+
+    private static final String TABLETIME_UPDATE = PropertyReader
+            .getProperties(PropertyFile.QUERIES)
+            .getProperty("tabletime.update")
+            + " WHERE teacher_id = :teacherId";
+
+    private static final String TEACHERS_COURSES_DELETE = PropertyReader
+            .getProperties(PropertyFile.QUERIES)
+            .getProperty("teachers_courses.delete")
+            + " WHERE teacher_id = :teacherId"
+            + " AND course_id = :courseId";
 
     private RowMapper<Teacher> teacherMapper;
     private RowMapper<Course> courseMapper;
     private BilateralMapper<TabletimeRow> tabletimeRowMapper;
     private NamedParameterJdbcTemplate jdbcTemplate;
-
-    @Value("${teachers.select}")
-    public void setTeachersSelect(String teachersSelect) {
-        TeacherDaoJdbc.TEACHERS_SELECT = teachersSelect;
-    }
-
-    @Value("${teachers.insert}")
-    public void setTeachersInsert(String teachersInsert) {
-        TeacherDaoJdbc.TEACHERS_INSERT = teachersInsert;
-    }
-
-    @Value("${teachers_courses.insert}")
-    public void setTeacherCoursesInsert(String teacherCoursesInsert) {
-        TeacherDaoJdbc.TEACHERS_COURSES_INSERT = teacherCoursesInsert;
-    }
-
-    @Value("${teachers.select} WHERE id = :id")
-    public void setTeachersGetById(String teachersGetById) {
-        TeacherDaoJdbc.TEACHERS_SELECT_BY_ID = teachersGetById;
-    }
-
-    @Value(""
-            + "${teachers.select}"
-            + " WHERE first_Name = :firstName"
-            + " AND last_name = :lastName")
-    public void setTeachersGetByFullName(String teachersGetByFullName) {
-        TeacherDaoJdbc.TEACHERS_SELECT_BY_FULL_NAME = teachersGetByFullName;
-    }
-
-    @Value("${teachers_courses.select}  WHERE teachers.id = :id")
-    public void setTeachersGetCourses(String teachersGetCourses) {
-        TeacherDaoJdbc.TEACHERS_COURSES_SELECT_BY_TEACHERID =
-                teachersGetCourses;
-    }
-
-    @Value("${teachers.update}")
-    public void setTeachersUpdate(String teachersUpdate) {
-        TeacherDaoJdbc.TEACHERS_UPDATE = teachersUpdate;
-    }
-
-    @Value("${tabletime.insert}")
-    public void setTabletimeInsert(String tabletimeInsert) {
-        TeacherDaoJdbc.TABLETIME_INSERT = tabletimeInsert;
-    }
-
-    @Value(""
-            + "${tabletime.select} WHERE"
-            + " tabletime.date_time BETWEEN :begin AND :end"
-            + " AND tabletime.teacher_id = :teacherId")
-    public void setGetTabletimeForTeacher(String getTabletimeForTeacher) {
-        TeacherDaoJdbc.TABLETIME_SELECT_BY_PERIOD_AND_TEACHER_ID =
-                getTabletimeForTeacher;
-    }
-
-    @Value("${tabletime.update} WHERE teacher_id = :teacherId")
-    public void setTabletimeUpdate(String tabletimeUpdate) {
-        TeacherDaoJdbc.TABLETIME_UPDATE = tabletimeUpdate;
-    }
-
-    @Value(""
-            + "${teachers_courses.delete}"
-            + " WHERE teacher_id = :teacherId"
-            + " AND course_id = :courseId")
-    public void setTeachersCoursesDelete(String teachersCoursesDelete) {
-        TeacherDaoJdbc.TEACHERS_COURSES_DELETE = teachersCoursesDelete;
-    }
 
     @Autowired
     public void setTeacherMapper(RowMapper<Teacher> teacherMapper) {

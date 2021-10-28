@@ -10,7 +10,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 @Configuration
-@ComponentScan("ua.com.foxminded.university.data")
+@ComponentScan
 @PropertySource("classpath:queries.properties")
 @PropertySource("classpath:config.properties")
 public class Config {
