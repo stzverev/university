@@ -5,12 +5,6 @@ public abstract class Person {
     private String firstName;
     private String lastName;
 
-    Person(String firstName, String lastName) {
-        super();
-        this.firstName = firstName;
-        this.lastName = lastName;
-    }
-
     public String getFirstName() {
         return firstName;
     }
@@ -29,15 +23,18 @@ public abstract class Person {
 
     @Override
     public String toString() {
-        return "Person [firstName=" + firstName + ", lastName=" + lastName + "]";
+        return "Person [firstName="
+                + firstName + ", lastName=" + lastName + "]";
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((firstName == null) ? 0 : firstName.hashCode());
-        result = prime * result + ((lastName == null) ? 0 : lastName.hashCode());
+        result = prime * result + ((firstName == null) ? 0
+                : firstName.hashCode());
+        result = prime * result + ((lastName == null) ? 0
+                : lastName.hashCode());
         return result;
     }
 

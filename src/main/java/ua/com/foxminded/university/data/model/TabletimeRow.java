@@ -10,15 +10,6 @@ public class TabletimeRow {
     private Course course;
     private Teacher teacher;
 
-    public TabletimeRow(LocalDateTime dateTime, Group group, Course course,
-            Teacher teacher) {
-        super();
-        this.dateTime = dateTime;
-        this.group = group;
-        this.course = course;
-        this.teacher = teacher;
-    }
-
     public long getId() {
         return id;
     }
@@ -77,7 +68,8 @@ public class TabletimeRow {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((course == null) ? 0 : course.hashCode());
-        result = prime * result + ((dateTime == null) ? 0 : dateTime.hashCode());
+        result = prime * result + ((dateTime == null) ? 0
+                : dateTime.hashCode());
         result = prime * result + ((group == null) ? 0 : group.hashCode());
         result = prime * result + ((teacher == null) ? 0 : teacher.hashCode());
         return result;

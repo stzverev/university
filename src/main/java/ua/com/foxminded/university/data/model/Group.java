@@ -1,17 +1,12 @@
 package ua.com.foxminded.university.data.model;
 
-import java.util.List;
-
 public class Group {
 
     private long id;
     private String name;
-    private List<Student> students;
-    private List<Course> courses;
 
-    public Group(String name) {
+    public Group() {
         super();
-        this.name = name;
     }
 
     public long getId() {
@@ -22,28 +17,12 @@ public class Group {
         return name;
     }
 
-    public List<Student> getStudents() {
-        return students;
-    }
-
-    public List<Course> getCourses() {
-        return courses;
-    }
-
     public void setId(long id) {
         this.id = id;
     }
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public void setStudents(List<Student> students) {
-        this.students = students;
-    }
-
-    public void setCourses(List<Course> courses) {
-        this.courses = courses;
     }
 
     @Override
