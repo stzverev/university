@@ -9,9 +9,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
+import ua.com.foxminded.university.data.service.PropertyReader;
+
 @Configuration
 @ComponentScan
-@PropertySource("classpath:queries.properties")
 @PropertySource("classpath:config.properties")
 public class Config {
 
@@ -26,6 +27,11 @@ public class Config {
         dataSource.setUsername(username);
         dataSource.setPassword(password);
         return dataSource;
+    }
+
+    @Bean
+    public PropertyReader queryReader() {
+        return new PropertyReader("queries.properties");
     }
 
 }

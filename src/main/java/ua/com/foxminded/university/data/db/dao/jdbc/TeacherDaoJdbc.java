@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -19,7 +20,6 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
 import org.springframework.stereotype.Repository;
 
-import ua.com.foxminded.university.data.PropertyFile;
 import ua.com.foxminded.university.data.db.dao.TeacherDao;
 import ua.com.foxminded.university.data.db.dao.jdbc.mappers.BilateralMapper;
 import ua.com.foxminded.university.data.model.Course;
@@ -30,66 +30,53 @@ import ua.com.foxminded.university.data.service.PropertyReader;
 @Repository
 public class TeacherDaoJdbc implements TeacherDao {
 
-    private static final String TEACHERS_SELECT = PropertyReader
-            .getProperties(PropertyFile.QUERIES)
-            .getProperty("teachers.select");
+    private static final String TEACHERS_SELECT = "teachers.select";
 
-    private static final String TEACHERS_INSERT = PropertyReader
-            .getProperties(PropertyFile.QUERIES)
-            .getProperty("teachers.insert");
+    private static final String TEACHERS_INSERT =
+            "teachers.insert";
 
-    private static final String TEACHERS_COURSES_INSERT = PropertyReader
-            .getProperties(PropertyFile.QUERIES)
-            .getProperty("teachers_courses.insert");
+    private static final String TEACHERS_COURSES_INSERT =
+            "teachers_courses.insert";
 
-    private static final String TEACHERS_SELECT_BY_ID = PropertyReader
-            .getProperties(PropertyFile.QUERIES)
-            .getProperty("teachers.select") + " WHERE id = :id";
+    private static final String TEACHERS_SELECT_BY_ID =
+            "teachers.select.byId";
 
-    private static final String TEACHERS_SELECT_BY_FULL_NAME = PropertyReader
-            .getProperties(PropertyFile.QUERIES)
-            .getProperty("teachers.select")
-                + " WHERE first_Name = :firstName"
-                + " AND last_name = :lastName";
+    private static final String TEACHERS_SELECT_BY_FULL_NAME =
+            "teachers.select.byFullName";
 
     private static final String TEACHERS_COURSES_SELECT_BY_TEACHERID =
-            PropertyReader.getProperties(PropertyFile.QUERIES)
-            .getProperty("teachers_courses.select")
-                + " WHERE teachers.id = :id";
+            "teachers_courses.select.byTeacherId";
 
-    private static final String TEACHERS_UPDATE = PropertyReader
-            .getProperties(PropertyFile.QUERIES)
-            .getProperty("teachers.update");
+    private static final String TEACHERS_UPDATE =
+            "teachers.update";
 
-    private static final String TABLETIME_INSERT = PropertyReader
-            .getProperties(PropertyFile.QUERIES)
-            .getProperty("tabletime.insert");
+    private static final String TABLETIME_INSERT =
+            "tabletime.insert";
 
     private static final String TABLETIME_SELECT_BY_PERIOD_AND_TEACHER_ID =
-            PropertyReader.getProperties(PropertyFile.QUERIES)
-            .getProperty("tabletime.select")
-            + " WHERE tabletime.date_time BETWEEN :begin AND :end"
-            + " AND tabletime.teacher_id = :teacherId";
+            "tabletime.select.byPeriodAndTeacherId";
 
-    private static final String TABLETIME_UPDATE = PropertyReader
-            .getProperties(PropertyFile.QUERIES)
-            .getProperty("tabletime.update")
-            + " WHERE teacher_id = :teacherId";
+    private static final String TABLETIME_UPDATE =
+            "tabletime.update.byTeacherId";
 
-    private static final String TEACHERS_COURSES_DELETE = PropertyReader
-            .getProperties(PropertyFile.QUERIES)
-            .getProperty("teachers_courses.delete")
-            + " WHERE teacher_id = :teacherId"
-            + " AND course_id = :courseId";
+    private static final String TEACHERS_COURSES_DELETE =
+            "teachers_courses.delete.byTeacherIdAndCourseId";
 
     private RowMapper<Teacher> teacherMapper;
     private RowMapper<Course> courseMapper;
     private BilateralMapper<TabletimeRow> tabletimeRowMapper;
     private NamedParameterJdbcTemplate jdbcTemplate;
+    private PropertyReader queryReader;
 
     @Autowired
     public void setTeacherMapper(RowMapper<Teacher> teacherMapper) {
         this.teacherMapper = teacherMapper;
+    }
+
+    @Autowired
+    @Qualifier("queryReader")
+    public void setPropertyReader(PropertyReader propertyReader) {
+        this.queryReader = propertyReader;
     }
 
     @Autowired
@@ -113,7 +100,9 @@ public class TeacherDaoJdbc implements TeacherDao {
     public Teacher getById(long id) {
         SqlParameterSource nameParameters = new MapSqlParameterSource("id", id);
         return this.jdbcTemplate.queryForObject(
-                TEACHERS_SELECT_BY_ID, nameParameters, teacherMapper::mapRow);
+                queryReader.getProperty(TEACHERS_SELECT_BY_ID),
+                nameParameters,
+                teacherMapper::mapRow);
     }
 
     @Override
@@ -122,7 +111,8 @@ public class TeacherDaoJdbc implements TeacherDao {
         namedParameters.put("firstName", firstName);
         namedParameters.put("lastName", lastName);
         return jdbcTemplate.queryForObject(
-                TEACHERS_SELECT_BY_FULL_NAME, namedParameters,
+                queryReader.getProperty(TEACHERS_SELECT_BY_FULL_NAME),
+                namedParameters,
                 teacherMapper::mapRow);
     }
 
@@ -130,13 +120,16 @@ public class TeacherDaoJdbc implements TeacherDao {
     public List<Course> getCourses(Teacher teacher) {
         MapSqlParameterSource namedParameters =
                 new MapSqlParameterSource("id", teacher.getId());
-        return jdbcTemplate.query(TEACHERS_COURSES_SELECT_BY_TEACHERID,
-                namedParameters, courseMapper::mapRow);
+        return jdbcTemplate.query(
+                queryReader.getProperty(TEACHERS_COURSES_SELECT_BY_TEACHERID),
+                namedParameters,
+                courseMapper::mapRow);
     }
 
     @Override
     public List<Teacher> getAll() {
-        return this.jdbcTemplate.query(TEACHERS_SELECT,
+        return this.jdbcTemplate.query(
+                queryReader.getProperty(TEACHERS_SELECT),
                 teacherMapper::mapRow);
     }
 
@@ -144,21 +137,27 @@ public class TeacherDaoJdbc implements TeacherDao {
     public void save(Teacher teacher) {
         SqlParameterSource namedParameters = new BeanPropertySqlParameterSource(
                 teacher);
-        this.jdbcTemplate.update(TEACHERS_INSERT, namedParameters);
+        this.jdbcTemplate.update(
+                queryReader.getProperty(TEACHERS_INSERT),
+                namedParameters);
     }
 
     @Override
     public void save(List<Teacher> teachers) {
         SqlParameterSource[] batch = SqlParameterSourceUtils
                 .createBatch(teachers);
-        this.jdbcTemplate.batchUpdate(TEACHERS_INSERT, batch);
+        this.jdbcTemplate.batchUpdate(
+                queryReader.getProperty(TEACHERS_INSERT),
+                batch);
     }
 
     @Override
     public void update(Teacher teacher) {
         SqlParameterSource namedParameters = new BeanPropertySqlParameterSource(
                 teacher);
-        this.jdbcTemplate.update(TEACHERS_UPDATE, namedParameters);
+        this.jdbcTemplate.update(
+                queryReader.getProperty(TEACHERS_UPDATE),
+                namedParameters);
     }
 
     @Override
@@ -172,7 +171,9 @@ public class TeacherDaoJdbc implements TeacherDao {
             list.add(map);
         }
         SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(list);
-        jdbcTemplate.batchUpdate(TEACHERS_COURSES_INSERT, batch);
+        jdbcTemplate.batchUpdate(
+                queryReader.getProperty(TEACHERS_COURSES_INSERT),
+                batch);
     }
 
     @Override
@@ -183,7 +184,9 @@ public class TeacherDaoJdbc implements TeacherDao {
                 .collect(Collectors.toList());
         SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(
                 mapRows);
-        jdbcTemplate.batchUpdate(TABLETIME_INSERT, batch);
+        jdbcTemplate.batchUpdate(
+                queryReader.getProperty(TABLETIME_INSERT),
+                batch);
     }
 
     @Override
@@ -194,7 +197,9 @@ public class TeacherDaoJdbc implements TeacherDao {
                 .collect(Collectors.toList());
         SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(
                 mapRows);
-        jdbcTemplate.batchUpdate(TABLETIME_UPDATE, batch);
+        jdbcTemplate.batchUpdate(
+                queryReader.getProperty(TABLETIME_UPDATE),
+                batch);
     }
 
     @Override
@@ -205,7 +210,9 @@ public class TeacherDaoJdbc implements TeacherDao {
         parameters.put("end", Timestamp.valueOf(end));
         parameters.put("teacherId", teacher.getId());
         return jdbcTemplate.query(
-                TABLETIME_SELECT_BY_PERIOD_AND_TEACHER_ID, parameters,
+                queryReader.getProperty(
+                        TABLETIME_SELECT_BY_PERIOD_AND_TEACHER_ID),
+                parameters,
                 tabletimeRowMapper::mapRow);
     }
 
@@ -214,7 +221,9 @@ public class TeacherDaoJdbc implements TeacherDao {
         Map<String, Long> parameters = new HashMap<>();
         parameters.put("teacherId", teacher.getId());
         parameters.put("courseId", course.getId());
-        jdbcTemplate.update(TEACHERS_COURSES_DELETE, parameters);
+        jdbcTemplate.update(
+                queryReader.getProperty(TEACHERS_COURSES_DELETE),
+                parameters);
     }
 
 }

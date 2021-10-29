@@ -4,20 +4,28 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import ua.com.foxminded.university.data.PropertyFile;
 import ua.com.foxminded.university.exceptions.PropertyIOException;
 import ua.com.foxminded.university.exceptions.PropertyNotFoundException;
 
 public class PropertyReader {
 
+    private final String fileName;
 
-    private PropertyReader() {
+    public PropertyReader(String fileName) {
+        this.fileName = fileName;
     }
 
-    public static Properties getProperties(PropertyFile propertyFile) {
+    public String getProperty(String key) {
+        return getProperties().getProperty(key);
+    }
+
+    public String getProperty(String key, String defaultValue) {
+        return getProperties().getProperty(key, defaultValue);
+    }
+
+    public Properties getProperties() {
         Properties properties = new Properties();
-        String fileName = propertyFile.name;
-        InputStream propertiesStream = PropertyReader.class
+        InputStream propertiesStream = getClass()
                 .getClassLoader().getResourceAsStream(fileName);
 
         if (propertiesStream != null) {
@@ -30,7 +38,7 @@ public class PropertyReader {
         }
     }
 
-    private static void loadProperties(Properties properties,
+    private void loadProperties(Properties properties,
             InputStream inputStream) {
         try {
             properties.load(inputStream);
