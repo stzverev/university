@@ -1,5 +1,7 @@
 package ua.com.foxminded.university.data.db.dao.jdbc;
 
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.LocalDateTime;
@@ -32,7 +34,7 @@ class CourseDaoJdbcTest {
     private GroupDaoJdbc groupDao;
 
     @Autowired
-    private  DataInitializer dataInitializer;
+    private DataInitializer dataInitializer;
 
     @BeforeEach
     private void init() {
@@ -96,6 +98,30 @@ class CourseDaoJdbcTest {
         Course actual = courseDao.getById(expected.getId());
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    void shouldGetTeachersAfterAddTeacherToCourse() {
+        Course course = saveAndGetCourse("Phisycs");
+        Teacher teacher = saveAndGetTeacher("Sheldon", "Cooper");
+        teacher.setCourses(Collections.singletonList(course));
+        teacherDao.addToCourses(teacher);
+
+        List<Teacher> teachers = courseDao.getTeachers(course);
+
+        assertThat(teachers, hasItem(teacher));
+    }
+
+    @Test
+    void shouldGetGroupsAfterAddGroupToCourse() {
+        Course course = saveAndGetCourse("Phisycs");
+        Group group = saveAndGetGroup("GE-22");
+        group.setCourses(Collections.singletonList(course));
+        groupDao.addToCourses(group);
+
+        List<Group> groups = courseDao.getGroups(course);
+
+        assertThat(groups, hasItem(group));
     }
 
     @Test

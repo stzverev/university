@@ -2,19 +2,14 @@ package ua.com.foxminded.university.data.model;
 
 import java.util.List;
 
-public class Course {
+public class Course extends AbstractEntity {
 
-    private long id;
     private String name;
     private List<Teacher> teachers;
     private List<Group> groups;
 
     public Course() {
         super();
-    }
-
-    public long getId() {
-        return id;
     }
 
     public String getName() {
@@ -27,10 +22,6 @@ public class Course {
 
     public List<Group> getGroups() {
         return groups;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public void setName(String name) {

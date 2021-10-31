@@ -1,5 +1,8 @@
 package ua.com.foxminded.university.data.db.dao.jdbc;
 
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.LocalDateTime;
@@ -133,7 +136,7 @@ class GroupDaoJdbcTest {
         row.setGroup(group);
         row.setDateTime(dateTime);
         List<TabletimeRow> rows = Collections.singletonList(row);
-        groupDao.saveTabletime(rows);
+        groupDao.addTabletimeRows(rows);
         List<TabletimeRow> expected = rows;
 
         LocalDateTime begin = LocalDateTime.of(2021, 10, 11, 0, 0, 0);
@@ -166,6 +169,19 @@ class GroupDaoJdbcTest {
         assertEquals(expected, actual);
     }
 
+    @Test
+    void shouldDidntFindCourseWhenGetCoursesForGroupAfterRemove() {
+        Course course = saveAndGetCourse("Phisycs");
+        Group group = saveAndGetGroup("RR-25");
+        group.setCourses(Collections.singletonList(course));
+        groupDao.addToCourses(group);
+        groupDao.deleteFromCourse(group, course);
+
+        List<Course> courses = groupDao.getCourses(group);
+
+        assertThat(courses, not(hasItem(course)));
+    }
+
     private List<TabletimeRow> saveAndGetTabletimeRow(LocalDateTime dateTime, Course course, Group group,
             Teacher teacher) {
         TabletimeRow row = new TabletimeRow();
@@ -174,7 +190,7 @@ class GroupDaoJdbcTest {
         row.setGroup(group);
         row.setDateTime(dateTime);
         List<TabletimeRow> rows = Collections.singletonList(row);
-        groupDao.saveTabletime(rows);
+        groupDao.addTabletimeRows(rows);
         return rows;
     }
 

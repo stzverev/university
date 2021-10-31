@@ -11,9 +11,11 @@ public interface TeacherDao extends PersonDao<Teacher> {
 
     List<Course> getCourses(Teacher teacher);
 
-    void saveCourses(Teacher teacher);
+    void addToCourses(Teacher teacher);
 
-    void saveTabletime(List<TabletimeRow> rows);
+    void removeCourse(Teacher teacher, Course course);
+
+    void addTabletimeRows(List<TabletimeRow> rows);
 
     void updateTabletime(List<TabletimeRow> rows);
 

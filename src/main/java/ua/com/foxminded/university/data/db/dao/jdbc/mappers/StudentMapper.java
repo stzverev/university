@@ -13,7 +13,7 @@ import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.Student;
 
 @Component
-public class StudentMapper implements GenericMapper<Student> {
+public class StudentMapper implements BilateralMapper<Student> {
 
     private RowMapper<Group> groupMapper;
 

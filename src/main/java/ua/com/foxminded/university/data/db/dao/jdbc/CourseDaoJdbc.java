@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -20,78 +20,65 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
 import org.springframework.stereotype.Repository;
 
 import ua.com.foxminded.university.data.db.dao.CourseDao;
-import ua.com.foxminded.university.data.db.dao.jdbc.mappers.GenericMapper;
+import ua.com.foxminded.university.data.db.dao.jdbc.mappers.BilateralMapper;
 import ua.com.foxminded.university.data.model.Course;
+import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.TabletimeRow;
+import ua.com.foxminded.university.data.model.Teacher;
+import ua.com.foxminded.university.data.service.PropertyReader;
 
 @Repository
 public class CourseDaoJdbc implements CourseDao {
 
-    private static String COURSES_INSERT;
-    private static String COURSES_SELECT;
-    private static String COURSES_SELECT_BY_ID;
-    private static String COURSES_SELECT_BY_NAME;
-    private static String COURSES_UPDATE;
-    private static String TABLETIME_INSERT;
-    private static String TABLETIME_SELECT_BY_COURSE;
-    private static String TABLETIME_UPDATE;
+    private static final String COURSES_INSERT = "courses.insert";
+    private static final String COURSES_SELECT = "courses.select";
+    private static final String COURSES_SELECT_BY_ID = "courses.select.byId";
+    private static final String COURSES_SELECT_BY_NAME =
+            "courses.select.byName";
+    private static final String COURSES_UPDATE = "courses.update";
+    private static final String TABLETIME_INSERT = "tabletime.insert";
+    private static final String TABLETIME_SELECT_BY_PERIOD_AND_COURSEID =
+            "tabletime.select.byPeriodAndCourseId";
+    private static final String TABLETIME_UPDATE_BY_COURSEID =
+            "tabletime.update.byCourseId";
+    private static final String TEACHERS_COURSES_SELECT_BY_COURSE_ID =
+            "teachers_courses.select.byCourseId";
+    private static final String GROUPS_COURSES_SELECT_BY_COURSE_ID =
+            "groups_courses.select.byCourseId";
 
     private RowMapper<Course> courseMapper;
-    private GenericMapper<TabletimeRow> tabletimeRowMapper;
+    private RowMapper<Teacher> teacherMapper;
+    private RowMapper<Group> groupMapper;
+    private BilateralMapper<TabletimeRow> tabletimeRowMapper;
     private NamedParameterJdbcTemplate jdbcTemplate;
+    private PropertyReader queryReader;
 
-    @Value("${courses.insert}")
-    public void setCoursesInsert(String coursesInsert) {
-        CourseDaoJdbc.COURSES_INSERT = coursesInsert;
-    }
-
-    @Value("${courses.select}")
-    public void setCoursesSelect(String coursesSelect) {
-        CourseDaoJdbc.COURSES_SELECT = coursesSelect;
-    }
-
-    @Value("${courses.select} WHERE id = :id")
-    public void setCoursesGetById(String coursesGetById) {
-        CourseDaoJdbc.COURSES_SELECT_BY_ID = coursesGetById;
-    }
-
-    @Value("${courses.select} WHERE name = :name")
-    public void setCoursesGetByName(String coursesGetByName) {
-        CourseDaoJdbc.COURSES_SELECT_BY_NAME = coursesGetByName;
-    }
-
-    @Value("${courses.update}")
-    public void setCoursesUpdate(String coursesUpdate) {
-        CourseDaoJdbc.COURSES_UPDATE = coursesUpdate;
-    }
-
-    @Value("${tabletime.insert}")
-    public void setTabletimeInsert(String tabletimeInsert) {
-        CourseDaoJdbc.TABLETIME_INSERT = tabletimeInsert;
+    @Autowired
+    @Qualifier("queryReader")
+    public void setQueryReader(PropertyReader queryReader) {
+        this.queryReader = queryReader;
     }
 
     @Autowired
     public void setTabletimeRowMapper(
-            GenericMapper<TabletimeRow> tabletimeRowMapper) {
+            BilateralMapper<TabletimeRow> tabletimeRowMapper) {
         this.tabletimeRowMapper = tabletimeRowMapper;
     }
 
-    @Value(""
-            + "${tabletime.select} WHERE"
-            + " tabletime.date_time BETWEEN :begin AND :end"
-            + " AND tabletime.course_id = :courseId")
-    public void setGetTabletimeForCourse(String getTabletimeForCourse) {
-        CourseDaoJdbc.TABLETIME_SELECT_BY_COURSE = getTabletimeForCourse;
-    }
-
-    @Value("${tabletime.update} WHERE course_id = :courseId")
-    public void setTabletimeUpdate(String tabletimeUpdate) {
-        TABLETIME_UPDATE = tabletimeUpdate;
+    @Autowired
+    public void setTeacherMapper(
+            RowMapper<Teacher> teacherMapper) {
+        this.teacherMapper = teacherMapper;
     }
 
     @Autowired
     public void setCourseMapper(RowMapper<Course> courseMapper) {
         this.courseMapper = courseMapper;
+    }
+
+    @Autowired
+    public void setGroupMapper(RowMapper<Group> groupMapper) {
+        this.groupMapper = groupMapper;
     }
 
     @Autowired
@@ -104,7 +91,8 @@ public class CourseDaoJdbc implements CourseDao {
     public Course getById(long id) {
         SqlParameterSource nameParameters = new MapSqlParameterSource("id", id);
         return this.jdbcTemplate.queryForObject(
-                COURSES_SELECT_BY_ID, nameParameters, courseMapper::mapRow);
+                queryReader.getProperty(COURSES_SELECT_BY_ID),
+                nameParameters, courseMapper::mapRow);
     }
 
     @Override
@@ -112,12 +100,14 @@ public class CourseDaoJdbc implements CourseDao {
         SqlParameterSource nameParameters = new MapSqlParameterSource(
                 "name", name);
         return this.jdbcTemplate.queryForObject(
-                COURSES_SELECT_BY_NAME, nameParameters, courseMapper::mapRow);
+                queryReader.getProperty(COURSES_SELECT_BY_NAME),
+                nameParameters, courseMapper::mapRow);
     }
 
     @Override
     public List<Course> getAll() {
-        return this.jdbcTemplate.query(COURSES_SELECT,
+        return this.jdbcTemplate.query(
+                queryReader.getProperty(COURSES_SELECT),
                 courseMapper::mapRow);
     }
 
@@ -125,21 +115,27 @@ public class CourseDaoJdbc implements CourseDao {
     public void save(Course course) {
         SqlParameterSource namedParameters = new BeanPropertySqlParameterSource(
                 course);
-        this.jdbcTemplate.update(COURSES_INSERT, namedParameters);
+        this.jdbcTemplate.update(
+                queryReader.getProperty(COURSES_INSERT),
+                namedParameters);
     }
 
     @Override
     public void save(List<Course> courses) {
         SqlParameterSource[] batch = SqlParameterSourceUtils
                 .createBatch(courses);
-        this.jdbcTemplate.batchUpdate(COURSES_INSERT, batch);
+        this.jdbcTemplate.batchUpdate(
+                queryReader.getProperty(COURSES_INSERT),
+                batch);
     }
 
     @Override
     public void update(Course course) {
         SqlParameterSource namedParameters = new BeanPropertySqlParameterSource(
                 course);
-        this.jdbcTemplate.update(COURSES_UPDATE, namedParameters);
+        this.jdbcTemplate.update(
+                queryReader.getProperty(COURSES_UPDATE),
+                namedParameters);
     }
 
     @Override
@@ -149,7 +145,9 @@ public class CourseDaoJdbc implements CourseDao {
                 .map(tabletimeRowMapper::mapToSave)
                 .collect(Collectors.toList());
         SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(rows);
-        jdbcTemplate.batchUpdate(TABLETIME_INSERT, batch);
+        jdbcTemplate.batchUpdate(
+                queryReader.getProperty(TABLETIME_INSERT),
+                batch);
     }
 
     @Override
@@ -160,7 +158,9 @@ public class CourseDaoJdbc implements CourseDao {
         parameters.put("end", Timestamp.valueOf(end));
         parameters.put("courseId", course.getId());
         return jdbcTemplate.query(
-                TABLETIME_SELECT_BY_COURSE, parameters,
+                queryReader.getProperty(
+                        TABLETIME_SELECT_BY_PERIOD_AND_COURSEID),
+                parameters,
                 tabletimeRowMapper::mapRow);
     }
 
@@ -171,7 +171,27 @@ public class CourseDaoJdbc implements CourseDao {
                 .map(tabletimeRowMapper::mapToUpdate)
                 .collect(Collectors.toList());
         SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(rows);
-        jdbcTemplate.batchUpdate(TABLETIME_UPDATE, batch);
+        jdbcTemplate.batchUpdate(
+                queryReader.getProperty(TABLETIME_UPDATE_BY_COURSEID),
+                batch);
+    }
+
+    @Override
+    public List<Teacher> getTeachers(Course course) {
+        MapSqlParameterSource parameters = new MapSqlParameterSource(
+                "id", course.getId());
+        return jdbcTemplate.query(
+                queryReader.getProperty(TEACHERS_COURSES_SELECT_BY_COURSE_ID),
+                parameters, teacherMapper);
+    }
+
+    @Override
+    public List<Group> getGroups(Course course) {
+        MapSqlParameterSource parameters = new MapSqlParameterSource(
+                "id", course.getId());
+        return jdbcTemplate.query(
+                queryReader.getProperty(GROUPS_COURSES_SELECT_BY_COURSE_ID),
+                parameters, groupMapper);
     }
 
 }

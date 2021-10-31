@@ -1,5 +1,8 @@
 package ua.com.foxminded.university.data.db.dao.jdbc;
 
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.LocalDateTime;
@@ -115,7 +118,7 @@ class TeacherDaoJdbcTest {
         courses.add(courseMath);
         courses.add(courseHistory);
         teacher.setCourses(courses);
-        teacherDao.saveCourses(teacher);
+        teacherDao.addToCourses(teacher);
         List<Course> expected = courses;
 
         List<Course> actual = teacherDao.getCourses(teacher);
@@ -135,7 +138,7 @@ class TeacherDaoJdbcTest {
         row.setGroup(group);
         row.setDateTime(dateTime);
         List<TabletimeRow> rows = Collections.singletonList(row);
-        teacherDao.saveTabletime(rows);
+        teacherDao.addTabletimeRows(rows);
         List<TabletimeRow> expected = rows;
 
         LocalDateTime begin = LocalDateTime.of(2021, 10, 11, 0, 0, 0);
@@ -168,6 +171,18 @@ class TeacherDaoJdbcTest {
         assertEquals(expected, actual);
     }
 
+    @Test
+    void shouldDidntFindCourseWhenTryGetCoursesForTeacherAfterRemove() {
+        Teacher teacher = saveAndGetTeacher("Sheldon", "Cooper");
+        Course course = saveAndGetCourse("Physics");
+        teacher.setCourses(Collections.singletonList(course));
+        teacherDao.addToCourses(teacher);
+        teacherDao.removeCourse(teacher, course);
+        List<Course> teacherCourses = teacherDao.getCourses(teacher);
+
+        assertThat(teacherCourses, not(hasItem(course)));
+    }
+
     private List<TabletimeRow> saveAndGetTabletimeRow(LocalDateTime dateTime, Course course, Group group,
             Teacher teacher) {
         TabletimeRow row = new TabletimeRow();
@@ -176,7 +191,7 @@ class TeacherDaoJdbcTest {
         row.setGroup(group);
         row.setDateTime(dateTime);
         List<TabletimeRow> rows = Collections.singletonList(row);
-        teacherDao.saveTabletime(rows);
+        teacherDao.addTabletimeRows(rows);
         return rows;
     }
 

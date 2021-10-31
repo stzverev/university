@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -20,75 +20,45 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
 import org.springframework.stereotype.Repository;
 
 import ua.com.foxminded.university.data.db.dao.GroupDao;
-import ua.com.foxminded.university.data.db.dao.jdbc.mappers.GenericMapper;
+import ua.com.foxminded.university.data.db.dao.jdbc.mappers.BilateralMapper;
+import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.Student;
 import ua.com.foxminded.university.data.model.TabletimeRow;
+import ua.com.foxminded.university.data.service.PropertyReader;
 
 @Repository
 public class GroupDaoJdbc implements GroupDao {
 
-    private static String GROUPS_SELECT;
-    private static String GROUPS_INSERT;
-    private static String GROUPS_SELECT_BY_ID;
-    private static String GROUPS_SELECT_BY_NAME;
-    private static String STUDENTS_SELECT_BY_GROUPID;
-    private static String GROUPS_UPDATE;
-    private static String TABLETIME_INSERT;
-    private static String TABLETIME_FOR_GROUP;
-    private static String TABLETIME_UPDATE;
+    private static final String GROUPS_SELECT = "groups.select";
+    private static final String GROUPS_INSERT = "groups.insert";
+    private static final String GROUPS_SELECT_BY_ID = "groups.select.byId";
+    private static final String GROUPS_SELECT_BY_NAME = "groups.select.byName";
+    private static final String STUDENTS_SELECT_BY_GROUPID =
+            "students.select.byGroupId";
+    private static final String GROUPS_UPDATE = "groups.update";
+    private static final String TABLETIME_INSERT = "tabletime.insert";
+    private static final String TABLETIME_SELECT_BY_PERIOD_AND_GROUPID =
+            "tabletime.select.byPeriodAndGroupId";
+    private static final String TABLETIME_UPDATE_BY_GROUPID =
+            "tabletime.update.byGroupId";
+    private static final String GROUPS_COURSES_SELECT_BY_GROUPID =
+            "groups_courses.select.byGroupId";
+    private static final String GROUPS_COURSES_INSERT = "groups_courses.insert";
+    private static final String GROUPS_COURSES_DELETE =
+            "groups_courses.delete.byGroupIdAndCourseId";
 
     private RowMapper<Group> groupMapper;
     private RowMapper<Student> studentMapper;
-    private GenericMapper<TabletimeRow> tabletimeRowMapper;
+    private RowMapper<Course> courseMapper;
+    private BilateralMapper<TabletimeRow> tabletimeRowMapper;
     private NamedParameterJdbcTemplate jdbcTemplate;
+    private PropertyReader queryReader;
 
-    @Value("${groups.select}")
-    public void setGroupsSelect(String groupsSelect) {
-        GroupDaoJdbc.GROUPS_SELECT = groupsSelect;
-    }
-
-    @Value("${groups.insert}")
-    public void setGroupsInsert(String groupsInsert) {
-        GroupDaoJdbc.GROUPS_INSERT = groupsInsert;
-    }
-
-    @Value("${groups.select}  WHERE groups.id = :id")
-    public void setGroupsGetById(String groupsGetById) {
-        GroupDaoJdbc.GROUPS_SELECT_BY_ID = groupsGetById;
-    }
-
-    @Value("${groups.select}  WHERE groups.name = :name")
-    public void setGroupsGetByName(String groupsGetByName) {
-        GroupDaoJdbc.GROUPS_SELECT_BY_NAME = groupsGetByName;
-    }
-
-    @Value("${students.select} WHERE groups.id = :groupId")
-    public void setStudentsGetByGroupId(String studentsGetByGroupId) {
-        GroupDaoJdbc.STUDENTS_SELECT_BY_GROUPID = studentsGetByGroupId;
-    }
-
-    @Value("${groups.update}")
-    public void setGroupsUpdate(String groupsUpdate) {
-        GroupDaoJdbc.GROUPS_UPDATE = groupsUpdate;
-    }
-
-    @Value("${tabletime.insert}")
-    public void setTabletimeInsert(String tabletimeInsert) {
-        GroupDaoJdbc.TABLETIME_INSERT = tabletimeInsert;
-    }
-
-    @Value(""
-            + "${tabletime.select} WHERE"
-            + " tabletime.date_time BETWEEN :begin AND :end"
-            + " AND tabletime.group_id = :groupId")
-    public void setGetTabletimeForGroup(String getTabletimeForGroup) {
-        GroupDaoJdbc.TABLETIME_FOR_GROUP = getTabletimeForGroup;
-    }
-
-    @Value("${tabletime.update} WHERE group_id = :groupId")
-    public void setTabletimeUpdate(String tabletimeUpdate) {
-        GroupDaoJdbc.TABLETIME_UPDATE = tabletimeUpdate;
+    @Autowired
+    @Qualifier("queryReader")
+    public void setPropertyReader(PropertyReader queryReader) {
+        this.queryReader = queryReader;
     }
 
     @Autowired
@@ -103,8 +73,13 @@ public class GroupDaoJdbc implements GroupDao {
 
     @Autowired
     public void setTabletimeRowMapper(
-            GenericMapper<TabletimeRow> tabletimeRowMapper) {
+            BilateralMapper<TabletimeRow> tabletimeRowMapper) {
         this.tabletimeRowMapper = tabletimeRowMapper;
+    }
+
+    @Autowired
+    public void setCourseMapper(RowMapper<Course> courseMapper) {
+        this.courseMapper = courseMapper;
     }
 
     @Autowired
@@ -117,7 +92,8 @@ public class GroupDaoJdbc implements GroupDao {
     public Group getById(long id) {
         SqlParameterSource nameParameters = new MapSqlParameterSource("id", id);
         return this.jdbcTemplate.queryForObject(
-                GROUPS_SELECT_BY_ID, nameParameters, groupMapper::mapRow);
+                queryReader.getProperty(GROUPS_SELECT_BY_ID),
+                nameParameters, groupMapper::mapRow);
     }
 
     @Override
@@ -125,12 +101,14 @@ public class GroupDaoJdbc implements GroupDao {
         SqlParameterSource nameParameters = new MapSqlParameterSource(
                 "name", name);
         return this.jdbcTemplate.queryForObject(
-                GROUPS_SELECT_BY_NAME, nameParameters, groupMapper::mapRow);
+                queryReader.getProperty(GROUPS_SELECT_BY_NAME),
+                nameParameters, groupMapper::mapRow);
     }
 
     @Override
     public List<Group> getAll() {
-        return this.jdbcTemplate.query(GROUPS_SELECT,
+        return this.jdbcTemplate.query(
+                queryReader.getProperty(GROUPS_SELECT),
                 groupMapper::mapRow);
     }
 
@@ -138,29 +116,37 @@ public class GroupDaoJdbc implements GroupDao {
     public void save(Group group) {
         SqlParameterSource namedParameters = new BeanPropertySqlParameterSource(
                 group);
-        this.jdbcTemplate.update(GROUPS_INSERT, namedParameters);
+        this.jdbcTemplate.update(
+                queryReader.getProperty(GROUPS_INSERT),
+                namedParameters);
     }
 
     @Override
     public void save(List<Group> groups) {
         SqlParameterSource[] batch = SqlParameterSourceUtils
                 .createBatch(groups);
-        this.jdbcTemplate.batchUpdate(GROUPS_INSERT, batch);
+        this.jdbcTemplate.batchUpdate(
+                queryReader.getProperty(GROUPS_INSERT),
+                batch);
     }
 
     @Override
     public List<Student> getStudents(Group group) {
         SqlParameterSource nameParameters = new MapSqlParameterSource(
                 "groupId", group.getId());
-        return jdbcTemplate.query(STUDENTS_SELECT_BY_GROUPID,
-                nameParameters, studentMapper::mapRow);
+        return jdbcTemplate.query(
+                queryReader.getProperty(STUDENTS_SELECT_BY_GROUPID),
+                nameParameters,
+                studentMapper::mapRow);
     }
 
     @Override
     public void update(Group group) {
         SqlParameterSource namedParameters = new BeanPropertySqlParameterSource(
                 group);
-        this.jdbcTemplate.update(GROUPS_UPDATE, namedParameters);
+        this.jdbcTemplate.update(
+                queryReader.getProperty(GROUPS_UPDATE),
+                namedParameters);
     }
 
     @Override
@@ -171,19 +157,22 @@ public class GroupDaoJdbc implements GroupDao {
         parameters.put("end", Timestamp.valueOf(end));
         parameters.put("groupId", group.getId());
         return jdbcTemplate.query(
-                TABLETIME_FOR_GROUP, parameters,
+                queryReader.getProperty(TABLETIME_SELECT_BY_PERIOD_AND_GROUPID),
+                parameters,
                 tabletimeRowMapper::mapRow);
     }
 
     @Override
-    public void saveTabletime(List<TabletimeRow> rows) {
+    public void addTabletimeRows(List<TabletimeRow> rows) {
         List<Map<String, Object>> mapRows = rows
                 .stream()
                 .map(tabletimeRowMapper::mapToSave)
                 .collect(Collectors.toList());
         SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(
                 mapRows);
-        jdbcTemplate.batchUpdate(TABLETIME_INSERT, batch);
+        jdbcTemplate.batchUpdate(
+                queryReader.getProperty(TABLETIME_INSERT),
+                batch);
 
     }
 
@@ -195,7 +184,46 @@ public class GroupDaoJdbc implements GroupDao {
                 .collect(Collectors.toList());
         SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(
                 mapRows);
-        jdbcTemplate.batchUpdate(TABLETIME_UPDATE, batch);
+        jdbcTemplate.batchUpdate(
+                queryReader.getProperty(TABLETIME_UPDATE_BY_GROUPID),
+                batch);
+    }
+
+    @Override
+    public List<Course> getCourses(Group group) {
+        MapSqlParameterSource parameters = new MapSqlParameterSource(
+                "id", group.getId());
+        return jdbcTemplate.query(
+                queryReader.getProperty(GROUPS_COURSES_SELECT_BY_GROUPID),
+                parameters, courseMapper);
+    }
+
+    @Override
+    public void addToCourses(Group group) {
+        List<Map<String, Long>> parameters = group.getCourses()
+                .stream()
+                .map(it -> {
+                    Map<String, Long> map = new HashMap<>();
+                    map.put("groupId", group.getId());
+                    map.put("courseId", it.getId());
+                    return map;
+                })
+                .collect(Collectors.toList());
+        SqlParameterSource[] batch = SqlParameterSourceUtils
+                .createBatch(parameters);
+        jdbcTemplate.batchUpdate(
+                queryReader.getProperty(GROUPS_COURSES_INSERT),
+                batch);
+    }
+
+    @Override
+    public void deleteFromCourse(Group group, Course course) {
+        Map<String, Long> parameters = new HashMap<>();
+        parameters.put("groupId", group.getId());
+        parameters.put("courseId", course.getId());
+        jdbcTemplate.update(
+                queryReader.getProperty(GROUPS_COURSES_DELETE),
+                parameters);
     }
 
 }
