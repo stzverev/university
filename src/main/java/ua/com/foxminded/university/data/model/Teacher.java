@@ -18,10 +18,4 @@ public class Teacher extends Person {
         this.courses = courses;
     }
 
-    @Override
-    public String toString() {
-        return "Teacher [toString()="
-                + super.toString() + ", courses=" + courses + "]";
-    }
-
 }

@@ -23,8 +23,8 @@ public abstract class Person extends AbstractEntity {
 
     @Override
     public String toString() {
-        return "Person [firstName="
-                + firstName + ", lastName=" + lastName + "]";
+        return "Person [firstName=" + firstName + ", lastName=" + lastName
+                + ", id=" + getId() + "]";
     }
 
     @Override

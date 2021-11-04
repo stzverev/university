@@ -29,7 +29,7 @@ public class Group extends AbstractEntity {
 
     @Override
     public String toString() {
-        return "Group [name=" + name + "]";
+        return "Group [name=" + name + ", id=" + getId() + "]";
     }
 
     @Override
