@@ -75,6 +75,7 @@ class GroupServiceImplTest {
     @Test
     void shouldAddCoursesWhenAddCourses() {
         Group group = new Group();
+        group.setCourses(new ArrayList<Course>());
         groupService.addToCourses(group);
         verify(groupDao).addToCourses(group);
     }
