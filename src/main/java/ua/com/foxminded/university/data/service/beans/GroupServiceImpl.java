@@ -2,7 +2,6 @@ package ua.com.foxminded.university.data.service.beans;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,8 +18,7 @@ import ua.com.foxminded.university.data.service.GroupService;
 public class GroupServiceImpl implements GroupService {
 
     private GroupDao groupDao;
-    private final Logger logger = LoggerFactory.getLogger(
-            GroupServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(GroupServiceImpl.class);
 
     @Autowired
     public GroupServiceImpl(GroupDao groupDao) {
@@ -41,18 +39,14 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public void save(List<Group> groups) {
-        String groupsDescription = groups
-                .stream()
-                .map(Group::toString)
-                .collect(Collectors.joining("; " + System.lineSeparator()));
-        logger.debug("The saving of list groups: {}", groupsDescription );
+        logger.debug("The saving of list groups: list length{}", groups.size());
         try {
             groupDao.save(groups);
         } catch (Exception e) {
             logger.error(""
                     + "Error when saving the list of groups:%n"
-                    + "groups: {}%n"
-                    + "error: {}", groupsDescription, e.getMessage());
+                    + "groups count: {}%n"
+                    + "error: {}", groups.size(), e.getMessage());
         }
     }
 
@@ -70,20 +64,16 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public void addToCourses(Group group) {
-        String coursesName = group.getCourses()
-                .stream()
-                .map(Course::toString)
-                .collect(Collectors.joining(", "));
-        logger.debug("The adding of group {} to the courses {} has started",
-                group, coursesName);
+        logger.debug("The adding of group {} to the {} courses has started",
+                group, group.getCourses().size());
         try {
             groupDao.addToCourses(group);
         } catch (Exception e) {
             logger.error(""
                     + "Error when adding courses to group:%n"
                     + "group: {}%n"
-                    + "courses: {}",
-                    group.getName(), coursesName);
+                    + "courses count: {}",
+                    group.getName(), group.getCourses().size());
         }
     }
 
@@ -113,18 +103,14 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public void addTabletimeRows(List<TabletimeRow> tabletimeRows) {
-        String tabletimeRowsDescription = tabletimeRows
-                .stream()
-                .map(TabletimeRow::toString)
-                .collect(Collectors.joining("; " + System.lineSeparator()));
-        logger.debug("The adding of tabletime rows has started:%n{}",
-                tabletimeRowsDescription);
+        logger.debug("The adding of tabletime rows has started:%n rows count - {}",
+                tabletimeRows.size());
         try {
             groupDao.addTabletimeRows(tabletimeRows);
         } catch (Exception e) {
             logger.error(""
-                     + "Error when adding tabletime rows: {};%n error: {}",
-                     tabletimeRowsDescription, e.getMessage());
+                     + "Error when adding tabletime rows: rows count - {};%n error: {}",
+                     tabletimeRows.size(), e.getMessage());
         }
     }
 

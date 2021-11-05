@@ -1,7 +1,6 @@
 package ua.com.foxminded.university.data.service.beans;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,8 +15,7 @@ import ua.com.foxminded.university.data.service.StudentService;
 public class StudentServiceImpl implements StudentService {
 
     private StudentDao studentDao;
-    private final Logger logger = LoggerFactory.getLogger(
-            StudentServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(StudentServiceImpl.class);
 
     @Autowired
     public StudentServiceImpl(StudentDao studentDao) {
@@ -39,18 +37,14 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public void save(List<Student> students) {
-        String studentsDescription = students
-                .stream()
-                .map(Student::toString)
-                .collect(Collectors.joining("; " + System.lineSeparator()));
-        logger.debug("The saving of list students has started:%n {}",
-                studentsDescription);
+        logger.debug("The saving of list students has started:%n students count - {}",
+                students.size());
         try {
             studentDao.save(students);
         } catch (Exception e) {
             logger.error(""
-                    + "Error when saving list students:%n students:{}%n"
-                    + "error: {}", studentsDescription, e.getMessage());
+                    + "Error when saving list students:%n students: students count - {}%n"
+                    + "error: {}", students.size(), e.getMessage());
         }
     }
 

@@ -2,7 +2,6 @@ package ua.com.foxminded.university.data.service.beans;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,8 +22,7 @@ public class CourseServiceImpl implements CourseService {
     private CourseDao courseDao;
     private TeacherDao teacherDao;
     private GroupDao groupDao;
-    private final Logger logger = LoggerFactory.getLogger(
-            CourseServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(CourseServiceImpl.class);
 
     @Autowired
     public CourseServiceImpl(CourseDao courseDao,
@@ -48,12 +46,8 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void save(List<Course> courses) {
-        String coursesDescription = courses
-                .stream()
-                .map(Course::toString)
-                .collect(Collectors.joining("; " + System.lineSeparator()));
-        logger.debug("The saving of list courses has started: {}",
-                coursesDescription );
+        logger.debug("The saving of list courses has started: list length - {}",
+                courses.size());
         courseDao.save(courses);
     }
 

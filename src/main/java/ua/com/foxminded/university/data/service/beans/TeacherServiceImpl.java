@@ -2,7 +2,6 @@ package ua.com.foxminded.university.data.service.beans;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,8 +18,7 @@ import ua.com.foxminded.university.data.service.TeacherService;
 public class TeacherServiceImpl implements TeacherService {
 
     private TeacherDao teacherDao;
-    private final Logger logger = LoggerFactory.getLogger(
-            TeacherServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(TeacherServiceImpl.class);
 
     @Autowired
     public TeacherServiceImpl(TeacherDao teacherDao) {
@@ -42,18 +40,14 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     public void save(List<Teacher> teachers) {
-        String teachersDescription = teachers
-                .stream()
-                .map(Teacher::toString)
-                .collect(Collectors.joining("; " + System.lineSeparator()));
-        logger.debug("The saving of list teachers has started:%n {}",
-                teachersDescription);
+        logger.debug("The saving of list teachers has started:%n teachers count - {}",
+                teachers.size());
         try {
             teacherDao.save(teachers);
         } catch (Exception e) {
             logger.error(""
-                    + "Error when saving list teachers:%n students:{}%n"
-                    + "error: {}", teachersDescription, e.getMessage());
+                    + "Error when saving list teachers:%n teachers count - {}%n"
+                    + "error: {}", teachers.size(), e.getMessage());
         }
     }
 
@@ -71,22 +65,18 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     public void addCourses(Teacher teacher) {
-        String coursesDescription = teacher.getCourses()
-                .stream()
-                .map(Course::toString)
-                .collect(Collectors.joining("; " + System.lineSeparator()));
         logger.debug(""
                 + "The adding of courses to the teacher has started:%n"
                 + "teacher: {}%n"
-                + "courses: {}", teacher, coursesDescription);
+                + "courses count: {}", teacher, teacher.getCourses().size());
         try {
             teacherDao.addToCourses(teacher);
         } catch (Exception e) {
             logger.error(""
                     + "Error when adding the teacher to the courses:%n"
                     + "teacher: {};%n"
-                    + "courses: {};%n"
-                    + "error: {}", teacher, coursesDescription, e.getMessage());
+                    + "courses count: {};%n"
+                    + "error: {}", teacher, teacher.getCourses().size(), e.getMessage());
         }
     }
 
@@ -119,18 +109,14 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     public void addTabletimeRows(List<TabletimeRow> tabletimeRows) {
-        String tabletimeRowsDescription = tabletimeRows
-                .stream()
-                .map(TabletimeRow::toString)
-                .collect(Collectors.joining("; " + System.lineSeparator()));
-        logger.debug("The adding of tabletime rows has started:%n{}",
-                tabletimeRowsDescription);
+        logger.debug("The adding of tabletime rows has started:%n rows count - {}",
+                tabletimeRows.size());
         try {
             teacherDao.addTabletimeRows(tabletimeRows);
         } catch (Exception e) {
             logger.error(""
-                    + "Error when adding tabletime rows: {};%n error: {}",
-                    tabletimeRowsDescription, e.getMessage());
+                    + "Error when adding tabletime rows: rows count - {};%n error: {}",
+                    tabletimeRows.size(), e.getMessage());
         }
     }
 
