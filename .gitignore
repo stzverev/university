@@ -7,3 +7,5 @@
 /target/
 /.checkstyle
 *.drawio
+*.log
+/LOG_FILE_IS_UNDEFINED.2021-11-03.gz
