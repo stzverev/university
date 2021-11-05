@@ -75,7 +75,8 @@ class TeacherServiceImplTest {
     @Test
     void shouldAddCoursesWhenAddCourses() {
         Teacher teacher = new Teacher();
-        teacherService.addCourses(teacher );
+        teacher.setCourses(new ArrayList<Course>());
+        teacherService.addCourses(teacher);
         verify(teacherDao).addToCourses(teacher);
     }
 

@@ -43,15 +43,8 @@ public class TabletimeRow {
 
     @Override
     public String toString() {
-        return "TabletimeRow [dateTime="
-                + dateTime
-                + ", group="
-                + group
-                + ", course="
-                + course
-                + ", teacher="
-                + teacher
-                + "]";
+        return "TabletimeRow [dateTime=" + dateTime + ", group=" + group
+                + ", course=" + course + ", teacher=" + teacher + "]";
     }
 
     @Override

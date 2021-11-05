@@ -37,6 +37,11 @@ public class Course extends AbstractEntity {
     }
 
     @Override
+    public String toString() {
+        return "Course [name=" + name + ", id=" + getId() + "]";
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
