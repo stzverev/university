@@ -33,7 +33,7 @@ public class TeacherServiceImpl implements TeacherService {
             teacherDao.save(teacher);
         } catch (Exception e) {
             logger.error(""
-                    + "Error when saving the teacher:%n teacher: {};%n"
+                    + "Error when saving the teacher: teacher: {}; "
                     + "error: {}", teacher, e.getMessage());
         }
     }
@@ -118,6 +118,11 @@ public class TeacherServiceImpl implements TeacherService {
                     + "Error when adding tabletime rows: rows count - {};%n error: {}",
                     tabletimeRows.size(), e.getMessage());
         }
+    }
+
+    @Override
+    public void update(Teacher teacher) {
+        teacherDao.update(teacher);
     }
 
 }

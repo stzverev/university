@@ -52,6 +52,11 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
+    public void update(Course course) {
+        courseDao.update(course);
+    }
+
+    @Override
     public List<Course> getAll() {
         logger.debug("The getting of all courses has started");
         return courseDao.getAll();

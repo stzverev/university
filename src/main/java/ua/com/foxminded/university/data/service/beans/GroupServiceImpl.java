@@ -114,4 +114,9 @@ public class GroupServiceImpl implements GroupService {
         }
     }
 
+    @Override
+    public void update(Group group) {
+        groupDao.update(group);
+    }
+
 }

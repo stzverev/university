@@ -30,20 +30,20 @@ public class StudentServiceImpl implements StudentService {
             studentDao.save(student);
         } catch (Exception e) {
             logger.error(""
-                    + "Error when saving the student:%n student: {};%n"
+                    + "Error when saving the student:  student: {}; "
                     + "error: {}", student, e.getMessage());
         }
     }
 
     @Override
     public void save(List<Student> students) {
-        logger.debug("The saving of list students has started:%n students count - {}",
+        logger.debug("The saving of list students has started:  students count - {}",
                 students.size());
         try {
             studentDao.save(students);
         } catch (Exception e) {
             logger.error(""
-                    + "Error when saving list students:%n students: students count - {}%n"
+                    + "Error when saving list students:  students: students count - {} "
                     + "error: {}", students.size(), e.getMessage());
         }
     }
@@ -56,17 +56,22 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public Student getById(long id) {
-        logger.debug("The getting of student by id has started:%n id: {}", id);
+        logger.debug("The getting of student by id has started:  id: {}", id);
         return studentDao.getById(id);
     }
 
     @Override
     public Student getByFullName(String firstName, String lastName) {
         logger.debug(""
-                + "The getting of student by full name has started:%n"
-                + "first name: {};%n"
+                + "The getting of student by full name has started: "
+                + "first name: {}; "
                 + "last name: {}", firstName, lastName);
         return studentDao.getByFullName(firstName, lastName);
+    }
+
+    @Override
+    public void update(Student student) {
+        studentDao.update(student);
     }
 
 }
