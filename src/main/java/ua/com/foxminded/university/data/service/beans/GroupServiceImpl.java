@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import ua.com.foxminded.university.data.db.dao.GroupDao;
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
+import ua.com.foxminded.university.data.model.Student;
 import ua.com.foxminded.university.data.model.TabletimeRow;
 import ua.com.foxminded.university.data.service.GroupService;
 
@@ -117,6 +118,11 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public void update(Group group) {
         groupDao.update(group);
+    }
+
+    @Override
+    public List<Student> getStudents(Group group) {
+        return groupDao.getStudents(group);
     }
 
 }

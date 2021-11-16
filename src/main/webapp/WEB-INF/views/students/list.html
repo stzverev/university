@@ -14,25 +14,8 @@
     <div class="container">
         <div th:replace="fragments/general.html :: header"></div>
         <div class="row gy-2">
-            <a type="button" class="btn btn-primary col-12" th:href="@{/students/new}">Add</a>
-        </div>
-        <div class="row gy-2">
-            <table class="table table-striped">
-	            <tr>
-	                <th scope="col">First name</th>
-	                <th scope="col">Last name</th>
-	                <th scope="col">Group</th>
-	                <th scope="col">Actions</th>
-	            </tr>
-	            <tr th:each="student: ${students}">
-	                <td th:text="${student.firstName}"/>
-	                <td th:text="${student.lastName}"/>
-	                <td th:text="${student.group.name}">
-	                <td>
-	                   <a th:href="@{students/{id}/edit(id = ${student.getId()})}" class="btn btn-primary" role="button">Edit</a>
-	                </td>
-	            </tr>
-	        </table>
+            <a type="button" class="w-100 btn btn-primary col-12" th:href="@{/students/new}">Add</a>
+            <div th:replace="fragments/students.html :: table"></div>
         </div>
         
     </div>

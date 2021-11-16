@@ -16,6 +16,10 @@
     </div>
 	<div class="container">
 		<div th:replace="fragments/groups.html :: groupBody(${#strings.contains(#httpServletRequest.requestURI, '/edit') == false})"></div>
+		<hr class="my-4">
+		<div th:if="${#strings.contains(#httpServletRequest.requestURI, '/edit')}">
+		    <div class="row" th:insert="fragments/students.html :: table"></div>
+		</div>
 	</div>
 	<script
 		src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"

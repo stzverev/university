@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import ua.com.foxminded.university.data.model.Group;
+import ua.com.foxminded.university.data.model.Student;
 import ua.com.foxminded.university.data.service.GroupService;
 
 @Controller
@@ -45,8 +46,15 @@ public class GroupsController {
     @GetMapping("/{id}/edit")
     public String showEdit(Model model, @PathVariable("id") long id) {
         Group group = groupService.getById(id);
+        List<Student> students = groupService.getStudents(group);
         model.addAttribute("group", group);
+        model.addAttribute("students", students);
         return "groups/card";
+    }
+
+    @GetMapping("/{groupId}/students/{studentId}/edit")
+    public String showStudent(@PathVariable("studentId") long studentId) {
+        return "redirect:/students/" + studentId + "/edit";
     }
 
     @PostMapping()
