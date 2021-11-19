@@ -125,4 +125,25 @@ public class TeacherServiceImpl implements TeacherService {
         teacherDao.update(teacher);
     }
 
+    @Override
+    public List<Course> getCourses(Teacher teacher) {
+        return teacherDao.getCourses(teacher);
+    }
+
+    @Override
+    public void delete(long id) {
+        teacherDao.delete(id);
+
+    }
+
+    @Override
+    public void removeFromCourse(Teacher teacher, Course course) {
+        teacherDao.removeCourse(teacher, course);
+    }
+
+    @Override
+    public void addToCourses(Teacher teacher) {
+        teacherDao.addToCourses(teacher);
+    }
+
 }

@@ -45,6 +45,7 @@ public class CourseDaoJdbc implements CourseDao {
             "teachers_courses.select.byCourseId";
     private static final String GROUPS_COURSES_SELECT_BY_COURSE_ID =
             "groups_courses.select.byCourseId";
+    private static final String COURSES_DELETE = "courses.delete.byId";
 
     private RowMapper<Course> courseMapper;
     private RowMapper<Teacher> teacherMapper;
@@ -192,6 +193,12 @@ public class CourseDaoJdbc implements CourseDao {
         return jdbcTemplate.query(
                 queryReader.getProperty(GROUPS_COURSES_SELECT_BY_COURSE_ID),
                 parameters, groupMapper);
+    }
+
+    @Override
+    public void delete(long id) {
+        MapSqlParameterSource parameters = new MapSqlParameterSource("id", id);
+        this.jdbcTemplate.update(queryReader.getProperty(COURSES_DELETE), parameters);
     }
 
 }

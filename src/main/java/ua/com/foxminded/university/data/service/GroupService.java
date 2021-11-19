@@ -15,4 +15,6 @@ public interface GroupService extends CommonService<Group>,
 
     List<Student> getStudents(Group group);
 
+    List<Course> getCourses(Group group);
+
 }

@@ -1,6 +1,7 @@
 package ua.com.foxminded.university.data.db.dao.jdbc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import ua.com.foxminded.university.data.Config;
@@ -106,6 +108,28 @@ class StudentDaoJdbcTest {
         Student actual = studentDao.getById(expected.getId());
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenGetStudenThatWasDeleted() {
+        String firstName = "Blaize";
+        String lastName = "Pascal";
+        Group group = saveAndGetTestGroup();
+        Student student = saveAndGetStudent(firstName, lastName, group);
+        studentDao.delete(student.getId());
+
+        long studentId = student.getId();
+        Throwable throwable = assertThrows(DataAccessException.class, () -> studentDao.getById(studentId));
+        assertEquals("Incorrect result size: expected 1, actual 0", throwable.getMessage());
+    }
+
+    private Student saveAndGetStudent(String firstName, String lastName, Group group) {
+        Student student = new Student();
+        student.setFirstName(firstName);
+        student.setLastName(lastName);
+        student.setGroup(group);
+        studentDao.save(student);
+        return studentDao.getByFullName(firstName, lastName);
     }
 
     private Group saveAndGetTestGroup() {

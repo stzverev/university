@@ -4,6 +4,7 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import ua.com.foxminded.university.data.Config;
@@ -107,6 +109,20 @@ class TeacherDaoJdbcTest {
         Teacher actual = teacherDao.getById(expected.getId());
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenGetTeacherThatWasDeleted() {
+        String firstName = "Curtis";
+        String lastName = "Connors";
+        Teacher teacher = saveAndGetTeacher(firstName, lastName);
+        teacherDao.delete(teacher.getId());
+
+        long teacherId = teacher.getId();
+        Throwable throwable = assertThrows(DataAccessException.class,
+                () -> teacherDao.getById(teacherId));
+
+        assertEquals("Incorrect result size: expected 1, actual 0", throwable.getMessage());
     }
 
     @Test

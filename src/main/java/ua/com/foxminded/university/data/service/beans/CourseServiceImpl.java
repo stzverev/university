@@ -142,4 +142,9 @@ public class CourseServiceImpl implements CourseService {
         }
     }
 
+    @Override
+    public void delete(long id) {
+        courseDao.delete(id);
+    }
+
 }

@@ -10,10 +10,10 @@
 	crossorigin="anonymous">
 </head>
 <body>
-	<div th:fragment="studentBody(isNew)">
+	<div th:fragment="teacherBody(isNew)">
 		<form th:method="${isNew} ? POST : PATCH"
-			th:action="${isNew} ? @{/students} : @{/students/{id}(id=${student.getId()})}"
-			th:object="${student}">
+			th:action="${isNew} ? @{/teachers} : @{/teachers/{id}(id=${teacher.getId()})}"
+			th:object="${teacher}">
 
 			<div class="row mb-3 g-3">
 				<div class="col col-12 col-sm-6">
@@ -26,14 +26,6 @@
 						type="text" class="form-control" id="lastName"
 						th:field="*{lastName}">
 				</div>
-				<div class="col col-12 col-sm-6">
-					<label for="group" class="form-label">Group</label> <select
-						class="form-select" name="groupId" id="group">
-						<option th:each="optionGroup: ${allGroups}"
-							th:value="${optionGroup.id}" th:text="${optionGroup.name}"
-							th:selected="${!isNew && (optionGroup.getId() == student.getGroup().getId())}"></option>
-					</select>
-				</div>
 			</div>
 			<div class="row mb-3 g-3">
 				<div class="col col-auto">
@@ -45,7 +37,7 @@
 		<div class="row mb-3 g-3">
 			<div class="col col-auto" th:if="${!isNew}">
 				<form th:method="DELETE"
-					th:action="@{/students/{id}(id=${student.getId()})}">
+					th:action="@{/teachers/{id}(id=${teacher.getId()})}">
 					<button type="submit" class="btn btn-danger">Delete</button>
 				</form>
 			</div>
@@ -54,14 +46,14 @@
 	<div th:fragment="table">
 		<table class="table">
 			<tr>
-				<th scope="col">Name</th>
-				<th scope="col">Group</th>
+				<th scope="col">First name</th>
+				<th scope="col">Last name</th>
 				<th scope="col">Actions</th>
 			</tr>
-			<tr th:each="student: ${students}">
-				<td th:text="${student.firstName + ' ' + student.lastName}"/>
-				<td th:text="${student.group.name}">
-				<td><a th:href="@{/students/{id}/edit(id = ${student.getId()})}"
+			<tr th:each="teacher: ${teachers}">
+				<td th:text="${teacher.firstName}" />
+				<td th:text="${teacher.lastName}" />
+				<td><a th:href="@{teachers/{id}/edit(id = ${teacher.getId()})}"
 					class="btn btn-light" role="button">View/Edit</a></td>
 			</tr>
 		</table>

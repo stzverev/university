@@ -10,6 +10,8 @@ public interface GenericDao <T> {
 
     void update(T object);
 
+    void delete(long id);
+
     T getById(long id);
 
     List<T> getAll();

@@ -125,4 +125,14 @@ public class GroupServiceImpl implements GroupService {
         return groupDao.getStudents(group);
     }
 
+    @Override
+    public void delete(long id) {
+        groupDao.delete(id);
+    }
+
+    @Override
+    public List<Course> getCourses(Group group) {
+        return groupDao.getCourses(group);
+    }
+
 }

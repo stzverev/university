@@ -74,4 +74,10 @@ public class StudentServiceImpl implements StudentService {
         studentDao.update(student);
     }
 
+    @Override
+    public void delete(long id) {
+        studentDao.delete(id);
+
+    }
+
 }

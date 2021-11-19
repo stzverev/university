@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -24,6 +25,7 @@ public class StudentsController {
 
     private StudentService studentService;
     private GroupService groupService;
+    private static final String REDIRECT_TO_STUDENTS = "redirect:/students";
 
     @Autowired
     public void setGroupService(GroupService groupService) {
@@ -61,7 +63,7 @@ public class StudentsController {
         Group group = groupService.getById(groupId);
         student.setGroup(group);
         studentService.save(student);
-        return "redirect:/students";
+        return REDIRECT_TO_STUDENTS;
     }
 
     @PatchMapping("/{id}")
@@ -71,7 +73,13 @@ public class StudentsController {
         Group group = groupService.getById(groupId);
         student.setGroup(group);
         studentService.update(student);
-        return "redirect:/students";
+        return REDIRECT_TO_STUDENTS;
+    }
+
+    @DeleteMapping("/{id}")
+    public String delete(@PathVariable("id") long id) {
+        studentService.delete(id);
+        return REDIRECT_TO_STUDENTS;
     }
 
 }
