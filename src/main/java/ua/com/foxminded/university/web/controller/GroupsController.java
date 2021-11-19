@@ -41,10 +41,6 @@ public class GroupsController {
 
     @GetMapping()
     public String showGroups(Model model) {
-        List<Group> groups = groupService.getAll();
-        groups.stream().forEach(it ->
-            it.setCourses(groupService.getCourses(it)));
-        model.addAttribute("groups", groups);
         return "groups/list";
     }
 
@@ -57,6 +53,7 @@ public class GroupsController {
     public String showEdit(Model model, @PathVariable("id") long id) {
         Group group = groupService.getById(id);
         List<Student> students = groupService.getStudents(group);
+        group.setCourses(groupService.getCourses(group));
         model.addAttribute("group", group);
         model.addAttribute("students", students);
         return "groups/card";
