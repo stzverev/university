@@ -41,10 +41,7 @@
 					</div>
 					<hr class="my-4">
 					<h3>Students</h3>
-					<div
-						th:if="${#strings.contains(#httpServletRequest.requestURI, '/edit')}">
-						<div class="row" th:insert="fragments/students.html :: table"></div>
-					</div>
+					<div class="row" th:insert="fragments/students.html :: table"></div>
 				</div>
 
 			</div>
