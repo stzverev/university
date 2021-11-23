@@ -35,6 +35,7 @@ public class TeacherServiceImpl implements TeacherService {
             logger.error(""
                     + "Error when saving the teacher: teacher: {}; "
                     + "error: {}", teacher, e.getMessage());
+            throw e;
         }
     }
 
@@ -48,6 +49,7 @@ public class TeacherServiceImpl implements TeacherService {
             logger.error(""
                     + "Error when saving list teachers:%n teachers count - {}%n"
                     + "error: {}", teachers.size(), e.getMessage());
+            throw e;
         }
     }
 
@@ -77,6 +79,7 @@ public class TeacherServiceImpl implements TeacherService {
                     + "teacher: {};%n"
                     + "courses count: {};%n"
                     + "error: {}", teacher, teacher.getCourses().size(), e.getMessage());
+            throw e;
         }
     }
 
@@ -94,6 +97,7 @@ public class TeacherServiceImpl implements TeacherService {
                     + "teacher: {};%n"
                     + "course: {};%n"
                     + "error: {}", teacher, course, e.getMessage());
+            throw e;
         }
     }
 
@@ -117,6 +121,7 @@ public class TeacherServiceImpl implements TeacherService {
             logger.error(""
                     + "Error when adding tabletime rows: rows count - {};%n error: {}",
                     tabletimeRows.size(), e.getMessage());
+            throw e;
         }
     }
 

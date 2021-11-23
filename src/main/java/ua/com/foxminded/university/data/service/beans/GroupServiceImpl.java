@@ -35,6 +35,7 @@ public class GroupServiceImpl implements GroupService {
         } catch (Exception e) {
             logger.error("Error when saving the {}: {}",
                     group, e.getMessage());
+            throw e;
         }
     }
 
@@ -48,6 +49,7 @@ public class GroupServiceImpl implements GroupService {
                     + "Error when saving the list of groups:%n"
                     + "groups count: {}%n"
                     + "error: {}", groups.size(), e.getMessage());
+            throw e;
         }
     }
 
@@ -75,6 +77,7 @@ public class GroupServiceImpl implements GroupService {
                     + "group: {}%n"
                     + "courses count: {}",
                     group.getName(), group.getCourses().size());
+            throw e;
         }
     }
 
@@ -89,6 +92,7 @@ public class GroupServiceImpl implements GroupService {
                     + "Error when removing course from group:%n"
                     + "group: {}%n"
                     + "course: {}", group, course);
+            throw e;
         }
     }
 
@@ -112,6 +116,7 @@ public class GroupServiceImpl implements GroupService {
             logger.error(""
                      + "Error when adding tabletime rows: rows count - {};%n error: {}",
                      tabletimeRows.size(), e.getMessage());
+            throw e;
         }
     }
 

@@ -41,6 +41,7 @@ public class CourseServiceImpl implements CourseService {
         } catch (Exception e) {
             logger.error("Error when saving course:%n course: {};%n error: {}",
                     course, e.getMessage());
+            throw e;
         }
     }
 
@@ -102,6 +103,7 @@ public class CourseServiceImpl implements CourseService {
                     + "group: {};%n"
                     + "course: {}%n"
                     + "error: {}", group, course, e.getMessage());
+            throw e;
         }
     }
 
@@ -123,6 +125,7 @@ public class CourseServiceImpl implements CourseService {
                     + "course: {}%n"
                     + "teacher: {}%n"
                     + "error: {}", course, teacher, e.getMessage());
+            throw e;
         }
     }
 
@@ -139,6 +142,7 @@ public class CourseServiceImpl implements CourseService {
                     + "teacher: {}%n"
                     + "course:{}%n"
                     + "error: {}", teacher, course, e.getMessage());
+            throw e;
         }
     }
 

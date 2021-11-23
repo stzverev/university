@@ -32,6 +32,7 @@ public class StudentServiceImpl implements StudentService {
             logger.error(""
                     + "Error when saving the student:  student: {}; "
                     + "error: {}", student, e.getMessage());
+            throw e;
         }
     }
 
@@ -45,6 +46,7 @@ public class StudentServiceImpl implements StudentService {
             logger.error(""
                     + "Error when saving list students:  students: students count - {} "
                     + "error: {}", students.size(), e.getMessage());
+            throw e;
         }
     }
 
@@ -77,7 +79,6 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public void delete(long id) {
         studentDao.delete(id);
-
     }
 
 }
