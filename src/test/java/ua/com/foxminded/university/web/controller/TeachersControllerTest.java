@@ -13,31 +13,27 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import ua.com.foxminded.university.data.Config;
 import ua.com.foxminded.university.data.service.CourseService;
-import ua.com.foxminded.university.data.service.GroupService;
-import ua.com.foxminded.university.data.service.StudentService;
+import ua.com.foxminded.university.data.service.TeacherService;
 import ua.com.foxminded.university.web.config.WebConfig;
 
 @ContextConfiguration(classes = {WebConfig.class, Config.class})
-@WebMvcTest(controllers = {GroupsController.class})
-class GroupsControllerTest {
+@WebMvcTest(controllers = {TeachersController.class})
+class TeachersControllerTest {
 
     @MockBean
-    private GroupService groupService;
+    private TeacherService teacherService;
 
     @MockBean
     private CourseService courseService;
-
-    @MockBean
-    private StudentService studentService;
 
     @Autowired
     private MockMvc mockMvc;
 
     @Test
-    void shouldGetGroupsListWhenGetGroups() throws Exception {
-        mockMvc.perform(get("/groups"))
+    void shouldGetTeachersListWhenGetTeachers() throws Exception {
+        mockMvc.perform(get("/teachers"))
             .andExpect(status().isOk());
-        verify(groupService).getAll();
+        verify(teacherService).getAll();
     }
 
 }
