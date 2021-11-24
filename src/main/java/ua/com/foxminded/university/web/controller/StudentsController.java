@@ -5,16 +5,11 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.Student;
 import ua.com.foxminded.university.data.service.GroupService;
 import ua.com.foxminded.university.data.service.StudentService;
@@ -56,30 +51,6 @@ public class StudentsController {
         model.addAttribute("student", student);
         model.addAttribute("allGroups", groupService.getAll());
         return "/students/card";
-    }
-
-    @PostMapping
-    public String create(@ModelAttribute Student student, @RequestParam("groupId") long groupId) {
-        Group group = groupService.getById(groupId);
-        student.setGroup(group);
-        studentService.save(student);
-        return REDIRECT_TO_STUDENTS;
-    }
-
-    @PatchMapping("/{id}")
-    public String update(@ModelAttribute Student student, @PathVariable("id") long id,
-            @RequestParam("groupId") long groupId) {
-        student.setId(id);
-        Group group = groupService.getById(groupId);
-        student.setGroup(group);
-        studentService.update(student);
-        return REDIRECT_TO_STUDENTS;
-    }
-
-    @DeleteMapping("/{id}")
-    public String delete(@PathVariable("id") long id) {
-        studentService.delete(id);
-        return REDIRECT_TO_STUDENTS;
     }
 
 }

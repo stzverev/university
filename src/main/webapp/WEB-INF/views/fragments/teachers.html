@@ -27,21 +27,7 @@
 						th:field="*{lastName}">
 				</div>
 			</div>
-			<div class="row mb-3 g-3">
-				<div class="col col-auto">
-					<button type="submit" class="btn btn-success"
-						th:text="${isNew} ? 'Create' : 'Update'"></button>
-				</div>
-			</div>
 		</form>
-		<div class="row mb-3 g-3">
-			<div class="col col-auto" th:if="${!isNew}">
-				<form th:method="DELETE"
-					th:action="@{/teachers/{id}(id=${teacher.getId()})}">
-					<button type="submit" class="btn btn-danger">Delete</button>
-				</form>
-			</div>
-		</div>
 	</div>
 	<div th:fragment="table">
 		<table class="table">

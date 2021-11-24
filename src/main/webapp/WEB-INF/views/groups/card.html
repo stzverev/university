@@ -23,16 +23,6 @@
 				<div th:if="${#strings.contains(#httpServletRequest.requestURI, '/edit')}">
 					<hr class="my-4">
 					<h3>Courses</h3>
-					<div class="row mb-1 gy-2 gx-1">
-						<div class="col col-auto">
-							<a th:href="@{/groups/{id}/add-course(id=(${group.id}))}"
-								class="btn btn-outline-primary">Add course</a>
-						</div>
-						<div class="col col-auto">
-							<a th:href="@{/groups/{id}/delete-course(id=(${group.id}))}"
-								class="btn btn-outline-danger">Delete course</a>
-						</div>
-					</div>
 					<div class="row mb-3 g-3">
 						<div class="col">
 							<div
