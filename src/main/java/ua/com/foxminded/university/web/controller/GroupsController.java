@@ -39,7 +39,7 @@ public class GroupsController {
         this.groupService = groupService;
     }
 
-    @GetMapping()
+    @GetMapping("")
     public String showGroups(Model model) {
         model.addAttribute("groups", groupService.getAll());
         return "groups/list";
