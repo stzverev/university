@@ -38,4 +38,12 @@ class CourseControllerTest {
         verify(courseService).getAll();
     }
 
+    @Test
+    void shouldGetByIdWhenGetWithId() throws Exception {
+        int id = 1;
+        mockMvc.perform(get("/courses/" + id + "/edit"))
+            .andExpect(status().isOk());
+        verify(courseService).getById(id);
+    }
+
 }
