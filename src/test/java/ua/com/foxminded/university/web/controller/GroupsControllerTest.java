@@ -39,14 +39,10 @@ class GroupsControllerTest {
     private GroupsController groupController;
 
     private MockMvc mockMvc;
-    private final int groupTestId = 1;
+    private final static int GROUP_TEST_ID = 1;
 
     @BeforeEach
     void init() {
-        Group testGroup = new Group("test");
-        List<Student> students = new ArrayList<>();
-        when(groupService.getById(groupTestId)).thenReturn(testGroup);
-        when(groupService.getStudents(testGroup)).thenReturn(students);
         mockMvc = MockMvcBuilders.standaloneSetup(groupController).build();
     }
 
@@ -59,9 +55,13 @@ class GroupsControllerTest {
 
     @Test
     void shouldGetByIdWhenGetWithId() throws Exception {
-        mockMvc.perform(get("/groups/" + groupTestId + "/edit"))
+        Group testGroup = new Group("test");
+        List<Student> students = new ArrayList<>();
+        when(groupService.getById(GROUP_TEST_ID)).thenReturn(testGroup);
+        when(groupService.getStudents(testGroup)).thenReturn(students);
+        mockMvc.perform(get("/groups/" + GROUP_TEST_ID + "/edit"))
             .andExpect(status().isOk());
-        verify(groupService).getById(groupTestId);
+        verify(groupService).getById(GROUP_TEST_ID);
     }
 
 }
