@@ -15,6 +15,12 @@
 		<div class="row justify-content-center mb-3">
 			<div class="col col-sm-10 col-md-8">
 				<div class="row mb-3">
+					<div class="col col-12">
+						<a th:href="@{/groups/new}" class="w-100 btn btn-outline-primary"
+							role="button">Add new group</a>
+					</div>
+				</div>
+				<div class="row mb-3">
 					<div th:each="group: ${groups}">
 						<div class="row mb-3 g-2 justify-content-center">
 							<div class="col col-auto">
@@ -23,6 +29,12 @@
 							<div class="col col-sm-auto">
 								<a th:href="@{/groups/{id}/edit(id=${group.getId()})}"
 									class="btn btn-outline-info">Edit</a>
+							</div>
+							<div class="col col-sm-auto">
+								<form th:method="DELETE"
+									th:action="@{/groups/{id}(id=${group.id})}">
+									<button type="submit" class="btn btn-outline-danger">Delete</button>
+								</form>
 							</div>
 						</div>
 					</div>

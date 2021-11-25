@@ -14,6 +14,12 @@
         <div th:replace="fragments/general.html :: header"></div>
 		<div class="row justify-content-center">
 			<div class="col col-md-7 col-lg-8">
+				<div class="row mb-3">
+					<div class="col col-12">
+						<a th:href="@{/teachers/new}"
+							class="w-100 btn btn-outline-primary" role="button">Add</a>
+					</div>
+				</div>
 				<div th:each="teacher: ${teachers}">
                     <div class="row mb-3 justify-content-center">
                         <div class="col col-auto">
@@ -23,6 +29,16 @@
                             <a th:href="@{/teachers/{id}/edit(id=(${teacher.id}))}" class="btn btn-outline-info">Edit</a>
                         </div>
                     </div>
+					<div class="row mb-3 gy-2 gx-1">
+						<div class="col col-auto">
+							<a th:href="@{/teachers/{id}/add-course(id=${teacher.id})}"
+								class="btn btn-outline-primary">Add course</a>
+						</div>
+						<div class="col col-auto">
+                            <a th:href="@{/teachers/{id}/delete-course(id=${teacher.id})}"
+                                class="btn btn-outline-danger">Delete course</a>
+                        </div>
+					</div>
 					<div class="row mb-3">
 						<div class="col"
 							th:insert="fragments/courses.html :: table(${teacher.courses})"></div>

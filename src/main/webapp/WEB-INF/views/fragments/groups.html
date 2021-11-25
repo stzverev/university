@@ -20,6 +20,12 @@
 						type="text" th:field="*{name}" id="name" class="form-control">
 				</div>
 			</div>
+			<div class="row mb-3">
+				<div class="col col-auto">
+					<button type="submit" class="btn btn-success col col-auto"
+						th:text="${isNew} ? 'Create' : 'Update'"></button>
+				</div>
+			</div>
 		</form>
 	</div>
 	<div th:fragment="table">
