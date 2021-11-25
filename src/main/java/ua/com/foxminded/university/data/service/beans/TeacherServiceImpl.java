@@ -28,101 +28,43 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     public void save(Teacher teacher) {
-        logger.debug("The saving of teacher has started: {}", teacher);
-        try {
-            teacherDao.save(teacher);
-        } catch (Exception e) {
-            logger.error(""
-                    + "Error when saving the teacher: teacher: {}; "
-                    + "error: {}", teacher, e.getMessage());
-            throw e;
-        }
+        teacherDao.save(teacher);
     }
 
     @Override
     public void save(List<Teacher> teachers) {
-        logger.debug("The saving of list teachers has started:%n teachers count - {}",
-                teachers.size());
-        try {
-            teacherDao.save(teachers);
-        } catch (Exception e) {
-            logger.error(""
-                    + "Error when saving list teachers:%n teachers count - {}%n"
-                    + "error: {}", teachers.size(), e.getMessage());
-            throw e;
-        }
+        teacherDao.save(teachers);
     }
 
     @Override
     public List<Teacher> getAll() {
-        logger.debug("The getting of all teachers has started");
         return teacherDao.getAll();
     }
 
     @Override
     public Teacher getById(long id) {
-        logger.debug("The getting of teacher by id has started:%n id: {}", id);
         return teacherDao.getById(id);
     }
 
     @Override
     public void addCourses(Teacher teacher) {
-        logger.debug(""
-                + "The adding of courses to the teacher has started:%n"
-                + "teacher: {}%n"
-                + "courses count: {}", teacher, teacher.getCourses().size());
-        try {
-            teacherDao.addToCourses(teacher);
-        } catch (Exception e) {
-            logger.error(""
-                    + "Error when adding the teacher to the courses:%n"
-                    + "teacher: {};%n"
-                    + "courses count: {};%n"
-                    + "error: {}", teacher, teacher.getCourses().size(), e.getMessage());
-            throw e;
-        }
+        teacherDao.addToCourses(teacher);
     }
 
     @Override
     public void removeCourse(Teacher teacher, Course course) {
-        logger.debug(""
-                + "The removing of teacher from courses:%n"
-                + "teacher: {};%n"
-                + "course: {}", teacher, course);
-        try {
-            teacherDao.removeCourse(teacher, course);
-        } catch (Exception e) {
-            logger.error(""
-                    + "Error when removing the teacher from the course:%n"
-                    + "teacher: {};%n"
-                    + "course: {};%n"
-                    + "error: {}", teacher, course, e.getMessage());
-            throw e;
-        }
+        teacherDao.removeCourse(teacher, course);
     }
 
     @Override
     public List<TabletimeRow> getTabletime(Teacher teacher, LocalDateTime begin,
             LocalDateTime end) {
-        logger.debug(""
-                + "The getting of tabletime has started%n"
-                + "teacher: {}; begin: {}; end: {}",
-                teacher, begin, end);
         return teacherDao.getTabletime(teacher, begin, end);
     }
 
     @Override
     public void addTabletimeRows(List<TabletimeRow> tabletimeRows) {
-        logger.debug("The adding of tabletime rows has started:%n rows count - {}",
-                tabletimeRows.size());
-        try {
-            teacherDao.addTabletimeRows(tabletimeRows);
-        } catch (Exception e) {
-            logger.error(""
-                    + "Error when adding tabletime rows: rows count - {};%n error: {}",
-                    tabletimeRows.size(), e.getMessage());
-            throw e;
-        }
+        teacherDao.addTabletimeRows(tabletimeRows);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package ua.com.foxminded.university.web.controller;
+package ua.com.foxminded.university.web.exceptions;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;

@@ -29,95 +29,42 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public void save(Group group) {
-        logger.debug("The savving of group: {}", group);
-        try {
-            groupDao.save(group);
-        } catch (Exception e) {
-            logger.error("Error when saving the {}: {}",
-                    group, e.getMessage());
-            throw e;
-        }
+        groupDao.save(group);
     }
 
     @Override
     public void save(List<Group> groups) {
-        logger.debug("The saving of list groups: list length{}", groups.size());
-        try {
-            groupDao.save(groups);
-        } catch (Exception e) {
-            logger.error(""
-                    + "Error when saving the list of groups:%n"
-                    + "groups count: {}%n"
-                    + "error: {}", groups.size(), e.getMessage());
-            throw e;
-        }
+        groupDao.save(groups);
     }
 
     @Override
     public List<Group> getAll() {
-        logger.debug("The getting of all groups");
         return groupDao.getAll();
     }
 
     @Override
     public Group getById(long id) {
-        logger.debug("The getting of group by id: id: {}", id);
         return groupDao.getById(id);
     }
 
     @Override
     public void addToCourses(Group group) {
-        logger.debug("The adding of group {} to the {} courses has started",
-                group, group.getCourses().size());
-        try {
-            groupDao.addToCourses(group);
-        } catch (Exception e) {
-            logger.error(""
-                    + "Error when adding courses to group:%n"
-                    + "group: {}%n"
-                    + "courses count: {}",
-                    group.getName(), group.getCourses().size());
-            throw e;
-        }
+        groupDao.addToCourses(group);
     }
 
     @Override
     public void removeFromCourse(Group group, Course course) {
-        logger.debug("The removing of group {} from course {} has started",
-                group, course);
-        try {
-            groupDao.deleteFromCourse(group, course);
-        } catch (Exception e) {
-            logger.error(""
-                    + "Error when removing course from group:%n"
-                    + "group: {}%n"
-                    + "course: {}", group, course);
-            throw e;
-        }
+        groupDao.deleteFromCourse(group, course);
     }
 
     @Override
-    public List<TabletimeRow> getTabletime(Group group, LocalDateTime begin,
-            LocalDateTime end) {
-        logger.debug(""
-                + "The getting of tabletime has started%n"
-                + "group: {}; begin: {}; end: {}",
-                group, begin, end);
+    public List<TabletimeRow> getTabletime(Group group, LocalDateTime begin, LocalDateTime end) {
         return groupDao.getTabletime(group, begin, end);
     }
 
     @Override
     public void addTabletimeRows(List<TabletimeRow> tabletimeRows) {
-        logger.debug("The adding of tabletime rows has started:%n rows count - {}",
-                tabletimeRows.size());
-        try {
-            groupDao.addTabletimeRows(tabletimeRows);
-        } catch (Exception e) {
-            logger.error(""
-                     + "Error when adding tabletime rows: rows count - {};%n error: {}",
-                     tabletimeRows.size(), e.getMessage());
-            throw e;
-        }
+        groupDao.addTabletimeRows(tabletimeRows);
     }
 
     @Override

@@ -51,11 +51,6 @@ public class CourseController {
         return "courses/card";
     }
 
-    @GetMapping("/{courseId}/students/{studentId}/edit")
-    public String showStudent(@PathVariable("studentId") long studentId) {
-        return "redirect:/students/" + studentId + "/edit";
-    }
-
     @PostMapping()
     public String create(@ModelAttribute Course course) {
         courseService.save(course);

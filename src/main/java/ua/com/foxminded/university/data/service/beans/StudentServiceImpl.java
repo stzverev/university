@@ -25,49 +25,26 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public void save(Student student) {
-        logger.debug("The saving of student has started: {}", student);
-        try {
-            studentDao.save(student);
-        } catch (Exception e) {
-            logger.error(""
-                    + "Error when saving the student:  student: {}; "
-                    + "error: {}", student, e.getMessage());
-            throw e;
-        }
+        studentDao.save(student);
     }
 
     @Override
     public void save(List<Student> students) {
-        logger.debug("The saving of list students has started:  students count - {}",
-                students.size());
-        try {
-            studentDao.save(students);
-        } catch (Exception e) {
-            logger.error(""
-                    + "Error when saving list students:  students: students count - {} "
-                    + "error: {}", students.size(), e.getMessage());
-            throw e;
-        }
+        studentDao.save(students);
     }
 
     @Override
     public List<Student> getAll() {
-        logger.debug("The getting of all students has started");
         return studentDao.getAll();
     }
 
     @Override
     public Student getById(long id) {
-        logger.debug("The getting of student by id has started:  id: {}", id);
         return studentDao.getById(id);
     }
 
     @Override
     public Student getByFullName(String firstName, String lastName) {
-        logger.debug(""
-                + "The getting of student by full name has started: "
-                + "first name: {}; "
-                + "last name: {}", firstName, lastName);
         return studentDao.getByFullName(firstName, lastName);
     }
 
