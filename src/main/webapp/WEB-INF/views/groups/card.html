@@ -42,6 +42,9 @@
 					<hr class="my-4">
 					<h3>Students</h3>
 					<div class="row" th:insert="fragments/students.html :: table"></div>
+					<hr class="my4">
+					<h3>Schedule</h3>
+					<div th:replace="fragments/tabletime.html :: tabletimeSelectForGroup(${group})">
 				</div>
 
 			</div>

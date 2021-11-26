@@ -1,4 +1,4 @@
-package ua.com.foxminded.university.data.service.beans;
+package ua.com.foxminded.university.data.service.impl;
 
 import java.util.Collections;
 import java.util.List;

@@ -41,7 +41,7 @@ public class TabletimeRowMapper implements BilateralMapper<TabletimeRow> {
     @Override
     public TabletimeRow mapRow(ResultSet rs, int rowNum) throws SQLException {
         TabletimeRow tabletimeRow = new TabletimeRow();
-        LocalDateTime dateTime = rs.getTimestamp("date_time").toLocalDateTime();
+        LocalDateTime dateTime = rs.getTimestamp("tabletime_datetime").toLocalDateTime();
         tabletimeRow.setDateTime(dateTime);
         Course course = courseMapper.mapRow(rs, rowNum);
         Group group = groupMapper.mapRow(rs, rowNum);

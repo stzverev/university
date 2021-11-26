@@ -1,9 +1,15 @@
 package ua.com.foxminded.university.web.controller;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,8 +24,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.Student;
+import ua.com.foxminded.university.data.model.TabletimeRow;
+import ua.com.foxminded.university.data.model.Teacher;
 import ua.com.foxminded.university.data.service.CourseService;
 import ua.com.foxminded.university.data.service.GroupService;
+import ua.com.foxminded.university.data.service.TeacherService;
 
 @Controller
 @RequestMapping("/groups")
@@ -28,6 +37,14 @@ public class GroupsController {
     private static final String REDIRECT_TO_GROUPS = "redirect:/groups";
     private GroupService groupService;
     private CourseService courseService;
+    private TeacherService teacherService;
+    private Logger logger = LoggerFactory.getLogger(GroupsController.class);
+
+
+    @Autowired
+    public void setTeacherService(TeacherService teacherService) {
+        this.teacherService = teacherService;
+    }
 
     @Autowired
     public void setCourseService(CourseService courseService) {
@@ -58,6 +75,58 @@ public class GroupsController {
         model.addAttribute("group", group);
         model.addAttribute("students", students);
         return "groups/card";
+    }
+
+    @GetMapping("/{id}/tabletime")
+    public String showTableTime(Model model, @PathVariable("id") long groupId,
+            @RequestParam("begin") @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime begin,
+            @RequestParam("end") @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime end)  {
+        Group group = groupService.getById(groupId);
+        List<TabletimeRow> tabletime = groupService.getTabletime(group, begin, end);
+        logger.debug("tabletime row count: {}", tabletime.size());
+        model.addAttribute("group", group );
+        model.addAttribute("begin", begin);
+        model.addAttribute("end", end);
+        model.addAttribute("tabletime", tabletime);
+        return "groups/tabletime";
+    }
+
+    @GetMapping("/{id}/tabletime/new")
+    public String showAddingNewRecordToTabletime(Model model, @PathVariable("id") long groupId) {
+        Group group = groupService.getById(groupId);
+        group.setCourses(groupService.getCourses(group));
+        List<Group> allGroups = Collections.singletonList(group);
+        List<Teacher> teachers = group.getCourses()
+                .stream()
+                .flatMap(course -> courseService.getTeachers(course).stream())
+                .collect(Collectors.toList());
+        model.addAttribute("group", group);
+        model.addAttribute("allGroups", allGroups);
+        model.addAttribute("allCourses", group.getCourses());
+        model.addAttribute("allTeachers", teachers);
+
+        return "groups/tabletime-new";
+    }
+
+    @PostMapping("/{id}/tabletime")
+    public String createNewRecordToTabletime(
+            @PathVariable("id") long groupId,
+            @RequestParam("courseId") long courseId,
+            @RequestParam("teacherId") long teacherId,
+            @RequestParam("begin") @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime begin) {
+        Group group = groupService.getById(groupId);
+        Course course = courseService.getById(courseId);
+        Teacher teacher = teacherService.getById(teacherId);
+
+        TabletimeRow tableTimeRow = new TabletimeRow();
+        tableTimeRow.setGroup(group);
+        tableTimeRow.setCourse(course);
+        tableTimeRow.setTeacher(teacher);
+        tableTimeRow.setDateTime(begin);
+
+        groupService.addTabletimeRows(Collections.singletonList(tableTimeRow));
+
+        return REDIRECT_TO_GROUPS + "/" + groupId + "/edit";
     }
 
     @GetMapping("/{groupId}/add-course")

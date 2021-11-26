@@ -1,4 +1,4 @@
-package ua.com.foxminded.university.data.service.beans;
+package ua.com.foxminded.university.data.service.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
