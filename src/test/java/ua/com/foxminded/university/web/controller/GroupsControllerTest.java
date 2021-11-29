@@ -8,7 +8,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -27,9 +29,12 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.Student;
+import ua.com.foxminded.university.data.model.TabletimeRow;
+import ua.com.foxminded.university.data.model.Teacher;
 import ua.com.foxminded.university.data.service.CourseService;
 import ua.com.foxminded.university.data.service.GroupService;
 import ua.com.foxminded.university.data.service.StudentService;
+import ua.com.foxminded.university.data.service.TeacherService;
 import ua.com.foxminded.university.web.exceptions.RestResponseEntityExceptionHandler;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,6 +49,9 @@ class GroupsControllerTest {
     @Mock
     private StudentService studentService;
 
+    @Mock
+    private TeacherService teacherService;
+
     @Spy
     private RestResponseEntityExceptionHandler controllerAdvice =
         new RestResponseEntityExceptionHandler();
@@ -52,9 +60,12 @@ class GroupsControllerTest {
     private GroupsController groupController;
 
     private MockMvc mockMvc;
+
     private final static int GROUP_TEST_ID = 0;
 
     private static final long COURSE_TEST_ID = 0;
+
+    private static final long TEACHER_TEST_ID = 0;
 
     @BeforeEach
     void init() {
@@ -187,6 +198,71 @@ class GroupsControllerTest {
                 .param("courseId", "" + testCourse.getId()))
             .andExpect(status().is3xxRedirection());
         verify(groupService).addToCourses(Mockito.any());
+    }
+
+    @Test
+    void shouldShowTabletime() throws Exception {
+        Group group = new Group();
+        group.setName("test group");
+        group.setId(GROUP_TEST_ID);
+
+        LocalDateTime begin = LocalDateTime.now();
+        LocalDateTime end = LocalDateTime.now();
+        TabletimeRow tabletimeRow = new TabletimeRow();
+
+        when(groupService.getById(group.getId())).thenReturn(group);
+        when(groupService.getTabletime(group, begin, end)).thenReturn(Collections.singletonList(tabletimeRow));
+
+        mockMvc.perform(get("/groups/" + group.getId() + "/tabletime")
+                .param("begin", begin.toString())
+                .param("end", end.toString()))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldAddingNewRecordToTabletime() throws Exception {
+        Group group = new Group();
+        group.setName("test group");
+        group.setId(GROUP_TEST_ID);
+
+        Course course = new Course();
+        course.setName("test course");
+        course.setId(COURSE_TEST_ID);
+
+        when(groupService.getById(group.getId())).thenReturn(group);
+        when(groupService.getCourses(group)).thenReturn(Collections.singletonList(course));
+
+        mockMvc.perform(get("/groups/" + group.getId() + "/tabletime/new"))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldCreateNewRecordToTabletime() throws Exception {
+        Group group = new Group();
+        group.setName("test group");
+        group.setId(GROUP_TEST_ID);
+
+        Course course = new Course();
+        course.setName("test course");
+        course.setId(COURSE_TEST_ID);
+
+        Teacher teacher = new Teacher();
+        teacher.setFirstName("Test");
+        teacher.setLastName("Teacher");
+        teacher.setId(TEACHER_TEST_ID);
+
+        when(groupService.getById(group.getId())).thenReturn(group);
+        when(courseService.getById(course.getId())).thenReturn(course);
+        when(teacherService.getById(teacher.getId())).thenReturn(teacher);
+
+        LocalDateTime begin = LocalDateTime.now();
+        mockMvc.perform(post("/groups/" + group.getId() + "/tabletime")
+                .param("courseId", "" + course.getId())
+                .param("teacherId", "" + teacher.getId())
+                .param("begin", begin.toString()))
+            .andExpect(status().is3xxRedirection());
+
+        verify(groupService).addTabletimeRows(Mockito.any());
     }
 
 }

@@ -83,7 +83,6 @@ public class GroupsController {
             @RequestParam("end") @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime end)  {
         Group group = groupService.getById(groupId);
         List<TabletimeRow> tabletime = groupService.getTabletime(group, begin, end);
-        logger.debug("tabletime row count: {}", tabletime.size());
         model.addAttribute("group", group );
         model.addAttribute("begin", begin);
         model.addAttribute("end", end);
