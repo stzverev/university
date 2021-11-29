@@ -13,10 +13,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import ua.com.foxminded.university.data.Config;
+import ua.com.foxminded.university.data.ConfigTest;
 import ua.com.foxminded.university.data.model.Group;
 
-@SpringJUnitConfig(Config.class)
+@SpringJUnitConfig(ConfigTest.class)
 @ExtendWith(MockitoExtension.class)
 class GroupMapperTest {
 

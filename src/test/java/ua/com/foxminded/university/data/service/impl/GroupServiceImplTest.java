@@ -1,4 +1,4 @@
-package ua.com.foxminded.university.data.service.beans;
+package ua.com.foxminded.university.data.service.impl;
 
 import static org.mockito.Mockito.verify;
 
@@ -14,15 +14,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import ua.com.foxminded.university.data.Config;
-import ua.com.foxminded.university.data.DataInitializer;
+import ua.com.foxminded.university.data.ConfigTest;
 import ua.com.foxminded.university.data.db.dao.GroupDao;
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.TabletimeRow;
+import ua.com.foxminded.university.data.service.DataInitializer;
 import ua.com.foxminded.university.data.service.impl.GroupServiceImpl;
 
-@SpringJUnitConfig(Config.class)
+@SpringJUnitConfig(ConfigTest.class)
 @ExtendWith(SpringExtension.class)
 class GroupServiceImplTest {
 
