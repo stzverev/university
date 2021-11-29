@@ -20,6 +20,7 @@ import ua.com.foxminded.university.data.db.dao.TeacherDao;
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.TabletimeRow;
 import ua.com.foxminded.university.data.model.Teacher;
+import ua.com.foxminded.university.data.service.impl.TeacherServiceImpl;
 
 @SpringJUnitConfig(Config.class)
 @ExtendWith(SpringExtension.class)

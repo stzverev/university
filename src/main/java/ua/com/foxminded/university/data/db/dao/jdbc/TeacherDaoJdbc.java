@@ -62,6 +62,8 @@ public class TeacherDaoJdbc implements TeacherDao {
     private static final String TEACHERS_COURSES_DELETE =
             "teachers_courses.delete.byTeacherIdAndCourseId";
 
+    private static final String TEACHERS_DELETE = "teachers.delete.byId";
+
     private RowMapper<Teacher> teacherMapper;
     private RowMapper<Course> courseMapper;
     private BilateralMapper<TabletimeRow> tabletimeRowMapper;
@@ -223,6 +225,13 @@ public class TeacherDaoJdbc implements TeacherDao {
         parameters.put("courseId", course.getId());
         jdbcTemplate.update(
                 queryReader.getProperty(TEACHERS_COURSES_DELETE),
+                parameters);
+    }
+
+    @Override
+    public void delete(long id) {
+        SqlParameterSource parameters = new MapSqlParameterSource("id", id);
+        jdbcTemplate.update(queryReader.getProperty(TEACHERS_DELETE),
                 parameters);
     }
 

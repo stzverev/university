@@ -47,6 +47,7 @@ public class GroupDaoJdbc implements GroupDao {
     private static final String GROUPS_COURSES_INSERT = "groups_courses.insert";
     private static final String GROUPS_COURSES_DELETE =
             "groups_courses.delete.byGroupIdAndCourseId";
+    private static final String GROUPS_DELETE = "groups.delete.byId";
 
     private RowMapper<Group> groupMapper;
     private RowMapper<Student> studentMapper;
@@ -224,6 +225,12 @@ public class GroupDaoJdbc implements GroupDao {
         jdbcTemplate.update(
                 queryReader.getProperty(GROUPS_COURSES_DELETE),
                 parameters);
+    }
+
+    @Override
+    public void delete(long id) {
+        MapSqlParameterSource parameters = new MapSqlParameterSource("id", id);
+        this.jdbcTemplate.update(queryReader.getProperty(GROUPS_DELETE), parameters);
     }
 
 }

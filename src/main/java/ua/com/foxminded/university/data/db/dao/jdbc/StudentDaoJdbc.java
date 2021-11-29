@@ -29,6 +29,7 @@ public class StudentDaoJdbc implements StudentDao {
             "students.select.byFullName";
     private static final String STUDENTS_SELECT_BY_ID = "students.select.byId";
     private static final String STUDENTS_UPDATE = "students.update";
+    private static final String STUDENTS_DELETE = "students.delete.byId";
 
     private BilateralMapper<Student> studentMapper;
     private NamedParameterJdbcTemplate jdbcTemplate;
@@ -105,6 +106,12 @@ public class StudentDaoJdbc implements StudentDao {
         this.jdbcTemplate.update(
                 queryReader.getProperty(STUDENTS_UPDATE),
                 namedParameters);
+    }
+
+    @Override
+    public void delete(long id) {
+        MapSqlParameterSource parameters = new MapSqlParameterSource("id", id);
+        this.jdbcTemplate.update(queryReader.getProperty(STUDENTS_DELETE), parameters);
     }
 
 }

@@ -11,6 +11,11 @@ public class Group extends AbstractEntity {
         super();
     }
 
+    public Group(String name) {
+        super();
+        this.name = name;
+    }
+
     public String getName() {
         return name;
     }

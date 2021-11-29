@@ -20,6 +20,7 @@ import ua.com.foxminded.university.data.db.dao.GroupDao;
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.TabletimeRow;
+import ua.com.foxminded.university.data.service.impl.GroupServiceImpl;
 
 @SpringJUnitConfig(Config.class)
 @ExtendWith(SpringExtension.class)

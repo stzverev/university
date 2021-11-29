@@ -17,6 +17,7 @@ import ua.com.foxminded.university.data.Config;
 import ua.com.foxminded.university.data.DataInitializer;
 import ua.com.foxminded.university.data.db.dao.StudentDao;
 import ua.com.foxminded.university.data.model.Student;
+import ua.com.foxminded.university.data.service.impl.StudentServiceImpl;
 
 @SpringJUnitConfig(Config.class)
 @ExtendWith(SpringExtension.class)

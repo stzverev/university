@@ -59,7 +59,7 @@ class TabletimeRowMapperTest {
 
     private ResultSet getTabletimeRowResultSetMock(TabletimeRow tabletimeRow) throws SQLException {
         ResultSet resultSet = mock(ResultSet.class);
-        when(resultSet.getTimestamp("date_time")).thenReturn(
+        when(resultSet.getTimestamp("tabletime_datetime")).thenReturn(
                 Timestamp.valueOf(tabletimeRow.getDateTime()));
         when(resultSet.getString("teacher_first_name")).thenReturn(
                 tabletimeRow.getTeacher().getFirstName());
