@@ -1,33 +1,27 @@
 package ua.com.foxminded.university.data;
 
+import javax.naming.NamingException;
 import javax.sql.DataSource;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.core.env.Environment;
+import org.springframework.jndi.JndiTemplate;
 
 import ua.com.foxminded.university.data.service.PropertyReader;
 
 @Configuration
 @ComponentScan
-@PropertySource("classpath:config.properties")
+@PropertySource("classpath:jndi.properties")
 public class Config {
 
     @Bean
-    public DataSource dataSource(@Value("${driver}") String driverClassName,
-            @Value("${url}") String url,
-            @Value("${user}") String username,
-            @Value("${password}") String password) {
-
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName(driverClassName);
-        dataSource.setUrl(url);
-        dataSource.setUsername(username);
-        dataSource.setPassword(password);
-        return dataSource;
+    @Autowired
+    public DataSource dataSource(Environment environment) throws NamingException {
+        return (DataSource) new JndiTemplate().lookup(environment.getProperty("url"));
     }
 
     @Bean
