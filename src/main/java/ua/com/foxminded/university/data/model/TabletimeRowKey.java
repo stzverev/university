@@ -8,7 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 @Embeddable
-public class TimetableRowId implements Serializable {
+public class TabletimeRowKey implements Serializable {
 
     @Column(name = "date_time")
     private LocalDateTime dateTime;
@@ -22,11 +22,11 @@ public class TimetableRowId implements Serializable {
     @Column(name = "teacher_id")
     private Long teacherId;
 
-    public TimetableRowId() {
+    public TabletimeRowKey() {
         super();
     }
 
-    public TimetableRowId(LocalDateTime dateTime, Long groupId, Long courseId, Long teacherId) {
+    public TabletimeRowKey(LocalDateTime dateTime, Long groupId, Long courseId, Long teacherId) {
         super();
         this.dateTime = dateTime;
         this.groupId = groupId;
@@ -79,7 +79,7 @@ public class TimetableRowId implements Serializable {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        TimetableRowId other = (TimetableRowId) obj;
+        TabletimeRowKey other = (TabletimeRowKey) obj;
         return Objects.equals(courseId, other.courseId) && Objects.equals(dateTime, other.dateTime)
                 && Objects.equals(groupId, other.groupId) && Objects.equals(teacherId, other.teacherId);
     }

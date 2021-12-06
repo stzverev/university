@@ -16,7 +16,7 @@ import javax.persistence.Table;
 public class TabletimeRow implements Serializable {
 
     @EmbeddedId
-    private TimetableRowId id;
+    private TabletimeRowKey id;
 
     @ManyToOne
     @MapsId("groupId")
@@ -41,11 +41,11 @@ public class TabletimeRow implements Serializable {
         return id.getDateTime();
     }
 
-    public void setId(TimetableRowId id) {
+    public void setId(TabletimeRowKey id) {
         this.id = id;
     }
 
-    public TimetableRowId getId() {
+    public TabletimeRowKey getId() {
         return id;
     }
 
