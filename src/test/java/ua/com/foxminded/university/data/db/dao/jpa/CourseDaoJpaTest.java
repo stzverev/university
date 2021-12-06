@@ -1,7 +1,6 @@
-package ua.com.foxminded.university.data.db.dao.jdbc;
+package ua.com.foxminded.university.data.db.dao.jpa;
 
 import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -10,6 +9,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,27 +18,26 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import ua.com.foxminded.university.data.ConfigTest;
+import ua.com.foxminded.university.data.db.dao.CourseDao;
+import ua.com.foxminded.university.data.db.dao.GroupDao;
+import ua.com.foxminded.university.data.db.dao.TeacherDao;
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
-import ua.com.foxminded.university.data.model.Student;
 import ua.com.foxminded.university.data.model.TabletimeRow;
 import ua.com.foxminded.university.data.model.Teacher;
 import ua.com.foxminded.university.data.service.DataInitializer;
 
 @SpringJUnitConfig(ConfigTest.class)
-class GroupDaoJdbcTest {
+class CourseDaoJpaTest {
 
     @Autowired
-    private GroupDaoJdbc groupDao;
+    private CourseDao courseDao;
 
     @Autowired
-    private CourseDaoJdbc courseDao;
+    private TeacherDao teacherDao;
 
     @Autowired
-    private TeacherDaoJdbc teacherDao;
-
-    @Autowired
-    private StudentDaoJdbc studentDao;
+    private GroupDao groupDao;
 
     @Autowired
     private DataInitializer dataInitializer;
@@ -49,101 +48,98 @@ class GroupDaoJdbcTest {
     }
 
     @Test
-    void shouldGetByNameGroupWhenSaveGroup() {
-        String name = "MI6";
-        Group group = new Group();
-        group.setName(name);
-        groupDao.save(group);
-        Group expected = group;
+    void shouldGetByNameCourseWhenSaveCourse() {
+        String name = "Math";
+        Course course = new Course();
+        course.setName(name);
+        courseDao.save(course);
+        Course expected = course;
 
-        Group actual = groupDao.getByName(name);
-
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void shouldGetByNameGroupWhenUpdateGroup() {
-        String name = "MI6";
-        String newName = "MI7";
-        Group group = new Group();
-        group.setName(name);
-        groupDao.save(group);
-        group = groupDao.getByName(name);
-        group.setName(newName);
-        groupDao.update(group);
-        Group expected = group;
-
-        Group actual = groupDao.getByName(newName);
+        Course actual = courseDao.getByName(name);
 
         assertEquals(expected, actual);
     }
 
     @Test
-    void shouldGetListGroupsWhenSaveList() {
-        List<Group> groups = new ArrayList<>();
-        Group group1 = new Group();
-        group1.setName("MI6");
-        groups.add(group1);
-        Group group2 = new Group();
-        group2.setName("KGB");
-        groups.add(group2);
-        groupDao.save(groups);
+    void shouldGetByNameCourseWhenUpdateCourse() {
+        String name = "Math";
+        String newName = "Math2";
+        Course course = new Course();
+        course.setName(name);
+        courseDao.save(course);
+        course = courseDao.getByName(name);
+        course.setName(newName);
+        courseDao.update(course);
+        Course expected = course;
 
-        List<Group> actual = groupDao.getAll();
+        Course actual = courseDao.getByName(newName);
 
-        assertEquals(groups, actual);
+        assertEquals(expected, actual);
     }
 
     @Test
-    void shouldGetGroupByIdWhenSaveGroup() {
+    void shouldGetListCoursesWhenSaveList() {
+        List<Course> courses = new ArrayList<>();
+        Course course1 = new Course();
+        course1.setName("Math");
+        courses.add(course1);
+        Course course2 = new Course();
+        course2.setName("History");
+        courses.add(course2);
+        courseDao.save(courses);
+
+        List<Course> actual = courseDao.getAll();
+
+        assertEquals(courses, actual);
+    }
+
+    @Test
+    void shouldGetCourseByIdWhenSaveCourse() {
         String name = "CIA";
-        Group expected = new Group();
+        Course expected = new Course();
         expected.setName(name);
-        groupDao.save(expected);
-        expected = groupDao.getByName(name);
+        courseDao.save(expected);
+        expected = courseDao.getByName(name);
 
-        Group actual = groupDao.getById(expected.getId());
-
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void shouldGetStudentsWhenSaveStudentToGroupThenOk() {
-        String groupName = "Elementary physics";
-        Group group = new Group();
-        group.setName(groupName);
-        groupDao.save(group);
-        group = groupDao.getByName(groupName);
-        Student student = new Student();
-        student.setFirstName("Albert");
-        student.setLastName("Einstein");
-        student.setGroup(group);
-        studentDao.save(student);
-        List<Student> expected = Collections.singletonList(student);
-
-        List<Student> actual = groupDao.getStudents(group);
+        Course actual = courseDao.getById(expected.getId()).get();
 
         assertEquals(expected, actual);
     }
 
     @Test
-    void shouldGetTabletimeForGroupWhenSaveTabletimeThenOk() {
+    void shouldGetTeachersAfterAddTeacherToCourse() {
+        Course course = saveAndGetCourse("Phisycs");
+        Teacher teacher = saveAndGetTeacher("Sheldon", "Cooper");
+        teacherDao.addToCourses(teacher, Collections.singleton(course));
+
+        Set<Teacher> teachers = courseDao.getTeachers(course);
+
+        assertThat(teachers, hasItem(teacher));
+    }
+
+    @Test
+    void shouldGetGroupsAfterAddGroupToCourse() {
+        Course course = saveAndGetCourse("Phisycs");
+        Group group = saveAndGetGroup("GE-22");
+        groupDao.addToCourses(group, Collections.singleton(course));
+
+        Set<Group> groups = courseDao.getGroups(course);
+
+        assertThat(groups, hasItem(group));
+    }
+
+    @Test
+    void shouldGetTabletimeForCourseWhenSaveTabletimeThenOk() {
         LocalDateTime dateTime = LocalDateTime.of(2021, 10, 11, 9, 0);
         Course course = saveAndGetCourse("Math");
         Group group = saveAndGetGroup("FJ-42");
         Teacher teacher = saveAndGetTeacher("Sheldon", "Cooper");
-        TabletimeRow row = new TabletimeRow();
-        row.setTeacher(teacher);
-        row.setCourse(course);
-        row.setGroup(group);
-        row.setDateTime(dateTime);
-        List<TabletimeRow> rows = Collections.singletonList(row);
-        groupDao.addTabletimeRows(rows);
+        List<TabletimeRow> rows = saveAndGetTabletimeRow(dateTime, course, group, teacher);
         List<TabletimeRow> expected = rows;
 
         LocalDateTime begin = LocalDateTime.of(2021, 10, 11, 0, 0, 0);
         LocalDateTime end = LocalDateTime.of(2021, 10, 11, 23, 59, 59);
-        List<TabletimeRow> tabletimeRowsGet = groupDao.getTabletime(group,
+        List<TabletimeRow> tabletimeRowsGet = courseDao.getTabletime(course,
                 begin, end);
         List<TabletimeRow> actual = tabletimeRowsGet;
 
@@ -151,20 +147,20 @@ class GroupDaoJdbcTest {
     }
 
     @Test
-    void shouldGetTabletimeForGroupWhenUpdateTabletimeThenOk() {
+    void shouldGetTabletimeForCourseWhenUpdateTabletimeThenOk() {
         Course course = saveAndGetCourse("Math");
         Group group = saveAndGetGroup("FJ-42");
         Teacher teacher = saveAndGetTeacher("Sheldon", "Cooper");
         saveAndGetTabletimeRow(
                 LocalDateTime.of(2021, 10, 11, 9, 0),
                 course, group, teacher);
-        List<TabletimeRow> expected = groupDao.getTabletime(group,
+        List<TabletimeRow> expected = courseDao.getTabletime(course,
                 LocalDateTime.of(2021, 10, 11, 0, 0, 0),
                 LocalDateTime.of(2021, 10, 11, 23, 59, 59));
         expected.get(0).setDateTime(
                 LocalDateTime.of(2021, 10, 12, 10, 0));
-        groupDao.updateTabletime(expected);
-        List<TabletimeRow> actual = groupDao.getTabletime(group,
+        courseDao.updateTabletime(expected);
+        List<TabletimeRow> actual = courseDao.getTabletime(course,
                 LocalDateTime.of(2021, 10, 12, 0, 0, 0),
                 LocalDateTime.of(2021, 10, 12, 23, 59, 59));;
 
@@ -172,25 +168,12 @@ class GroupDaoJdbcTest {
     }
 
     @Test
-    void shouldDidntFindCourseWhenGetCoursesForGroupAfterRemove() {
-        Course course = saveAndGetCourse("Phisycs");
-        Group group = saveAndGetGroup("RR-25");
-        group.setCourses(Collections.singletonList(course));
-        groupDao.addToCourses(group);
-        groupDao.deleteFromCourse(group, course);
+    void shouldThrowExceptionWhenGetCourseThatWasDeleted() {
+        Course course = saveAndGetCourse("Math");
+        long courseId = course.getId();
+        courseDao.delete(courseId);
 
-        List<Course> courses = groupDao.getCourses(group);
-
-        assertThat(courses, not(hasItem(course)));
-    }
-
-    @Test
-    void shouldThrowExceptionWhenGetGroupThatWasDeleted() {
-        Group group = saveAndGetGroup("RR-255");
-        long groupId = group.getId();
-        groupDao.delete(groupId);
-
-        Throwable error = assertThrows(DataAccessException.class, () -> groupDao.getById(groupId));
+        DataAccessException error = assertThrows(DataAccessException.class, () -> courseDao.getById(courseId));
         assertEquals("Incorrect result size: expected 1, actual 0", error.getMessage());
     }
 
@@ -202,7 +185,7 @@ class GroupDaoJdbcTest {
         row.setGroup(group);
         row.setDateTime(dateTime);
         List<TabletimeRow> rows = Collections.singletonList(row);
-        groupDao.addTabletimeRows(rows);
+        courseDao.saveTabletime(rows);
         return rows;
     }
 

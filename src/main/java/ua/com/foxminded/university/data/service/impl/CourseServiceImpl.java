@@ -2,6 +2,7 @@ package ua.com.foxminded.university.data.service.impl;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,10 +14,12 @@ import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.Teacher;
 import ua.com.foxminded.university.data.service.CourseService;
+import ua.com.foxminded.university.exceptions.ObjectNotFoundById;
 
 @Service
 public class CourseServiceImpl implements CourseService {
 
+    private static final Class<Course> ENTITY_CLASS = Course.class;
     private CourseDao courseDao;
     private TeacherDao teacherDao;
     private GroupDao groupDao;
@@ -51,22 +54,22 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Course getById(long id) {
-        return courseDao.getById(id);
+        return courseDao.getById(id).orElseThrow(() -> new ObjectNotFoundById(id, ENTITY_CLASS));
     }
 
     @Override
-    public List<Teacher> getTeachers(Course course) {
+    public Set<Teacher> getTeachers(Course course) {
         return courseDao.getTeachers(course);
     }
 
     @Override
-    public List<Group> getGroups(Course course) {
+    public Set<Group> getGroups(Course course) {
         return courseDao.getGroups(course);
     }
 
     @Override
     public void addGroup(Course course, Group group) {
-        groupDao.addToCourses(group);
+        groupDao.addToCourses(group, Collections.singleton(course));
     }
 
     @Override
@@ -76,12 +79,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void addTeacher(Course course, Teacher teacher) {
-        Teacher teacherForCourse = new Teacher();
-        teacherForCourse.setId(teacher.getId());
-        teacherForCourse.setFirstName(teacher.getFirstName());
-        teacherForCourse.setLastName(teacher.getLastName());
-        teacherForCourse.setCourses(Collections.singletonList(course));
-        teacherDao.addToCourses(teacherForCourse);
+        teacherDao.addToCourses(teacher, Collections.singleton(course));
     }
 
     @Override

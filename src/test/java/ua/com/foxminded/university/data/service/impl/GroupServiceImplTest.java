@@ -4,7 +4,9 @@ import static org.mockito.Mockito.verify;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +22,6 @@ import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.TabletimeRow;
 import ua.com.foxminded.university.data.service.DataInitializer;
-import ua.com.foxminded.university.data.service.impl.GroupServiceImpl;
 
 @SpringJUnitConfig(ConfigTest.class)
 @ExtendWith(SpringExtension.class)
@@ -68,7 +69,7 @@ class GroupServiceImplTest {
 
     @Test
     void shouldAddTabletimeRowsWhenAddTabletime() {
-        List<TabletimeRow> rows = new ArrayList<>();
+        Set<TabletimeRow> rows = new HashSet<>();
         groupService.addTabletimeRows(rows);
         verify(groupDao).addTabletimeRows(rows);
     }
@@ -76,9 +77,9 @@ class GroupServiceImplTest {
     @Test
     void shouldAddCoursesWhenAddCourses() {
         Group group = new Group();
-        group.setCourses(new ArrayList<Course>());
-        groupService.addToCourses(group);
-        verify(groupDao).addToCourses(group);
+        Set<Course> courses = new HashSet<>();
+        groupService.addToCourses(group, courses);
+        verify(groupDao).addToCourses(group, courses);
     }
 
     @Test

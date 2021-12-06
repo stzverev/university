@@ -1,16 +1,47 @@
 package ua.com.foxminded.university.data.model;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class TabletimeRow {
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
+import javax.persistence.Table;
 
+@Entity(name = "Tabletime")
+@Table(name = "tabletime")
+public class TabletimeRow implements Serializable {
+
+    @EmbeddedId
+    private TimetableRowId id;
+
+    @MapsId("dateTime")
+    @JoinColumn(name = "date_time")
     private LocalDateTime dateTime;
+
+    @ManyToOne
+    @MapsId("groupId")
+    @JoinColumn(name = "group_id")
     private Group group;
+
+    @ManyToOne
+    @MapsId("courseId")
+    @JoinColumn(name = "course_id")
     private Course course;
+
+    @ManyToOne
+    @MapsId("teacherId")
+    @JoinColumn(name = "teacher_id")
     private Teacher teacher;
 
     public LocalDateTime getDateTime() {
         return dateTime;
+    }
+
+    public TimetableRowId getId() {
+        return id;
     }
 
     public Group getGroup() {

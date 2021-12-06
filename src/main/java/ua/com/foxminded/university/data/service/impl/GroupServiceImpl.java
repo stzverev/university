@@ -2,6 +2,7 @@ package ua.com.foxminded.university.data.service.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,10 +13,12 @@ import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.Student;
 import ua.com.foxminded.university.data.model.TabletimeRow;
 import ua.com.foxminded.university.data.service.GroupService;
+import ua.com.foxminded.university.exceptions.ObjectNotFoundById;
 
 @Service
 public class GroupServiceImpl implements GroupService {
 
+    private static final Class<Group> ENTITY_CLASS = Group.class;
     private GroupDao groupDao;
 
     @Autowired
@@ -41,12 +44,12 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Group getById(long id) {
-        return groupDao.getById(id);
+        return groupDao.getById(id).orElseThrow(() -> new ObjectNotFoundById(id, ENTITY_CLASS));
     }
 
     @Override
-    public void addToCourses(Group group) {
-        groupDao.addToCourses(group);
+    public void addToCourses(Group group, Set<Course> courses) {
+        groupDao.addToCourses(group, courses);
     }
 
     @Override
@@ -55,12 +58,12 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public List<TabletimeRow> getTabletime(Group group, LocalDateTime begin, LocalDateTime end) {
+    public Set<TabletimeRow> getTabletime(Group group, LocalDateTime begin, LocalDateTime end) {
         return groupDao.getTabletime(group, begin, end);
     }
 
     @Override
-    public void addTabletimeRows(List<TabletimeRow> tabletimeRows) {
+    public void addTabletimeRows(Set<TabletimeRow> tabletimeRows) {
         groupDao.addTabletimeRows(tabletimeRows);
     }
 
@@ -70,7 +73,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public List<Student> getStudents(Group group) {
+    public Set<Student> getStudents(Group group) {
         return groupDao.getStudents(group);
     }
 
@@ -80,7 +83,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public List<Course> getCourses(Group group) {
+    public Set<Course> getCourses(Group group) {
         return groupDao.getCourses(group);
     }
 

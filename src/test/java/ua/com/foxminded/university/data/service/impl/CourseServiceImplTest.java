@@ -8,6 +8,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -21,7 +22,6 @@ import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.Teacher;
 import ua.com.foxminded.university.data.service.DataInitializer;
-import ua.com.foxminded.university.data.service.impl.CourseServiceImpl;
 
 @SpringJUnitConfig(ConfigTest.class)
 @ExtendWith(SpringExtension.class)
@@ -50,15 +50,16 @@ class CourseServiceImplTest {
     @Test
     void shouldAddToCoursesWhenAddGroupToCourse() {
         Group group = new Group();
-        courseService.addGroup(new Course(), group);
-        verify(groupDao).addToCourses(group);
+        Course course = new Course();
+        courseService.addGroup(course, group);
+        verify(groupDao).addToCourses(group, Mockito.any());
     }
 
     @Test
     void shouldAddToCoursesWhenAddTeacherToCourse() {
         Teacher teacher = new Teacher();
         courseService.addTeacher(new Course(), teacher);
-        verify(teacherDao).addToCourses(teacher);
+        verify(teacherDao).addToCourses(teacher, Mockito.any());
     }
 
     @Test

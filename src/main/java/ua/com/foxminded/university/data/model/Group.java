@@ -1,11 +1,38 @@
 package ua.com.foxminded.university.data.model;
 
-import java.util.List;
+import java.util.Set;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "groups")
+@NamedQuery(name = "Group.getByName", query = "FROM Group WHERE name = :name")
+@NamedQuery(name = "Group.getAll", query = "FROM Group")
+@NamedQuery(name = "Group.getTabletime",
+    query = "FROM Tabletime WHERE group = :group AND dateTime BETWEEN :begin AND :end")
 public class Group extends AbstractEntity {
 
+    @Column(name = "name")
     private String name;
-    private List<Course> courses;
+
+    @ManyToMany
+    @JoinTable(name = "groups_courses",
+        joinColumns = @JoinColumn(name = "group_id"),
+        inverseJoinColumns = @JoinColumn(name = "course_id"))
+    private Set<Course> courses;
+
+    @OneToMany(mappedBy = "group")
+    private Set<Student> students;
+
+    @OneToMany(mappedBy = "group")
+    private Set<TabletimeRow> tabletime;
 
     public Group() {
         super();
@@ -24,12 +51,28 @@ public class Group extends AbstractEntity {
         this.name = name;
     }
 
-    public List<Course> getCourses() {
+    public Set<Course> getCourses() {
         return courses;
     }
 
-    public void setCourses(List<Course> courses) {
+    public Set<Student> getStudents() {
+        return students;
+    }
+
+    public void setStudents(Set<Student> students) {
+        this.students = students;
+    }
+
+    public void setCourses(Set<Course> courses) {
         this.courses = courses;
+    }
+
+    public Set<TabletimeRow> getTabletime() {
+        return tabletime;
+    }
+
+    public void setTabletime(Set<TabletimeRow> tabletime) {
+        this.tabletime = tabletime;
     }
 
     @Override

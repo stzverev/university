@@ -3,6 +3,7 @@ package ua.com.foxminded.university.web.controller;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -40,7 +41,6 @@ public class GroupsController {
     private TeacherService teacherService;
     private Logger logger = LoggerFactory.getLogger(GroupsController.class);
 
-
     @Autowired
     public void setTeacherService(TeacherService teacherService) {
         this.teacherService = teacherService;
@@ -70,10 +70,13 @@ public class GroupsController {
     @GetMapping("/{id}/edit")
     public String showEdit(Model model, @PathVariable("id") long id) {
         Group group = groupService.getById(id);
-        List<Student> students = groupService.getStudents(group);
-        group.setCourses(groupService.getCourses(group));
+        Set<Student> students = groupService.getStudents(group);
+        logger.debug("students: {}", students.size());
+        Set<Course> courses = groupService.getCourses(group);
+        logger.debug("courses: {}", courses.size());
         model.addAttribute("group", group);
         model.addAttribute("students", students);
+        model.addAttribute("courses", courses);
         return "groups/card";
     }
 
@@ -82,7 +85,7 @@ public class GroupsController {
             @RequestParam("begin") @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime begin,
             @RequestParam("end") @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime end)  {
         Group group = groupService.getById(groupId);
-        List<TabletimeRow> tabletime = groupService.getTabletime(group, begin, end);
+        Set<TabletimeRow> tabletime = groupService.getTabletime(group, begin, end);
         model.addAttribute("group", group );
         model.addAttribute("begin", begin);
         model.addAttribute("end", end);
@@ -123,7 +126,7 @@ public class GroupsController {
         tableTimeRow.setTeacher(teacher);
         tableTimeRow.setDateTime(begin);
 
-        groupService.addTabletimeRows(Collections.singletonList(tableTimeRow));
+        groupService.addTabletimeRows(Collections.singleton(tableTimeRow));
 
         return REDIRECT_TO_GROUPS + "/" + groupId + "/edit";
     }
@@ -157,8 +160,7 @@ public class GroupsController {
     public String addCourse(@RequestParam("groupId") long groupId, @RequestParam("courseId") long courseId) {
         Group group = groupService.getById(groupId);
         Course course = courseService.getById(courseId);
-        group.setCourses(Collections.singletonList(course));
-        groupService.addToCourses(group);
+        groupService.addToCourses(group, Collections.singleton(course));
         return REDIRECT_TO_GROUPS;
     }
 

@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -135,7 +136,7 @@ class TeachersControllerTest {
         teacher.setId(TEACHER_TEST_ID);
 
         when(teacherService.getById(teacher.getId())).thenReturn(teacher);
-        when(teacherService.getCourses(teacher)).thenReturn(new ArrayList<>());
+        when(teacherService.getCourses(teacher)).thenReturn(new HashSet<>());
         mockMvc.perform(get("/teachers/" + teacher.getId() + "/delete-course"))
             .andExpect(status().isOk());
         verify(teacherService).getById(teacher.getId());
@@ -181,7 +182,7 @@ class TeachersControllerTest {
                 .param("teacherId", "" + teacher.getId())
                 .param("courseId", "" + testCourse.getId()))
             .andExpect(status().is3xxRedirection());
-        verify(teacherService).addToCourses(Mockito.any());
+        verify(teacherService).addToCourse(Mockito.any(), Mockito.any());
     }
 
 }

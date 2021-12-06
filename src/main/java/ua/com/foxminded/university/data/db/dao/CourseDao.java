@@ -2,6 +2,7 @@ package ua.com.foxminded.university.data.db.dao;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
@@ -19,8 +20,8 @@ public interface CourseDao extends GenericDao<Course> {
     List<TabletimeRow> getTabletime(Course course, LocalDateTime begin,
             LocalDateTime end);
 
-    List<Teacher> getTeachers(Course course);
+    Set<Teacher> getTeachers(Course course);
 
-    List<Group> getGroups(Course group);
+    Set<Group> getGroups(Course group);
 
 }

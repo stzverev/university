@@ -4,7 +4,9 @@ import static org.mockito.Mockito.verify;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +22,6 @@ import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.TabletimeRow;
 import ua.com.foxminded.university.data.model.Teacher;
 import ua.com.foxminded.university.data.service.DataInitializer;
-import ua.com.foxminded.university.data.service.impl.TeacherServiceImpl;
 
 @SpringJUnitConfig(ConfigTest.class)
 @ExtendWith(SpringExtension.class)
@@ -68,7 +69,7 @@ class TeacherServiceImplTest {
 
     @Test
     void shouldAddTabletimeRowsWhenAddTabletime() {
-        List<TabletimeRow> rows = new ArrayList<>();
+        Set<TabletimeRow> rows = new HashSet<>();
         teacherService.addTabletimeRows(rows);
         verify(teacherDao).addTabletimeRows(rows);
     }
@@ -76,9 +77,9 @@ class TeacherServiceImplTest {
     @Test
     void shouldAddCoursesWhenAddCourses() {
         Teacher teacher = new Teacher();
-        teacher.setCourses(new ArrayList<Course>());
-        teacherService.addCourses(teacher);
-        verify(teacherDao).addToCourses(teacher);
+        Set<Course> courses = new HashSet<>();
+        teacherService.addCourses(teacher, courses);
+        verify(teacherDao).addToCourses(teacher, courses);
     }
 
     @Test
