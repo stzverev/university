@@ -22,6 +22,18 @@ public class TimetableRowId implements Serializable {
     @Column(name = "teacher_id")
     private Long teacherId;
 
+    public TimetableRowId() {
+        super();
+    }
+
+    public TimetableRowId(LocalDateTime dateTime, Long groupId, Long courseId, Long teacherId) {
+        super();
+        this.dateTime = dateTime;
+        this.groupId = groupId;
+        this.courseId = courseId;
+        this.teacherId = teacherId;
+    }
+
     public LocalDateTime getDateTime() {
         return dateTime;
     }

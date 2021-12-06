@@ -1,65 +1,57 @@
 package ua.com.foxminded.university.data.service.impl;
 
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import ua.com.foxminded.university.data.ConfigTest;
 import ua.com.foxminded.university.data.db.dao.CourseDao;
 import ua.com.foxminded.university.data.db.dao.GroupDao;
 import ua.com.foxminded.university.data.db.dao.TeacherDao;
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.Teacher;
-import ua.com.foxminded.university.data.service.DataInitializer;
 
-@SpringJUnitConfig(ConfigTest.class)
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 class CourseServiceImplTest {
 
-    @MockBean
+    private static final int COURSE_TEST_ID = 1;
+
+    @Mock
     private CourseDao courseDao;
 
-    @MockBean
+    @Mock
     private GroupDao groupDao;
 
-    @MockBean
+    @Mock
     private TeacherDao teacherDao;
 
-    @Autowired
+    @InjectMocks
     private CourseServiceImpl courseService;
-
-    @Autowired
-    private  DataInitializer dataInitializer;
-
-    @BeforeEach
-    private void init() {
-        dataInitializer.loadData();
-    }
 
     @Test
     void shouldAddToCoursesWhenAddGroupToCourse() {
         Group group = new Group();
         Course course = new Course();
         courseService.addGroup(course, group);
-        verify(groupDao).addToCourses(group, Mockito.any());
+        verify(groupDao).addToCourses(Mockito.eq(group), Mockito.eq(Collections.singleton(course)));
     }
 
     @Test
     void shouldAddToCoursesWhenAddTeacherToCourse() {
         Teacher teacher = new Teacher();
         courseService.addTeacher(new Course(), teacher);
-        verify(teacherDao).addToCourses(teacher, Mockito.any());
+        verify(teacherDao).addToCourses(Mockito.eq(teacher), Mockito.any());
     }
 
     @Test
@@ -77,8 +69,9 @@ class CourseServiceImplTest {
 
     @Test
     void shouldGetCourseByIdWhenGetById() {
-        courseService.getById(1);
-        verify(courseDao).getById(1);
+        when(courseDao.getById(COURSE_TEST_ID)).thenReturn(Optional.of(new Course()));
+        courseService.getById(COURSE_TEST_ID);
+        verify(courseDao).getById(COURSE_TEST_ID);
     }
 
     @Test

@@ -1,7 +1,6 @@
 package ua.com.foxminded.university.data.db.dao.jpa;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -109,19 +108,6 @@ class StudentDaoJpaTest {
         Student actual = studentDao.getById(expected.getId()).get();
 
         assertEquals(expected, actual);
-    }
-
-    @Test
-    void shouldThrowExceptionWhenGetStudenThatWasDeleted() {
-        String firstName = "Blaize";
-        String lastName = "Pascal";
-        Group group = saveAndGetTestGroup();
-        Student student = saveAndGetStudent(firstName, lastName, group);
-        long studentId = student.getId();
-        studentDao.delete(studentId);
-
-        Throwable throwable = assertThrows(NullPointerException.class, () -> studentDao.getById(studentId));
-//        assertEquals("Incorrect result size: expected 1, actual 0", throwable.getMessage());
     }
 
     private Student saveAndGetStudent(String firstName, String lastName, Group group) {

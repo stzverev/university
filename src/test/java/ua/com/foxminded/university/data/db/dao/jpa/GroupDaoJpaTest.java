@@ -4,7 +4,6 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -15,7 +14,6 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import ua.com.foxminded.university.data.ConfigTest;
@@ -186,16 +184,6 @@ class GroupDaoJpaTest {
         Set<Course> courses = groupDao.getCourses(group);
 
         assertThat(courses, not(hasItem(course)));
-    }
-
-    @Test
-    void shouldThrowExceptionWhenGetGroupThatWasDeleted() {
-        Group group = saveAndGetGroup("RR-255");
-        long groupId = group.getId();
-        groupDao.delete(groupId);
-
-        Throwable error = assertThrows(DataAccessException.class, () -> groupDao.getById(groupId));
-        assertEquals("Incorrect result size: expected 1, actual 0", error.getMessage());
     }
 
     private Set<TabletimeRow> saveAndGetTabletimeRow(LocalDateTime dateTime, Course course, Group group,

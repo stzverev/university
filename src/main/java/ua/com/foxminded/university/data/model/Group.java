@@ -16,7 +16,7 @@ import javax.persistence.Table;
 @NamedQuery(name = "Group.getByName", query = "FROM Group WHERE name = :name")
 @NamedQuery(name = "Group.getAll", query = "FROM Group")
 @NamedQuery(name = "Group.getTabletime",
-    query = "FROM Tabletime WHERE group = :group AND dateTime BETWEEN :begin AND :end")
+    query = "FROM Tabletime WHERE group = :group AND id.dateTime BETWEEN :begin AND :end")
 public class Group extends AbstractEntity {
 
     @Column(name = "name")

@@ -1,45 +1,36 @@
 package ua.com.foxminded.university.data.service.impl;
 
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import ua.com.foxminded.university.data.ConfigTest;
 import ua.com.foxminded.university.data.db.dao.GroupDao;
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.TabletimeRow;
-import ua.com.foxminded.university.data.service.DataInitializer;
 
-@SpringJUnitConfig(ConfigTest.class)
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 class GroupServiceImplTest {
 
-    @MockBean
+    private static final long GROUP_ID_TEST = 1;
+
+    @Mock
     private GroupDao groupDao;
 
-    @Autowired
+    @InjectMocks
     private GroupServiceImpl groupService;
-
-    @Autowired
-    private  DataInitializer dataInitializer;
-
-    @BeforeEach
-    private void init() {
-        dataInitializer.loadData();
-    }
 
     @Test
     void shouldSaveGroupWhenSave() {
@@ -56,8 +47,9 @@ class GroupServiceImplTest {
 
     @Test
     void shouldGetGroupByIdWhenGetById() {
-        groupService.getById(1);
-        verify(groupDao).getById(1);
+        when(groupDao.getById(GROUP_ID_TEST)).thenReturn(Optional.of(new Group()));
+        groupService.getById(GROUP_ID_TEST);
+        verify(groupDao).getById(GROUP_ID_TEST);
     }
 
     @Test

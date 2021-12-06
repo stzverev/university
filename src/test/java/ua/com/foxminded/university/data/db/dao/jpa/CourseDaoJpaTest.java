@@ -3,7 +3,6 @@ package ua.com.foxminded.university.data.db.dao.jpa;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -14,7 +13,6 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import ua.com.foxminded.university.data.ConfigTest;
@@ -165,16 +163,6 @@ class CourseDaoJpaTest {
                 LocalDateTime.of(2021, 10, 12, 23, 59, 59));;
 
         assertEquals(expected, actual);
-    }
-
-    @Test
-    void shouldThrowExceptionWhenGetCourseThatWasDeleted() {
-        Course course = saveAndGetCourse("Math");
-        long courseId = course.getId();
-        courseDao.delete(courseId);
-
-        DataAccessException error = assertThrows(DataAccessException.class, () -> courseDao.getById(courseId));
-        assertEquals("Incorrect result size: expected 1, actual 0", error.getMessage());
     }
 
     private List<TabletimeRow> saveAndGetTabletimeRow(LocalDateTime dateTime, Course course, Group group,

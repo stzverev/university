@@ -2,6 +2,7 @@ package ua.com.foxminded.university.data.model;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -16,10 +17,6 @@ public class TabletimeRow implements Serializable {
 
     @EmbeddedId
     private TimetableRowId id;
-
-    @MapsId("dateTime")
-    @JoinColumn(name = "date_time")
-    private LocalDateTime dateTime;
 
     @ManyToOne
     @MapsId("groupId")
@@ -36,8 +33,16 @@ public class TabletimeRow implements Serializable {
     @JoinColumn(name = "teacher_id")
     private Teacher teacher;
 
+    public TabletimeRow() {
+        super();
+    }
+
     public LocalDateTime getDateTime() {
-        return dateTime;
+        return id.getDateTime();
+    }
+
+    public void setId(TimetableRowId id) {
+        this.id = id;
     }
 
     public TimetableRowId getId() {
@@ -57,7 +62,7 @@ public class TabletimeRow implements Serializable {
     }
 
     public void setDateTime(LocalDateTime dateTime) {
-        this.dateTime = dateTime;
+        this.id.setDateTime(dateTime);
     }
 
     public void setGroup(Group group) {
@@ -73,21 +78,8 @@ public class TabletimeRow implements Serializable {
     }
 
     @Override
-    public String toString() {
-        return "TabletimeRow [dateTime=" + dateTime + ", group=" + group
-                + ", course=" + course + ", teacher=" + teacher + "]";
-    }
-
-    @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((course == null) ? 0 : course.hashCode());
-        result = prime * result + ((dateTime == null) ? 0
-                : dateTime.hashCode());
-        result = prime * result + ((group == null) ? 0 : group.hashCode());
-        result = prime * result + ((teacher == null) ? 0 : teacher.hashCode());
-        return result;
+        return Objects.hash(course, group, id, teacher);
     }
 
     @Override
@@ -99,27 +91,8 @@ public class TabletimeRow implements Serializable {
         if (getClass() != obj.getClass())
             return false;
         TabletimeRow other = (TabletimeRow) obj;
-        if (course == null) {
-            if (other.course != null)
-                return false;
-        } else if (!course.equals(other.course))
-            return false;
-        if (dateTime == null) {
-            if (other.dateTime != null)
-                return false;
-        } else if (!dateTime.equals(other.dateTime))
-            return false;
-        if (group == null) {
-            if (other.group != null)
-                return false;
-        } else if (!group.equals(other.group))
-            return false;
-        if (teacher == null) {
-            if (other.teacher != null)
-                return false;
-        } else if (!teacher.equals(other.teacher))
-            return false;
-        return true;
+        return Objects.equals(course, other.course) && Objects.equals(group, other.group)
+                && Objects.equals(id, other.id) && Objects.equals(teacher, other.teacher);
     }
 
 }
