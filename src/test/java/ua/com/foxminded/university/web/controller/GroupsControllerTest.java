@@ -209,7 +209,7 @@ class GroupsControllerTest {
 
         LocalDateTime begin = LocalDateTime.now();
         LocalDateTime end = LocalDateTime.now();
-        TabletimeRow tabletimeRow = new TabletimeRow();
+        TabletimeRow tabletimeRow = new TabletimeRow(end, new Course(), group, new Teacher());
 
         when(groupService.getById(group.getId())).thenReturn(group);
         when(groupService.getTabletime(group, begin, end)).thenReturn(Collections.singleton(tabletimeRow));

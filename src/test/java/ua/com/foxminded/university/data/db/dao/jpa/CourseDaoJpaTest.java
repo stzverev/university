@@ -133,13 +133,13 @@ class CourseDaoJpaTest {
         Group group = saveAndGetGroup("FJ-42");
         Teacher teacher = saveAndGetTeacher("Sheldon", "Cooper");
         List<TabletimeRow> rows = saveAndGetTabletimeRow(dateTime, course, group, teacher);
-        List<TabletimeRow> expected = rows;
+        TabletimeRow expected = rows.stream().findFirst().get();
 
         LocalDateTime begin = LocalDateTime.of(2021, 10, 11, 0, 0, 0);
         LocalDateTime end = LocalDateTime.of(2021, 10, 11, 23, 59, 59);
-        List<TabletimeRow> tabletimeRowsGet = courseDao.getTabletime(course,
+        Set<TabletimeRow> tabletimeRowsGet = courseDao.getTabletime(course,
                 begin, end);
-        List<TabletimeRow> actual = tabletimeRowsGet;
+        TabletimeRow actual = tabletimeRowsGet.stream().findFirst().get();
 
         assertEquals(expected, actual);
     }
@@ -152,26 +152,24 @@ class CourseDaoJpaTest {
         saveAndGetTabletimeRow(
                 LocalDateTime.of(2021, 10, 11, 9, 0),
                 course, group, teacher);
-        List<TabletimeRow> expected = courseDao.getTabletime(course,
+        Set<TabletimeRow> rowsBeforeChanges = courseDao.getTabletime(course,
                 LocalDateTime.of(2021, 10, 11, 0, 0, 0),
                 LocalDateTime.of(2021, 10, 11, 23, 59, 59));
-        expected.get(0).setDateTime(
+        rowsBeforeChanges.stream().findFirst().get().getId().setDateTime(
                 LocalDateTime.of(2021, 10, 12, 10, 0));
-        courseDao.updateTabletime(expected);
-        List<TabletimeRow> actual = courseDao.getTabletime(course,
+        TabletimeRow expected = rowsBeforeChanges.stream().findFirst().get();
+        courseDao.updateTabletime(rowsBeforeChanges);
+        Set<TabletimeRow> rowsAfterChanges = courseDao.getTabletime(course,
                 LocalDateTime.of(2021, 10, 12, 0, 0, 0),
-                LocalDateTime.of(2021, 10, 12, 23, 59, 59));;
+                LocalDateTime.of(2021, 10, 12, 23, 59, 59));
+        TabletimeRow actual = rowsAfterChanges.stream().findFirst().get();
 
         assertEquals(expected, actual);
     }
 
     private List<TabletimeRow> saveAndGetTabletimeRow(LocalDateTime dateTime, Course course, Group group,
             Teacher teacher) {
-        TabletimeRow row = new TabletimeRow();
-        row.setTeacher(teacher);
-        row.setCourse(course);
-        row.setGroup(group);
-        row.setDateTime(dateTime);
+        TabletimeRow row = new TabletimeRow(dateTime, course, group, teacher);
         List<TabletimeRow> rows = Collections.singletonList(row);
         courseDao.saveTabletime(rows);
         return rows;

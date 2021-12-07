@@ -61,7 +61,7 @@ class GroupServiceImplTest {
 
     @Test
     void shouldAddTabletimeRowsWhenAddTabletime() {
-        Set<TabletimeRow> rows = new HashSet<>();
+        List<TabletimeRow> rows = new ArrayList<>();
         groupService.addTabletimeRows(rows);
         verify(groupDao).addTabletimeRows(rows);
     }

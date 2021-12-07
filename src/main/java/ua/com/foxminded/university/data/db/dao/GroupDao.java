@@ -1,6 +1,7 @@
 package ua.com.foxminded.university.data.db.dao;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 import ua.com.foxminded.university.data.model.Course;
@@ -14,7 +15,7 @@ public interface GroupDao extends GenericDao<Group> {
 
     Set<Student> getStudents(Group group);
 
-    void addTabletimeRows(Set<TabletimeRow> rows);
+    void addTabletimeRows(List<TabletimeRow> rows);
 
     void updateTabletime(Set<TabletimeRow> rows);
 

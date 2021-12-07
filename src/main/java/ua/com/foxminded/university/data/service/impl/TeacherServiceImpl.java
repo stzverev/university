@@ -64,7 +64,7 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     @Override
-    public void addTabletimeRows(Set<TabletimeRow> tabletimeRows) {
+    public void addTabletimeRows(List<TabletimeRow> tabletimeRows) {
         teacherDao.addTabletimeRows(tabletimeRows);
     }
 

@@ -14,19 +14,19 @@ public class TabletimeRowKey implements Serializable {
     private LocalDateTime dateTime;
 
     @Column(name = "group_id")
-    private Long groupId;
+    private long groupId;
 
     @Column(name = "course_id")
-    private Long courseId;
+    private long courseId;
 
     @Column(name = "teacher_id")
-    private Long teacherId;
+    private long teacherId;
 
     public TabletimeRowKey() {
         super();
     }
 
-    public TabletimeRowKey(LocalDateTime dateTime, Long groupId, Long courseId, Long teacherId) {
+    public TabletimeRowKey(LocalDateTime dateTime, long groupId, long courseId, long teacherId) {
         super();
         this.dateTime = dateTime;
         this.groupId = groupId;
@@ -42,27 +42,33 @@ public class TabletimeRowKey implements Serializable {
         this.dateTime = dateTime;
     }
 
-    public Long getGroupId() {
+    public long getGroupId() {
         return groupId;
     }
 
-    public void setGroupId(Long groupId) {
+    public void setGroupId(long groupId) {
         this.groupId = groupId;
     }
 
-    public Long getCourseId() {
+    @Override
+    public String toString() {
+        return "TabletimeRowKey [dateTime=" + dateTime + ", groupId=" + groupId + ", courseId=" + courseId
+                + ", teacherId=" + teacherId + "]";
+    }
+
+    public long getCourseId() {
         return courseId;
     }
 
-    public void setCourseId(Long courseId) {
+    public void setCourseId(long courseId) {
         this.courseId = courseId;
     }
 
-    public Long getTeacherId() {
+    public long getTeacherId() {
         return teacherId;
     }
 
-    public void setTeacherId(Long teacherId) {
+    public void setTeacherId(long teacherId) {
         this.teacherId = teacherId;
     }
 
@@ -80,8 +86,8 @@ public class TabletimeRowKey implements Serializable {
         if (getClass() != obj.getClass())
             return false;
         TabletimeRowKey other = (TabletimeRowKey) obj;
-        return Objects.equals(courseId, other.courseId) && Objects.equals(dateTime, other.dateTime)
-                && Objects.equals(groupId, other.groupId) && Objects.equals(teacherId, other.teacherId);
+        return courseId == other.courseId && Objects.equals(dateTime, other.dateTime) && groupId == other.groupId
+                && teacherId == other.teacherId;
     }
 
 }

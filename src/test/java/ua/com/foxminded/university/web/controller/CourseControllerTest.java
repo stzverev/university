@@ -1,6 +1,7 @@
 package ua.com.foxminded.university.web.controller;
 
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -55,6 +56,7 @@ class CourseControllerTest {
     @Test
     void shouldGetByIdWhenGetWithId() throws Exception {
         int id = 1;
+        when(courseService.getById(id)).thenReturn(new Course());
         mockMvc.perform(get("/courses/" + id + "/edit"))
             .andExpect(status().isOk());
         verify(courseService).getById(id);

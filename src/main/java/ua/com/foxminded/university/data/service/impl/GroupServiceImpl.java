@@ -63,7 +63,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public void addTabletimeRows(Set<TabletimeRow> tabletimeRows) {
+    public void addTabletimeRows(List<TabletimeRow> tabletimeRows) {
         groupDao.addTabletimeRows(tabletimeRows);
     }
 

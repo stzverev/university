@@ -34,11 +34,13 @@ public class TabletimeRow implements Serializable {
     private Teacher teacher;
 
     public TabletimeRow() {
-        super();
     }
 
-    public LocalDateTime getDateTime() {
-        return id.getDateTime();
+    public TabletimeRow(LocalDateTime dateTime, Course course, Group group, Teacher teacher) {
+        this.id = new TabletimeRowKey(dateTime, group.getId(), course.getId(), teacher.getId());
+        this.course = course;
+        this.group = group;
+        this.teacher = teacher;
     }
 
     public void setId(TabletimeRowKey id) {
@@ -61,10 +63,6 @@ public class TabletimeRow implements Serializable {
         return teacher;
     }
 
-    public void setDateTime(LocalDateTime dateTime) {
-        this.id.setDateTime(dateTime);
-    }
-
     public void setGroup(Group group) {
         this.group = group;
     }
@@ -78,8 +76,13 @@ public class TabletimeRow implements Serializable {
     }
 
     @Override
+    public String toString() {
+        return "TabletimeRow [id=" + id + ", group=" + group + ", course=" + course + ", teacher=" + teacher + "]";
+    }
+
+    @Override
     public int hashCode() {
-        return Objects.hash(course, group, id, teacher);
+        return Objects.hash(id);
     }
 
     @Override
@@ -91,8 +94,7 @@ public class TabletimeRow implements Serializable {
         if (getClass() != obj.getClass())
             return false;
         TabletimeRow other = (TabletimeRow) obj;
-        return Objects.equals(course, other.course) && Objects.equals(group, other.group)
-                && Objects.equals(id, other.id) && Objects.equals(teacher, other.teacher);
+        return Objects.equals(id, other.id);
     }
 
 }

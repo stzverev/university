@@ -16,7 +16,7 @@ import javax.persistence.Table;
 @NamedQuery(name = "Teacher.getByFullName",
     query = "FROM Teacher WHERE firstName = :firstName AND lastName = :lastName")
 @NamedQuery(name = "Teacher.getTabletime",
-    query = "FROM Tabletime WHERE teacher = :teacher AND dateTime BETWEEN :begin AND :end")
+    query = "FROM Tabletime WHERE teacher = :teacher AND id.dateTime BETWEEN :begin AND :end")
 public class Teacher extends Person {
 
     @ManyToMany

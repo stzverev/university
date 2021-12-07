@@ -42,16 +42,24 @@ public class CourseDaoJpa extends AbstractJpaDao<Course> implements CourseDao {
 
     @Override
     public void saveTabletime(List<TabletimeRow> rows) {
-        rows.stream().forEach(getEntityManager()::persist);
+        rows.stream().forEach(row -> {
+            Course course = getEntityManager().find(Course.class, row.getCourse().getId());
+            Teacher teacher = getEntityManager().find(Teacher.class, row.getTeacher().getId());
+            Group group = getEntityManager().find(Group.class, row.getGroup().getId());
+            row.setCourse(course);
+            row.setGroup(group);
+            row.setTeacher(teacher);
+            getEntityManager().persist(row);
+        });
     }
 
     @Override
-    public void updateTabletime(List<TabletimeRow> rows) {
+    public void updateTabletime(Set<TabletimeRow> rows) {
         rows.stream().forEach(getEntityManager()::merge);
     }
 
     @Override
-    public List<TabletimeRow> getTabletime(Course course, LocalDateTime begin, LocalDateTime end) {
+    public Set<TabletimeRow> getTabletime(Course course, LocalDateTime begin, LocalDateTime end) {
         List<TabletimeRow> tabletime = getEntityManager()
                 .createNamedQuery(COURSE_GET_TABLETIME, TabletimeRow.class)
                 .setParameter("course", course)
@@ -59,7 +67,7 @@ public class CourseDaoJpa extends AbstractJpaDao<Course> implements CourseDao {
                 .setParameter("end", end)
                 .getResultList();
         tabletime.stream().forEach(getEntityManager()::detach);
-        return tabletime;
+        return tabletime.stream().collect(Collectors.toSet());
     }
 
     @Override

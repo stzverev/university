@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import ua.com.foxminded.university.data.db.dao.TeacherDao;
 import ua.com.foxminded.university.data.model.Course;
+import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.TabletimeRow;
 import ua.com.foxminded.university.data.model.Teacher;
 
@@ -62,8 +63,16 @@ public class TeacherDaoJpa extends AbstractJpaDao<Teacher> implements TeacherDao
     }
 
     @Override
-    public void addTabletimeRows(Set<TabletimeRow> rows) {
-        rows.stream().forEach(getEntityManager()::persist);
+    public void addTabletimeRows(List<TabletimeRow> rows) {
+        rows.stream().forEach(row -> {
+            Course course = getEntityManager().find(Course.class, row.getCourse().getId());
+            Teacher teacher = getEntityManager().find(Teacher.class, row.getTeacher().getId());
+            Group group = getEntityManager().find(Group.class, row.getGroup().getId());
+            row.setCourse(course);
+            row.setGroup(group);
+            row.setTeacher(teacher);
+            getEntityManager().persist(row);
+        });
     }
 
     @Override
@@ -74,6 +83,9 @@ public class TeacherDaoJpa extends AbstractJpaDao<Teacher> implements TeacherDao
     @Override
     public Set<TabletimeRow> getTabletime(Teacher teacher, LocalDateTime begin, LocalDateTime end) {
         List<TabletimeRow> tabletime = getEntityManager().createNamedQuery(TEACHER_GET_TABLETIME, TabletimeRow.class)
+                .setParameter("teacher", teacher)
+                .setParameter("begin", begin)
+                .setParameter("end", end)
                 .getResultList();
         tabletime.stream().forEach(getEntityManager()::detach);
         return tabletime.stream().collect(Collectors.toSet());

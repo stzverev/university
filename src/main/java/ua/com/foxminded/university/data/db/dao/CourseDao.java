@@ -15,9 +15,9 @@ public interface CourseDao extends GenericDao<Course> {
 
     void saveTabletime(List<TabletimeRow> rows);
 
-    void updateTabletime(List<TabletimeRow> rows);
+    void updateTabletime(Set<TabletimeRow> rows);
 
-    List<TabletimeRow> getTabletime(Course course, LocalDateTime begin,
+    Set<TabletimeRow> getTabletime(Course course, LocalDateTime begin,
             LocalDateTime end);
 
     Set<Teacher> getTeachers(Course course);

@@ -136,20 +136,16 @@ class TeacherDaoJpaTest {
         Course course = saveAndGetCourse("Math");
         Group group = saveAndGetGroup("FJ-42");
         Teacher teacher = saveAndGetTeacher("Sheldon", "Cooper");
-        TabletimeRow row = new TabletimeRow();
-        row.setTeacher(teacher);
-        row.setCourse(course);
-        row.setGroup(group);
-        row.setDateTime(dateTime);
-        Set<TabletimeRow> rows = Collections.singleton(row);
+        TabletimeRow row = new TabletimeRow(dateTime, course, group, teacher);
+        List<TabletimeRow> rows = Collections.singletonList(row);
         teacherDao.addTabletimeRows(rows);
-        Set<TabletimeRow> expected = rows;
+        TabletimeRow expected = rows.get(0);
 
         LocalDateTime begin = LocalDateTime.of(2021, 10, 11, 0, 0, 0);
         LocalDateTime end = LocalDateTime.of(2021, 10, 11, 23, 59, 59);
         Set<TabletimeRow> tabletimeRowsGet = teacherDao.getTabletime(teacher,
                 begin, end);
-        Set<TabletimeRow> actual = tabletimeRowsGet;
+        TabletimeRow actual = tabletimeRowsGet.stream().findFirst().get();
 
         assertEquals(expected, actual);
     }
@@ -162,18 +158,22 @@ class TeacherDaoJpaTest {
         saveAndGetTabletimeRow(
                 LocalDateTime.of(2021, 10, 11, 9, 0),
                 course, group, teacher);
-        Set<TabletimeRow> expected = teacherDao.getTabletime(teacher,
+        Set<TabletimeRow> rowsBeforeChanges = teacherDao.getTabletime(teacher,
                 LocalDateTime.of(2021, 10, 11, 0, 0, 0),
                 LocalDateTime.of(2021, 10, 11, 23, 59, 59));
-        expected.stream()
+        rowsBeforeChanges.stream()
             .findFirst()
             .get()
+            .getId()
             .setDateTime(
                 LocalDateTime.of(2021, 10, 12, 10, 0));
-        teacherDao.updateTabletime(expected);
-        Set<TabletimeRow> actual = teacherDao.getTabletime(teacher,
+        TabletimeRow expected = rowsBeforeChanges.stream().findFirst().get();
+
+        teacherDao.updateTabletime(rowsBeforeChanges);
+        Set<TabletimeRow> rowsAfterChanges = teacherDao.getTabletime(teacher,
                 LocalDateTime.of(2021, 10, 12, 0, 0, 0),
-                LocalDateTime.of(2021, 10, 12, 23, 59, 59));;
+                LocalDateTime.of(2021, 10, 12, 23, 59, 59));
+        TabletimeRow actual = rowsAfterChanges.stream().findFirst().get();
 
         assertEquals(expected, actual);
     }
@@ -189,14 +189,10 @@ class TeacherDaoJpaTest {
         assertThat(teacherCourses, not(hasItem(course)));
     }
 
-    private Set<TabletimeRow> saveAndGetTabletimeRow(LocalDateTime dateTime, Course course, Group group,
+    private List<TabletimeRow> saveAndGetTabletimeRow(LocalDateTime dateTime, Course course, Group group,
             Teacher teacher) {
-        TabletimeRow row = new TabletimeRow();
-        row.setTeacher(teacher);
-        row.setCourse(course);
-        row.setGroup(group);
-        row.setDateTime(dateTime);
-        Set<TabletimeRow> rows = Collections.singleton(row);
+        TabletimeRow row = new TabletimeRow(dateTime, course, group, teacher);
+        List<TabletimeRow> rows = Collections.singletonList(row);
         teacherDao.addTabletimeRows(rows);
         return rows;
     }

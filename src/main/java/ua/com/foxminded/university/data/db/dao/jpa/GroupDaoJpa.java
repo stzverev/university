@@ -3,6 +3,7 @@ package ua.com.foxminded.university.data.db.dao.jpa;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -18,6 +19,7 @@ import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.Student;
 import ua.com.foxminded.university.data.model.TabletimeRow;
+import ua.com.foxminded.university.data.model.Teacher;
 
 @Repository
 @Transactional
@@ -54,8 +56,16 @@ public class GroupDaoJpa extends AbstractJpaDao<Group> implements GroupDao {
     }
 
     @Override
-    public void addTabletimeRows(Set<TabletimeRow> rows) {
-        rows.stream().forEach(row -> getEntityManager().persist(row));
+    public void addTabletimeRows(List<TabletimeRow> rows) {
+        rows.stream().forEach(row -> {
+            Course course = getEntityManager().find(Course.class, row.getCourse().getId());
+            Group group = getEntityManager().find(Group.class, row.getGroup().getId());
+            Teacher teacher = getEntityManager().find(Teacher.class, row.getTeacher().getId());
+            row.setCourse(course);
+            row.setGroup(group);
+            row.setTeacher(teacher);
+            getEntityManager().persist(row);
+        });
     }
 
     @Override
@@ -77,13 +87,15 @@ public class GroupDaoJpa extends AbstractJpaDao<Group> implements GroupDao {
 
     @Override
     public Set<Course> getCourses(Group group) {
-        group = getEntityManager().find(Group.class, group.getId());
+        EntityGraph<Group> entityGraph = getEntityManager().createEntityGraph(Group.class);
+        entityGraph.addAttributeNodes("courses");
+        Map<String, Object> properties = new HashMap<>();
+        properties.put(JAVAX_PERSISTENCE_FETCHGRAPH, entityGraph);
+        group = getEntityManager().find(Group.class, group.getId(), properties);
+
         Set<Course> courses = group.getCourses();
-        logger.debug("courses got: {}", courses.size());
         getEntityManager().detach(group);
-        logger.debug("group detached");
         courses.stream().forEach(getEntityManager()::detach);
-        logger.debug("courses detached");
         return courses;
     }
 

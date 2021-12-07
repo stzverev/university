@@ -120,13 +120,8 @@ public class GroupsController {
         Course course = courseService.getById(courseId);
         Teacher teacher = teacherService.getById(teacherId);
 
-        TabletimeRow tableTimeRow = new TabletimeRow();
-        tableTimeRow.setGroup(group);
-        tableTimeRow.setCourse(course);
-        tableTimeRow.setTeacher(teacher);
-        tableTimeRow.setDateTime(begin);
-
-        groupService.addTabletimeRows(Collections.singleton(tableTimeRow));
+        TabletimeRow tableTimeRow = new TabletimeRow(begin, course, group, teacher);
+        groupService.addTabletimeRows(Collections.singletonList(tableTimeRow));
 
         return REDIRECT_TO_GROUPS + "/" + groupId + "/edit";
     }

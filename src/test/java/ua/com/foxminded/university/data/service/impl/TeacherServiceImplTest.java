@@ -61,7 +61,7 @@ class TeacherServiceImplTest {
 
     @Test
     void shouldAddTabletimeRowsWhenAddTabletime() {
-        Set<TabletimeRow> rows = new HashSet<>();
+        List<TabletimeRow> rows = new ArrayList<>();
         teacherService.addTabletimeRows(rows);
         verify(teacherDao).addTabletimeRows(rows);
     }

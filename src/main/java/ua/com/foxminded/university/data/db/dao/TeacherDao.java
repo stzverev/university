@@ -1,6 +1,7 @@
 package ua.com.foxminded.university.data.db.dao;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 import ua.com.foxminded.university.data.model.Course;
@@ -15,7 +16,7 @@ public interface TeacherDao extends PersonDao<Teacher> {
 
     void removeCourse(Teacher teacher, Course course);
 
-    void addTabletimeRows(Set<TabletimeRow> rows);
+    void addTabletimeRows(List<TabletimeRow> rows);
 
     void updateTabletime(Set<TabletimeRow> rows);
 
