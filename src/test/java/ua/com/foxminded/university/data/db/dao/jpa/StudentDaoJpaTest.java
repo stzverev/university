@@ -1,7 +1,6 @@
-package ua.com.foxminded.university.data.db.dao.jdbc;
+package ua.com.foxminded.university.data.db.dao.jpa;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,22 +8,23 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import ua.com.foxminded.university.data.ConfigTest;
+import ua.com.foxminded.university.data.db.dao.GroupDao;
+import ua.com.foxminded.university.data.db.dao.StudentDao;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.Student;
 import ua.com.foxminded.university.data.service.DataInitializer;
 
 @SpringJUnitConfig(ConfigTest.class)
-class StudentDaoJdbcTest {
+class StudentDaoJpaTest {
 
     @Autowired
-    private StudentDaoJdbc studentDao;
+    private StudentDao studentDao;
 
     @Autowired
-    private GroupDaoJdbc groupDao;
+    private GroupDao groupDao;
 
     @Autowired
     private DataInitializer dataInitializer;
@@ -105,22 +105,9 @@ class StudentDaoJdbcTest {
         studentDao.save(expected);
         expected = studentDao.getByFullName(firstName, lastName);
 
-        Student actual = studentDao.getById(expected.getId());
+        Student actual = studentDao.getById(expected.getId()).get();
 
         assertEquals(expected, actual);
-    }
-
-    @Test
-    void shouldThrowExceptionWhenGetStudenThatWasDeleted() {
-        String firstName = "Blaize";
-        String lastName = "Pascal";
-        Group group = saveAndGetTestGroup();
-        Student student = saveAndGetStudent(firstName, lastName, group);
-        studentDao.delete(student.getId());
-
-        long studentId = student.getId();
-        Throwable throwable = assertThrows(DataAccessException.class, () -> studentDao.getById(studentId));
-        assertEquals("Incorrect result size: expected 1, actual 0", throwable.getMessage());
     }
 
     private Student saveAndGetStudent(String firstName, String lastName, Group group) {

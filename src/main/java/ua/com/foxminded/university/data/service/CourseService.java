@@ -1,6 +1,6 @@
 package ua.com.foxminded.university.data.service;
 
-import java.util.List;
+import java.util.Set;
 
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
@@ -8,9 +8,9 @@ import ua.com.foxminded.university.data.model.Teacher;
 
 public interface CourseService extends CommonService<Course> {
 
-    List<Teacher> getTeachers(Course course);
+    Set<Teacher> getTeachers(Course course);
 
-    List<Group> getGroups(Course course);
+    Set<Group> getGroups(Course course);
 
     void addGroup(Course course, Group group);
 

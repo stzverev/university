@@ -2,20 +2,19 @@ package ua.com.foxminded.university.data.service.impl;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import ua.com.foxminded.university.data.db.dao.StudentDao;
 import ua.com.foxminded.university.data.model.Student;
 import ua.com.foxminded.university.data.service.StudentService;
+import ua.com.foxminded.university.exceptions.ObjectNotFoundById;
 
 @Service
 public class StudentServiceImpl implements StudentService {
 
+    private static final Class<Student> ENTITY_CLASS = Student.class;
     private StudentDao studentDao;
-    private final Logger logger = LoggerFactory.getLogger(StudentServiceImpl.class);
 
     @Autowired
     public StudentServiceImpl(StudentDao studentDao) {
@@ -40,7 +39,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public Student getById(long id) {
-        return studentDao.getById(id);
+        return studentDao.getById(id).orElseThrow(() -> new ObjectNotFoundById(id, ENTITY_CLASS));
     }
 
     @Override

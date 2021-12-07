@@ -1,10 +1,10 @@
 package ua.com.foxminded.university.data.service.impl;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,12 +13,13 @@ import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.TabletimeRow;
 import ua.com.foxminded.university.data.model.Teacher;
 import ua.com.foxminded.university.data.service.TeacherService;
+import ua.com.foxminded.university.exceptions.ObjectNotFoundById;
 
 @Service
 public class TeacherServiceImpl implements TeacherService {
 
+    private static final Class<Teacher> ENTITY_CLASS = Teacher.class;
     private TeacherDao teacherDao;
-    private final Logger logger = LoggerFactory.getLogger(TeacherServiceImpl.class);
 
     @Autowired
     public TeacherServiceImpl(TeacherDao teacherDao) {
@@ -43,12 +44,12 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     public Teacher getById(long id) {
-        return teacherDao.getById(id);
+        return teacherDao.getById(id).orElseThrow(() -> new ObjectNotFoundById(id, ENTITY_CLASS));
     }
 
     @Override
-    public void addCourses(Teacher teacher) {
-        teacherDao.addToCourses(teacher);
+    public void addCourses(Teacher teacher, Set<Course> courses) {
+        teacherDao.addToCourses(teacher, courses);
     }
 
     @Override
@@ -57,7 +58,7 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     @Override
-    public List<TabletimeRow> getTabletime(Teacher teacher, LocalDateTime begin,
+    public Set<TabletimeRow> getTabletime(Teacher teacher, LocalDateTime begin,
             LocalDateTime end) {
         return teacherDao.getTabletime(teacher, begin, end);
     }
@@ -73,7 +74,7 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     @Override
-    public List<Course> getCourses(Teacher teacher) {
+    public Set<Course> getCourses(Teacher teacher) {
         return teacherDao.getCourses(teacher);
     }
 
@@ -89,8 +90,8 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     @Override
-    public void addToCourses(Teacher teacher) {
-        teacherDao.addToCourses(teacher);
+    public void addToCourse(Teacher teacher, Course course) {
+        teacherDao.addToCourses(teacher, Collections.singleton(course));
     }
 
 }

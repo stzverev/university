@@ -1,8 +1,10 @@
 package ua.com.foxminded.university.data.db.dao;
 
+import java.io.Serializable;
 import java.util.List;
+import java.util.Optional;
 
-public interface GenericDao <T> {
+public interface GenericDao <T extends Serializable> {
 
     void save(List<T> list);
 
@@ -12,7 +14,7 @@ public interface GenericDao <T> {
 
     void delete(long id);
 
-    T getById(long id);
+    Optional<T> getById(long id);
 
     List<T> getAll();
 

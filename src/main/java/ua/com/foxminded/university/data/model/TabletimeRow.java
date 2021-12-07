@@ -1,16 +1,54 @@
 package ua.com.foxminded.university.data.model;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
-public class TabletimeRow {
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
+import javax.persistence.Table;
 
-    private LocalDateTime dateTime;
+@Entity(name = "Tabletime")
+@Table(name = "tabletime")
+public class TabletimeRow implements Serializable {
+
+    @EmbeddedId
+    private TabletimeRowKey id;
+
+    @ManyToOne
+    @MapsId("groupId")
+    @JoinColumn(name = "group_id")
     private Group group;
+
+    @ManyToOne
+    @MapsId("courseId")
+    @JoinColumn(name = "course_id")
     private Course course;
+
+    @ManyToOne
+    @MapsId("teacherId")
+    @JoinColumn(name = "teacher_id")
     private Teacher teacher;
 
-    public LocalDateTime getDateTime() {
-        return dateTime;
+    public TabletimeRow() {
+    }
+
+    public TabletimeRow(LocalDateTime dateTime, Course course, Group group, Teacher teacher) {
+        this.id = new TabletimeRowKey(dateTime, group.getId(), course.getId(), teacher.getId());
+        this.course = course;
+        this.group = group;
+        this.teacher = teacher;
+    }
+
+    public void setId(TabletimeRowKey id) {
+        this.id = id;
+    }
+
+    public TabletimeRowKey getId() {
+        return id;
     }
 
     public Group getGroup() {
@@ -23,10 +61,6 @@ public class TabletimeRow {
 
     public Teacher getTeacher() {
         return teacher;
-    }
-
-    public void setDateTime(LocalDateTime dateTime) {
-        this.dateTime = dateTime;
     }
 
     public void setGroup(Group group) {
@@ -43,20 +77,12 @@ public class TabletimeRow {
 
     @Override
     public String toString() {
-        return "TabletimeRow [dateTime=" + dateTime + ", group=" + group
-                + ", course=" + course + ", teacher=" + teacher + "]";
+        return "TabletimeRow [id=" + id + ", group=" + group + ", course=" + course + ", teacher=" + teacher + "]";
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((course == null) ? 0 : course.hashCode());
-        result = prime * result + ((dateTime == null) ? 0
-                : dateTime.hashCode());
-        result = prime * result + ((group == null) ? 0 : group.hashCode());
-        result = prime * result + ((teacher == null) ? 0 : teacher.hashCode());
-        return result;
+        return Objects.hash(id);
     }
 
     @Override
@@ -68,27 +94,7 @@ public class TabletimeRow {
         if (getClass() != obj.getClass())
             return false;
         TabletimeRow other = (TabletimeRow) obj;
-        if (course == null) {
-            if (other.course != null)
-                return false;
-        } else if (!course.equals(other.course))
-            return false;
-        if (dateTime == null) {
-            if (other.dateTime != null)
-                return false;
-        } else if (!dateTime.equals(other.dateTime))
-            return false;
-        if (group == null) {
-            if (other.group != null)
-                return false;
-        } else if (!group.equals(other.group))
-            return false;
-        if (teacher == null) {
-            if (other.teacher != null)
-                return false;
-        } else if (!teacher.equals(other.teacher))
-            return false;
-        return true;
+        return Objects.equals(id, other.id);
     }
 
 }

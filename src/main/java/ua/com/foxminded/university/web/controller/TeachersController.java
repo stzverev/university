@@ -1,7 +1,7 @@
 package ua.com.foxminded.university.web.controller;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -55,9 +55,9 @@ public class TeachersController {
     @GetMapping("/{id}/edit")
     public String showEditCard(Model model, @PathVariable("id") long id) {
         Teacher teacher = teacherService.getById(id);
-        teacher.setCourses(teacherService.getCourses(teacher));
+        Set<Course> courses = teacherService.getCourses(teacher);
         model.addAttribute("teacher", teacher);
-        model.addAttribute("courses", teacher.getCourses());
+        model.addAttribute("courses", courses);
         return "/teachers/card";
     }
 
@@ -109,8 +109,7 @@ public class TeachersController {
     public String addCourse(@RequestParam("teacherId") long teacherId, @RequestParam("courseId") long courseId) {
         Teacher teacher = teacherService.getById(teacherId);
         Course course = courseService.getById(courseId);
-        teacher.setCourses(Collections.singletonList(course));
-        teacherService.addToCourses(teacher);
+        teacherService.addToCourse(teacher, course);
         return REDIRECT_TO_TEACHERS;
     }
 

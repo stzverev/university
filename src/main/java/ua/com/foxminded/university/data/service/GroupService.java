@@ -1,6 +1,6 @@
 package ua.com.foxminded.university.data.service;
 
-import java.util.List;
+import java.util.Set;
 
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
@@ -9,12 +9,12 @@ import ua.com.foxminded.university.data.model.Student;
 public interface GroupService extends CommonService<Group>,
     TabletimeService<Group> {
 
-    void addToCourses(Group group);
+    void addToCourses(Group group, Set<Course> courses);
 
     void removeFromCourse(Group group, Course course);
 
-    List<Student> getStudents(Group group);
+    Set<Student> getStudents(Group group);
 
-    List<Course> getCourses(Group group);
+    Set<Course> getCourses(Group group);
 
 }

@@ -11,7 +11,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +22,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -35,6 +35,7 @@ import ua.com.foxminded.university.data.service.CourseService;
 import ua.com.foxminded.university.data.service.GroupService;
 import ua.com.foxminded.university.data.service.StudentService;
 import ua.com.foxminded.university.data.service.TeacherService;
+import ua.com.foxminded.university.exceptions.ObjectNotFoundById;
 import ua.com.foxminded.university.web.exceptions.RestResponseEntityExceptionHandler;
 
 @ExtendWith(MockitoExtension.class)
@@ -84,7 +85,7 @@ class GroupsControllerTest {
     @Test
     void shouldGetByIdWhenGetWithId() throws Exception {
         Group testGroup = new Group("test");
-        List<Student> students = new ArrayList<>();
+        Set<Student> students = new HashSet<>();
         when(groupService.getById(GROUP_TEST_ID)).thenReturn(testGroup);
         when(groupService.getStudents(testGroup)).thenReturn(students);
         mockMvc.perform(get("/groups/" + GROUP_TEST_ID + "/edit"))
@@ -100,12 +101,12 @@ class GroupsControllerTest {
 
     @Test
     void shouldHandleEmptyDataAccesExceptionWhenGroupNotExist() throws Exception {
-        EmptyResultDataAccessException ex = new EmptyResultDataAccessException("test exception", 1);
+        ObjectNotFoundById ex = new ObjectNotFoundById(GROUP_TEST_ID, Group.class);
         when(groupService.getById(GROUP_TEST_ID))
             .thenThrow(ex);
         mockMvc.perform(get("/groups/" + GROUP_TEST_ID + "/edit"))
             .andExpect(status().isNotFound());
-        verify(controllerAdvice).handleEmptyDataAccesException(Mockito.eq(ex), Mockito.any());
+        verify(controllerAdvice).handleObjectNotFoundById(Mockito.eq(ex), Mockito.any());
     }
 
     @Test
@@ -155,7 +156,7 @@ class GroupsControllerTest {
     void shouldShowDeletingACourse() throws Exception {
         Group testGroup = new Group("test");
         when(groupService.getById(GROUP_TEST_ID)).thenReturn(testGroup);
-        when(groupService.getCourses(testGroup)).thenReturn(new ArrayList<>());
+        when(groupService.getCourses(testGroup)).thenReturn(new HashSet<>());
         mockMvc.perform(get("/groups/" + GROUP_TEST_ID + "/delete-course"))
             .andExpect(status().isOk());
         verify(groupService).getById(GROUP_TEST_ID);
@@ -197,7 +198,7 @@ class GroupsControllerTest {
                 .param("groupId", "" + testGroup.getId())
                 .param("courseId", "" + testCourse.getId()))
             .andExpect(status().is3xxRedirection());
-        verify(groupService).addToCourses(Mockito.any());
+        verify(groupService).addToCourses(Mockito.any(), Mockito.any());
     }
 
     @Test
@@ -208,10 +209,10 @@ class GroupsControllerTest {
 
         LocalDateTime begin = LocalDateTime.now();
         LocalDateTime end = LocalDateTime.now();
-        TabletimeRow tabletimeRow = new TabletimeRow();
+        TabletimeRow tabletimeRow = new TabletimeRow(end, new Course(), group, new Teacher());
 
         when(groupService.getById(group.getId())).thenReturn(group);
-        when(groupService.getTabletime(group, begin, end)).thenReturn(Collections.singletonList(tabletimeRow));
+        when(groupService.getTabletime(group, begin, end)).thenReturn(Collections.singleton(tabletimeRow));
 
         mockMvc.perform(get("/groups/" + group.getId() + "/tabletime")
                 .param("begin", begin.toString())
@@ -230,7 +231,7 @@ class GroupsControllerTest {
         course.setId(COURSE_TEST_ID);
 
         when(groupService.getById(group.getId())).thenReturn(group);
-        when(groupService.getCourses(group)).thenReturn(Collections.singletonList(course));
+        when(groupService.getCourses(group)).thenReturn(Collections.singleton(course));
 
         mockMvc.perform(get("/groups/" + group.getId() + "/tabletime/new"))
             .andExpect(status().isOk());

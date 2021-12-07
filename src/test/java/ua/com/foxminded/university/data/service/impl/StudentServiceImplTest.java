@@ -1,41 +1,35 @@
 package ua.com.foxminded.university.data.service.impl;
 
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import ua.com.foxminded.university.data.ConfigTest;
 import ua.com.foxminded.university.data.db.dao.StudentDao;
 import ua.com.foxminded.university.data.model.Student;
 import ua.com.foxminded.university.data.service.DataInitializer;
-import ua.com.foxminded.university.data.service.impl.StudentServiceImpl;
 
-@SpringJUnitConfig(ConfigTest.class)
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 class StudentServiceImplTest {
 
-    @MockBean
+    private static final int STUDENT_TEST_ID = 1;
+
+    @Mock
     private StudentDao studentDao;
 
-    @Autowired
+    @InjectMocks
     private StudentServiceImpl studentService;
 
-    @Autowired
+    @InjectMocks
     private  DataInitializer dataInitializer;
-
-    @BeforeEach
-    private void init() {
-        dataInitializer.loadData();
-    }
 
     @Test
     void shouldSaveStudentWhenSave() {
@@ -58,8 +52,9 @@ class StudentServiceImplTest {
 
     @Test
     void shouldGetStudentByIdWhenGetById() {
-        studentService.getById(1);
-        verify(studentDao).getById(1);
+        when(studentDao.getById(STUDENT_TEST_ID)).thenReturn(Optional.of(new Student()));
+        studentService.getById(STUDENT_TEST_ID);
+        verify(studentDao).getById(STUDENT_TEST_ID);
     }
 
     @Test

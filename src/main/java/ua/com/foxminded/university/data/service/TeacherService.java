@@ -1,6 +1,6 @@
 package ua.com.foxminded.university.data.service;
 
-import java.util.List;
+import java.util.Set;
 
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Teacher;
@@ -8,14 +8,14 @@ import ua.com.foxminded.university.data.model.Teacher;
 public interface TeacherService extends CommonService<Teacher>,
     TabletimeService<Teacher> {
 
-    void addCourses(Teacher teacher);
+    void addCourses(Teacher teacher, Set<Course> courses);
 
-    List<Course> getCourses(Teacher teacher);
+    Set<Course> getCourses(Teacher teacher);
 
     void removeCourse(Teacher teacher, Course course);
 
     void removeFromCourse(Teacher teacher, Course course);
 
-    void addToCourses(Teacher teacher);
+    void addToCourse(Teacher teacher, Course course);
 
 }

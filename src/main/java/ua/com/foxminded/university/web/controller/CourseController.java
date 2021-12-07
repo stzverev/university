@@ -1,6 +1,7 @@
 package ua.com.foxminded.university.web.controller;
 
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import ua.com.foxminded.university.data.model.Course;
+import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.service.CourseService;
 
 @Controller
@@ -47,6 +49,8 @@ public class CourseController {
     @GetMapping("/{id}/edit")
     public String showEdit(Model model, @PathVariable("id") long id) {
         Course course = courseService.getById(id);
+        Set<Group> groups = courseService.getGroups(course);
+        course.setGroups(groups);
         model.addAttribute("course", course);
         return "courses/card";
     }

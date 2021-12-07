@@ -1,23 +1,26 @@
-package ua.com.foxminded.university.data.db.dao.jdbc;
+package ua.com.foxminded.university.data.db.dao.jpa;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import ua.com.foxminded.university.data.ConfigTest;
+import ua.com.foxminded.university.data.db.dao.CourseDao;
+import ua.com.foxminded.university.data.db.dao.GroupDao;
+import ua.com.foxminded.university.data.db.dao.TeacherDao;
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.TabletimeRow;
@@ -25,16 +28,16 @@ import ua.com.foxminded.university.data.model.Teacher;
 import ua.com.foxminded.university.data.service.DataInitializer;
 
 @SpringJUnitConfig(ConfigTest.class)
-class TeacherDaoJdbcTest {
+class TeacherDaoJpaTest {
 
     @Autowired
-    private TeacherDaoJdbc teacherDao;
+    private TeacherDao teacherDao;
 
     @Autowired
-    private CourseDaoJdbc courseDao;
+    private CourseDao courseDao;
 
     @Autowired
-    private GroupDaoJdbc groupDao;
+    private GroupDao groupDao;
 
     @Autowired
     private DataInitializer dataInitializer;
@@ -106,23 +109,9 @@ class TeacherDaoJdbcTest {
         teacherDao.save(expected);
         expected = teacherDao.getByFullName(firstName, lastName);
 
-        Teacher actual = teacherDao.getById(expected.getId());
+        Teacher actual = teacherDao.getById(expected.getId()).get();
 
         assertEquals(expected, actual);
-    }
-
-    @Test
-    void shouldThrowExceptionWhenGetTeacherThatWasDeleted() {
-        String firstName = "Curtis";
-        String lastName = "Connors";
-        Teacher teacher = saveAndGetTeacher(firstName, lastName);
-        teacherDao.delete(teacher.getId());
-
-        long teacherId = teacher.getId();
-        Throwable throwable = assertThrows(DataAccessException.class,
-                () -> teacherDao.getById(teacherId));
-
-        assertEquals("Incorrect result size: expected 1, actual 0", throwable.getMessage());
     }
 
     @Test
@@ -130,14 +119,13 @@ class TeacherDaoJdbcTest {
         Course courseMath = saveAndGetCourse("Math");
         Course courseHistory = saveAndGetCourse("History");
         Teacher teacher = saveAndGetTeacher("Sheldon", "Cooper");
-        List<Course> courses = new ArrayList<>();
+        Set<Course> courses = new HashSet<>();
         courses.add(courseMath);
         courses.add(courseHistory);
-        teacher.setCourses(courses);
-        teacherDao.addToCourses(teacher);
-        List<Course> expected = courses;
+        teacherDao.addToCourses(teacher, courses);
+        Set<Course> expected = courses;
 
-        List<Course> actual = teacherDao.getCourses(teacher);
+        Set<Course> actual = teacherDao.getCourses(teacher);
 
         assertEquals(expected, actual);
     }
@@ -148,20 +136,16 @@ class TeacherDaoJdbcTest {
         Course course = saveAndGetCourse("Math");
         Group group = saveAndGetGroup("FJ-42");
         Teacher teacher = saveAndGetTeacher("Sheldon", "Cooper");
-        TabletimeRow row = new TabletimeRow();
-        row.setTeacher(teacher);
-        row.setCourse(course);
-        row.setGroup(group);
-        row.setDateTime(dateTime);
+        TabletimeRow row = new TabletimeRow(dateTime, course, group, teacher);
         List<TabletimeRow> rows = Collections.singletonList(row);
         teacherDao.addTabletimeRows(rows);
-        List<TabletimeRow> expected = rows;
+        TabletimeRow expected = rows.get(0);
 
         LocalDateTime begin = LocalDateTime.of(2021, 10, 11, 0, 0, 0);
         LocalDateTime end = LocalDateTime.of(2021, 10, 11, 23, 59, 59);
-        List<TabletimeRow> tabletimeRowsGet = teacherDao.getTabletime(teacher,
+        Set<TabletimeRow> tabletimeRowsGet = teacherDao.getTabletime(teacher,
                 begin, end);
-        List<TabletimeRow> actual = tabletimeRowsGet;
+        TabletimeRow actual = tabletimeRowsGet.stream().findFirst().get();
 
         assertEquals(expected, actual);
     }
@@ -174,15 +158,22 @@ class TeacherDaoJdbcTest {
         saveAndGetTabletimeRow(
                 LocalDateTime.of(2021, 10, 11, 9, 0),
                 course, group, teacher);
-        List<TabletimeRow> expected = teacherDao.getTabletime(teacher,
+        Set<TabletimeRow> rowsBeforeChanges = teacherDao.getTabletime(teacher,
                 LocalDateTime.of(2021, 10, 11, 0, 0, 0),
                 LocalDateTime.of(2021, 10, 11, 23, 59, 59));
-        expected.get(0).setDateTime(
+        rowsBeforeChanges.stream()
+            .findFirst()
+            .get()
+            .getId()
+            .setDateTime(
                 LocalDateTime.of(2021, 10, 12, 10, 0));
-        teacherDao.updateTabletime(expected);
-        List<TabletimeRow> actual = teacherDao.getTabletime(teacher,
+        TabletimeRow expected = rowsBeforeChanges.stream().findFirst().get();
+
+        teacherDao.updateTabletime(rowsBeforeChanges);
+        Set<TabletimeRow> rowsAfterChanges = teacherDao.getTabletime(teacher,
                 LocalDateTime.of(2021, 10, 12, 0, 0, 0),
-                LocalDateTime.of(2021, 10, 12, 23, 59, 59));;
+                LocalDateTime.of(2021, 10, 12, 23, 59, 59));
+        TabletimeRow actual = rowsAfterChanges.stream().findFirst().get();
 
         assertEquals(expected, actual);
     }
@@ -191,21 +182,16 @@ class TeacherDaoJdbcTest {
     void shouldDidntFindCourseWhenTryGetCoursesForTeacherAfterRemove() {
         Teacher teacher = saveAndGetTeacher("Sheldon", "Cooper");
         Course course = saveAndGetCourse("Physics");
-        teacher.setCourses(Collections.singletonList(course));
-        teacherDao.addToCourses(teacher);
+        teacherDao.addToCourses(teacher, Collections.singleton(course));
         teacherDao.removeCourse(teacher, course);
-        List<Course> teacherCourses = teacherDao.getCourses(teacher);
+        Set<Course> teacherCourses = teacherDao.getCourses(teacher);
 
         assertThat(teacherCourses, not(hasItem(course)));
     }
 
     private List<TabletimeRow> saveAndGetTabletimeRow(LocalDateTime dateTime, Course course, Group group,
             Teacher teacher) {
-        TabletimeRow row = new TabletimeRow();
-        row.setTeacher(teacher);
-        row.setCourse(course);
-        row.setGroup(group);
-        row.setDateTime(dateTime);
+        TabletimeRow row = new TabletimeRow(dateTime, course, group, teacher);
         List<TabletimeRow> rows = Collections.singletonList(row);
         teacherDao.addTabletimeRows(rows);
         return rows;

@@ -1,44 +1,36 @@
 package ua.com.foxminded.university.data.service.impl;
 
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import ua.com.foxminded.university.data.ConfigTest;
 import ua.com.foxminded.university.data.db.dao.TeacherDao;
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.TabletimeRow;
 import ua.com.foxminded.university.data.model.Teacher;
-import ua.com.foxminded.university.data.service.DataInitializer;
-import ua.com.foxminded.university.data.service.impl.TeacherServiceImpl;
 
-@SpringJUnitConfig(ConfigTest.class)
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 class TeacherServiceImplTest {
 
-    @MockBean
+    private static final int TEACHER_ID_TEST = 1;
+
+    @Mock
     private TeacherDao teacherDao;
 
-    @Autowired
+    @InjectMocks
     private TeacherServiceImpl teacherService;
-
-    @Autowired
-    private  DataInitializer dataInitializer;
-
-    @BeforeEach
-    private void init() {
-        dataInitializer.loadData();
-    }
 
     @Test
     void shouldSaveTeacherWhenSave() {
@@ -55,8 +47,9 @@ class TeacherServiceImplTest {
 
     @Test
     void shouldGetTeacherByIdWhenGetById() {
-        teacherService.getById(1);
-        verify(teacherDao).getById(1);
+        when(teacherDao.getById(TEACHER_ID_TEST)).thenReturn(Optional.of(new Teacher()));
+        teacherService.getById(TEACHER_ID_TEST);
+        verify(teacherDao).getById(TEACHER_ID_TEST);
     }
 
     @Test
@@ -76,9 +69,9 @@ class TeacherServiceImplTest {
     @Test
     void shouldAddCoursesWhenAddCourses() {
         Teacher teacher = new Teacher();
-        teacher.setCourses(new ArrayList<Course>());
-        teacherService.addCourses(teacher);
-        verify(teacherDao).addToCourses(teacher);
+        Set<Course> courses = new HashSet<>();
+        teacherService.addCourses(teacher, courses);
+        verify(teacherDao).addToCourses(teacher, courses);
     }
 
     @Test
