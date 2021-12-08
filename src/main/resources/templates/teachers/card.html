@@ -22,7 +22,7 @@
 				<div
 					th:if="${#strings.contains(#httpServletRequest.requestURI, '/edit')}">
 					<div
-						th:replace="fragments/courses.html :: table(${teacher.courses})"></div>
+						th:replace="fragments/courses.html :: table(${courses})"></div>
 				</div>
 			</div>
 		</div>

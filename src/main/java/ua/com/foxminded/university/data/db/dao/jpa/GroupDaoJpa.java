@@ -92,9 +92,7 @@ public class GroupDaoJpa extends AbstractJpaDao<Group> implements GroupDao {
         Map<String, Object> properties = new HashMap<>();
         properties.put(JAVAX_PERSISTENCE_FETCHGRAPH, entityGraph);
         group = getEntityManager().find(Group.class, group.getId(), properties);
-
         Set<Course> courses = group.getCourses();
-        getEntityManager().detach(group);
         courses.stream().forEach(getEntityManager()::detach);
         return courses;
     }
