@@ -70,7 +70,7 @@ public class TeachersController {
     @PatchMapping("/{id}")
     public String update(@ModelAttribute Teacher teacher, @PathVariable("id") long id) {
         teacher.setId(id);
-        teacherService.update(teacher);
+        teacherService.save(teacher);
         return REDIRECT_TO_TEACHERS;
     }
 
@@ -101,7 +101,7 @@ public class TeachersController {
     public String deleteCourse(@RequestParam("teacherId") long teacherId, @RequestParam("courseId") long courseId) {
         Teacher teacher = teacherService.getById(teacherId);
         Course course = courseService.getById(courseId);
-        teacherService.removeFromCourse(teacher, course);
+        teacherService.removeCourse(teacher, course);
         return REDIRECT_TO_TEACHERS;
     }
 

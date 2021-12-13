@@ -6,8 +6,7 @@ import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.Student;
 
-public interface GroupService extends CommonService<Group>,
-    TabletimeService<Group> {
+public interface GroupService extends CommonService<Group> {
 
     void addToCourses(Group group, Set<Course> courses);
 

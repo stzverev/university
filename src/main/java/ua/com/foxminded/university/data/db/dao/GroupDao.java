@@ -1,31 +1,11 @@
 package ua.com.foxminded.university.data.db.dao;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Set;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
-import ua.com.foxminded.university.data.model.Student;
-import ua.com.foxminded.university.data.model.TabletimeRow;
 
-public interface GroupDao extends GenericDao<Group> {
+public interface GroupDao extends JpaRepository<Group, Long> {
 
-    Group getByName(String name);
-
-    Set<Student> getStudents(Group group);
-
-    void addTabletimeRows(List<TabletimeRow> rows);
-
-    void updateTabletime(Set<TabletimeRow> rows);
-
-    Set<TabletimeRow> getTabletime(Group group, LocalDateTime begin,
-            LocalDateTime end);
-
-    Set<Course> getCourses(Group group);
-
-    void addToCourses(Group group, Set<Course> courses);
-
-    void deleteFromCourse(Group group, Course course);
+    Group findByName(String name);
 
 }

@@ -103,7 +103,7 @@ class TeachersControllerTest {
         mockMvc.perform(patch("/teachers/" + teacher.getId())
                 .flashAttr("teacher", teacher))
             .andExpect(status().is3xxRedirection());
-        verify(teacherService).update(teacher);
+        verify(teacherService).save(teacher);
     }
 
     @Test
@@ -161,7 +161,7 @@ class TeachersControllerTest {
                 .param("teacherId", "" + teacher.getId())
                 .param("courseId", "" + testCourse.getId()))
             .andExpect(status().is3xxRedirection());
-        verify(teacherService).removeFromCourse(teacher, testCourse);
+        verify(teacherService).removeCourse(teacher, testCourse);
     }
 
     @Test

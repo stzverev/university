@@ -1,9 +1,13 @@
 package ua.com.foxminded.university.data.db.dao;
 
-import java.io.Serializable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.NoRepositoryBean;
 
-public interface PersonDao<T extends Serializable> extends GenericDao<T> {
+import ua.com.foxminded.university.data.model.Person;
 
-    T getByFullName(String firstName, String lastName);
+@NoRepositoryBean
+public interface PersonDao<T extends Person> extends JpaRepository<T, Long> {
+
+    T findByFirstNameAndLastName(String firstName, String lastName);
 
 }

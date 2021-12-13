@@ -72,7 +72,7 @@ public class StudentsController {
         student.setId(id);
         Group group = groupService.getById(groupId);
         student.setGroup(group);
-        studentService.update(student);
+        studentService.save(student);
         return REDIRECT_TO_STUDENTS;
     }
 

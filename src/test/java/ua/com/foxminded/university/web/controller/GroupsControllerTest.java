@@ -34,6 +34,7 @@ import ua.com.foxminded.university.data.model.Teacher;
 import ua.com.foxminded.university.data.service.CourseService;
 import ua.com.foxminded.university.data.service.GroupService;
 import ua.com.foxminded.university.data.service.StudentService;
+import ua.com.foxminded.university.data.service.TabletimeService;
 import ua.com.foxminded.university.data.service.TeacherService;
 import ua.com.foxminded.university.exceptions.ObjectNotFoundById;
 import ua.com.foxminded.university.web.exceptions.RestResponseEntityExceptionHandler;
@@ -46,6 +47,9 @@ class GroupsControllerTest {
 
     @Mock
     private CourseService courseService;
+
+    @Mock
+    private TabletimeService tabletimeService;
 
     @Mock
     private StudentService studentService;
@@ -127,7 +131,7 @@ class GroupsControllerTest {
                 .flashAttr("group", testGroup);
         mockMvc.perform(request)
             .andExpect(status().is3xxRedirection());
-        verify(groupService).update(testGroup);
+        verify(groupService).save(testGroup);
     }
 
     @Test
@@ -212,7 +216,8 @@ class GroupsControllerTest {
         TabletimeRow tabletimeRow = new TabletimeRow(end, new Course(), group, new Teacher());
 
         when(groupService.getById(group.getId())).thenReturn(group);
-        when(groupService.getTabletime(group, begin, end)).thenReturn(Collections.singleton(tabletimeRow));
+        when(tabletimeService.getTabletimeForGroup(group.getId(), begin, end))
+            .thenReturn(Collections.singletonList(tabletimeRow));
 
         mockMvc.perform(get("/groups/" + group.getId() + "/tabletime")
                 .param("begin", begin.toString())
@@ -263,7 +268,8 @@ class GroupsControllerTest {
                 .param("begin", begin.toString()))
             .andExpect(status().is3xxRedirection());
 
-        verify(groupService).addTabletimeRows(Mockito.any());
+        TabletimeRow tabletimeRow = new TabletimeRow(begin, course, group, teacher);
+        verify(tabletimeService).save(Mockito.eq(tabletimeRow));
     }
 
 }

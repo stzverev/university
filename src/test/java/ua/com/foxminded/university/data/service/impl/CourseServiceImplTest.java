@@ -1,114 +1,45 @@
 package ua.com.foxminded.university.data.service.impl;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import ua.com.foxminded.university.data.db.dao.CourseDao;
-import ua.com.foxminded.university.data.db.dao.GroupDao;
-import ua.com.foxminded.university.data.db.dao.TeacherDao;
+import ua.com.foxminded.university.data.ConfigTest;
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
-import ua.com.foxminded.university.data.model.Teacher;
+import ua.com.foxminded.university.data.service.CourseService;
+import ua.com.foxminded.university.data.service.GroupService;
 
-@ExtendWith(MockitoExtension.class)
+@SpringJUnitConfig(ConfigTest.class)
+@Sql(scripts = "classpath:data.sql")
 class CourseServiceImplTest {
 
-    private static final int COURSE_TEST_ID = 1;
+    private static final String COURSE_NAME = "Test course";
+    private static final String GROUP_NAME = "Test group";
 
-    @Mock
-    private CourseDao courseDao;
+    @Autowired
+    private CourseService courseService;
 
-    @Mock
-    private GroupDao groupDao;
-
-    @Mock
-    private TeacherDao teacherDao;
-
-    @InjectMocks
-    private CourseServiceImpl courseService;
+    @Autowired
+    private GroupService groupService;
 
     @Test
-    void shouldAddToCoursesWhenAddGroupToCourse() {
-        Group group = new Group();
-        Course course = new Course();
-        courseService.addGroup(course, group);
-        verify(groupDao).addToCourses(Mockito.eq(group), Mockito.eq(Collections.singleton(course)));
-    }
-
-    @Test
-    void shouldAddToCoursesWhenAddTeacherToCourse() {
-        Teacher teacher = new Teacher();
-        courseService.addTeacher(new Course(), teacher);
-        verify(teacherDao).addToCourses(Mockito.eq(teacher), Mockito.any());
-    }
-
-    @Test
-    void shouldSaveCourseWhenSave() {
-        Course course = new Course();
+    void shouldContainsGroupWhenAddedGroup() {
+        Group group = new Group(GROUP_NAME);
+        Course course = new Course(COURSE_NAME);
+        groupService.save(group);
         courseService.save(course);
-        verify(courseDao).save(course);
-    }
+        courseService.addGroup(course, group);
 
-    @Test
-    void shouldGetCoursesWhenGet() {
-        courseService.getAll();
-        verify(courseDao).getAll();
-    }
+        Set<Group> actual = courseService.getGroups(course);
 
-    @Test
-    void shouldGetCourseByIdWhenGetById() {
-        when(courseDao.getById(COURSE_TEST_ID)).thenReturn(Optional.of(new Course()));
-        courseService.getById(COURSE_TEST_ID);
-        verify(courseDao).getById(COURSE_TEST_ID);
-    }
-
-    @Test
-    void shouldSaveCoursesWhenSaveListCourses() {
-        List<Course> courses = new ArrayList<>();
-        courseService.save(courses);
-        verify(courseDao).save(courses);
-    }
-
-    @Test
-    void shouldGetGroupWhenGetGroup() {
-        Course course = new Course();
-        courseService.getGroups(course);
-        verify(courseDao).getGroups(course);
-    }
-
-    @Test
-    void shouldGetTeachersWhenGetTeacher() {
-        Course course = new Course();
-        courseService.getTeachers(course);
-        verify(courseDao).getTeachers(course);
-    }
-
-    @Test
-    void shouldRemoveGroupWhenRemoveGroup() {
-        Course course = new Course();
-        Group group = new Group();
-        courseService.removeGroup(course, group);
-        verify(groupDao).deleteFromCourse(group, course);
-    }
-
-    @Test
-    void shouldRemoveTeacherWhenRemoveTeacher() {
-        Course course = new Course();
-        Teacher teacher = new Teacher();
-        courseService.removeTeacherFromCourse(course, teacher);
-        verify(teacherDao).removeCourse(teacher, course);
+        assertThat(actual, hasItem(group));
     }
 
 }

@@ -2,18 +2,19 @@ package ua.com.foxminded.university.data.service.impl;
 
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import ua.com.foxminded.university.data.db.dao.StudentDao;
 import ua.com.foxminded.university.data.model.Student;
 import ua.com.foxminded.university.data.service.StudentService;
-import ua.com.foxminded.university.exceptions.ObjectNotFoundById;
 
 @Service
+@Transactional
 public class StudentServiceImpl implements StudentService {
 
-    private static final Class<Student> ENTITY_CLASS = Student.class;
     private StudentDao studentDao;
 
     @Autowired
@@ -29,32 +30,27 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public void save(List<Student> students) {
-        studentDao.save(students);
+        studentDao.saveAll(students);
     }
 
     @Override
     public List<Student> getAll() {
-        return studentDao.getAll();
+        return studentDao.findAll();
     }
 
     @Override
     public Student getById(long id) {
-        return studentDao.getById(id).orElseThrow(() -> new ObjectNotFoundById(id, ENTITY_CLASS));
+        return studentDao.getById(id);
     }
 
     @Override
     public Student getByFullName(String firstName, String lastName) {
-        return studentDao.getByFullName(firstName, lastName);
-    }
-
-    @Override
-    public void update(Student student) {
-        studentDao.update(student);
+        return studentDao.findByFirstNameAndLastName(firstName, lastName);
     }
 
     @Override
     public void delete(long id) {
-        studentDao.delete(id);
+        studentDao.deleteById(id);
     }
 
 }

@@ -51,11 +51,12 @@ CREATE TABLE groups_courses (
 );
 
 CREATE TABLE tabletime(
+    id SERIAL NOT NULL,
     date_time timestamp NOT NULL,
     group_id int NOT NULL,
     course_id int NOT NULL,
     teacher_id int NOT null,
-    CONSTRAINT PK_tabletime PRIMARY KEY (date_time, group_id, course_id, teacher_id),
+    CONSTRAINT PK_tabletime PRIMARY KEY (id),
     CONSTRAINT FK_tabletime_groups FOREIGN KEY (group_id) REFERENCES groups(id),
     CONSTRAINT FK_tabletime_courses FOREIGN KEY (course_id) REFERENCES courses(id),
     CONSTRAINT FK_tabletime_teachers FOREIGN KEY (teacher_id) REFERENCES teachers(id)   

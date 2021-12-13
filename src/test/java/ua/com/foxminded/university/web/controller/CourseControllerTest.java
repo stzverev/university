@@ -89,7 +89,7 @@ class CourseControllerTest {
         mockMvc.perform(patch("/courses/" + COURSE_TEST_ID)
                 .flashAttr("course", course))
             .andExpect(status().is3xxRedirection());
-        verify(courseService).update(course);
+        verify(courseService).save(course);
     }
 
     @Test

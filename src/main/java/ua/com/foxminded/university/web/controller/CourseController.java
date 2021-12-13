@@ -64,7 +64,7 @@ public class CourseController {
     @PatchMapping("/{id}")
     public String update(@ModelAttribute Course course, @PathVariable("id") long id) {
         course.setId(id);
-        courseService.update(course);
+        courseService.save(course);
         return REDIRECT_TO_COURSES;
     }
 

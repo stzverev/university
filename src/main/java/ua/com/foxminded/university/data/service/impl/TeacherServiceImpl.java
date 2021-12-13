@@ -1,30 +1,34 @@
 package ua.com.foxminded.university.data.service.impl;
 
-import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import ua.com.foxminded.university.data.db.dao.CourseDao;
+import ua.com.foxminded.university.data.db.dao.TabletimeDao;
 import ua.com.foxminded.university.data.db.dao.TeacherDao;
 import ua.com.foxminded.university.data.model.Course;
-import ua.com.foxminded.university.data.model.TabletimeRow;
 import ua.com.foxminded.university.data.model.Teacher;
 import ua.com.foxminded.university.data.service.TeacherService;
-import ua.com.foxminded.university.exceptions.ObjectNotFoundById;
 
 @Service
+@Transactional
 public class TeacherServiceImpl implements TeacherService {
 
-    private static final Class<Teacher> ENTITY_CLASS = Teacher.class;
     private TeacherDao teacherDao;
+    private CourseDao courseDao;
+    private TabletimeDao tabletimeDao;
 
     @Autowired
-    public TeacherServiceImpl(TeacherDao teacherDao) {
+    public TeacherServiceImpl(TeacherDao teacherDao, CourseDao courseDao) {
         super();
         this.teacherDao = teacherDao;
+        this.courseDao = courseDao;
     }
 
     @Override
@@ -34,64 +38,51 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     public void save(List<Teacher> teachers) {
-        teacherDao.save(teachers);
+        teacherDao.saveAll(teachers);
     }
 
     @Override
     public List<Teacher> getAll() {
-        return teacherDao.getAll();
+        return teacherDao.findAll();
     }
 
     @Override
     public Teacher getById(long id) {
-        return teacherDao.getById(id).orElseThrow(() -> new ObjectNotFoundById(id, ENTITY_CLASS));
+        return teacherDao.getById(id);
     }
 
     @Override
     public void addCourses(Teacher teacher, Set<Course> courses) {
-        teacherDao.addToCourses(teacher, courses);
+        teacher = teacherDao.getById(teacher.getId());
+        Set<Long> coursesId = courses.stream()
+                .map(Course::getId)
+                .collect(Collectors.toSet());
+        List<Course> foundCourses = courseDao.findAllById(coursesId);
+        foundCourses.stream().forEach(teacher.getCourses()::add);
     }
 
     @Override
     public void removeCourse(Teacher teacher, Course course) {
-        teacherDao.removeCourse(teacher, course);
-    }
-
-    @Override
-    public Set<TabletimeRow> getTabletime(Teacher teacher, LocalDateTime begin,
-            LocalDateTime end) {
-        return teacherDao.getTabletime(teacher, begin, end);
-    }
-
-    @Override
-    public void addTabletimeRows(List<TabletimeRow> tabletimeRows) {
-        teacherDao.addTabletimeRows(tabletimeRows);
-    }
-
-    @Override
-    public void update(Teacher teacher) {
-        teacherDao.update(teacher);
+        teacher = teacherDao.getById(teacher.getId());
+        course = courseDao.getById(course.getId());
+        teacher.getCourses().remove(course);
     }
 
     @Override
     public Set<Course> getCourses(Teacher teacher) {
-        return teacherDao.getCourses(teacher);
+        return teacherDao.getById(teacher.getId()).getCourses();
     }
 
     @Override
     public void delete(long id) {
-        teacherDao.delete(id);
-
-    }
-
-    @Override
-    public void removeFromCourse(Teacher teacher, Course course) {
-        teacherDao.removeCourse(teacher, course);
+        teacherDao.deleteById(id);
     }
 
     @Override
     public void addToCourse(Teacher teacher, Course course) {
-        teacherDao.addToCourses(teacher, Collections.singleton(course));
+        teacher = teacherDao.getById(teacher.getId());
+        course = courseDao.getById(course.getId());
+        teacher.getCourses().add(course);
     }
 
 }

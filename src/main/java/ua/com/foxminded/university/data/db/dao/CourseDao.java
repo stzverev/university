@@ -1,27 +1,21 @@
 package ua.com.foxminded.university.data.db.dao;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Set;
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.EntityGraph.EntityGraphType;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import ua.com.foxminded.university.data.model.Course;
-import ua.com.foxminded.university.data.model.Group;
-import ua.com.foxminded.university.data.model.TabletimeRow;
-import ua.com.foxminded.university.data.model.Teacher;
 
-public interface CourseDao extends GenericDao<Course> {
+public interface CourseDao extends JpaRepository<Course, Long> {
 
-    Course getByName(String name);
+    Optional<Course> findByName(String name);
 
-    void saveTabletime(List<TabletimeRow> rows);
+    @EntityGraph(attributePaths = "groups", type = EntityGraphType.FETCH)
+    Optional<Course> findFetchGroupsById(Long id);
 
-    void updateTabletime(Set<TabletimeRow> rows);
-
-    Set<TabletimeRow> getTabletime(Course course, LocalDateTime begin,
-            LocalDateTime end);
-
-    Set<Teacher> getTeachers(Course course);
-
-    Set<Group> getGroups(Course group);
+    @EntityGraph(attributePaths = "teachers", type = EntityGraphType.FETCH)
+    Optional<Course> findFetchTeachersById(Long id);
 
 }

@@ -2,15 +2,18 @@ package ua.com.foxminded.university.data.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 import ua.com.foxminded.university.data.model.TabletimeRow;
 
-public interface TabletimeService<T> {
+public interface TabletimeService extends CommonService<TabletimeRow> {
 
-    Set<TabletimeRow> getTabletime(T object, LocalDateTime begin,
+    List<TabletimeRow> getTabletimeForCourse(long id, LocalDateTime begin,
             LocalDateTime end);
 
-    void addTabletimeRows(List<TabletimeRow> tabletimeRows);
+    List<TabletimeRow> getTabletimeForTeacher(long id, LocalDateTime begin,
+            LocalDateTime end);
+
+    List<TabletimeRow> getTabletimeForGroup(long id, LocalDateTime begin,
+            LocalDateTime end);
 
 }

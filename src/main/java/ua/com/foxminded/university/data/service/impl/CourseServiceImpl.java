@@ -1,8 +1,11 @@
 package ua.com.foxminded.university.data.service.impl;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,7 +20,11 @@ import ua.com.foxminded.university.data.service.CourseService;
 import ua.com.foxminded.university.exceptions.ObjectNotFoundById;
 
 @Service
+@Transactional
 public class CourseServiceImpl implements CourseService {
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     private static final Class<Course> ENTITY_CLASS = Course.class;
     private CourseDao courseDao;
@@ -39,57 +46,65 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void save(List<Course> courses) {
-        courseDao.save(courses);
-    }
-
-    @Override
-    public void update(Course course) {
-        courseDao.update(course);
+        courseDao.saveAll(courses);
     }
 
     @Override
     public List<Course> getAll() {
-        return courseDao.getAll();
+        return courseDao.findAll();
     }
 
     @Override
     public Course getById(long id) {
-        return courseDao.getById(id).orElseThrow(() -> new ObjectNotFoundById(id, ENTITY_CLASS));
+        return courseDao.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundById(id, ENTITY_CLASS));
     }
 
     @Override
     public Set<Teacher> getTeachers(Course course) {
-        return courseDao.getTeachers(course);
+        return courseDao.findFetchTeachersById(course.getId())
+                .orElseThrow(() -> new ObjectNotFoundById(course.getId(), ENTITY_CLASS))
+                .getTeachers();
     }
 
     @Override
     public Set<Group> getGroups(Course course) {
-        return courseDao.getGroups(course);
+        return courseDao.findFetchGroupsById(course.getId())
+                .orElseThrow(() -> new ObjectNotFoundById(course.getId(), ENTITY_CLASS))
+                .getGroups();
     }
 
     @Override
     public void addGroup(Course course, Group group) {
-        groupDao.addToCourses(group, Collections.singleton(course));
+        course = courseDao.getById(course.getId());
+        group = groupDao.getById(group.getId());
+        course.getGroups().add(group);
     }
 
     @Override
     public void removeGroup(Course course, Group group) {
-        groupDao.deleteFromCourse(group, course);
+        course = courseDao.getById(course.getId());
+        group = groupDao.getById(group.getId());
+        course.getGroups().remove(group);
     }
 
     @Override
     public void addTeacher(Course course, Teacher teacher) {
-        teacherDao.addToCourses(teacher, Collections.singleton(course));
+        course = courseDao.getById(course.getId());
+        teacher = teacherDao.getById(teacher.getId());
+        course.getTeachers().add(teacher);
     }
 
     @Override
     public void removeTeacherFromCourse(Course course, Teacher teacher) {
-        teacherDao.removeCourse(teacher, course);
+        course = courseDao.getById(course.getId());
+        teacher = teacherDao.getById(teacher.getId());
+        course.getTeachers().remove(teacher);
     }
 
     @Override
     public void delete(long id) {
-        courseDao.delete(id);
+        courseDao.deleteById(id);
     }
 
 }

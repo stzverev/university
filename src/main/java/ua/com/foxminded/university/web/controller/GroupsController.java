@@ -29,6 +29,7 @@ import ua.com.foxminded.university.data.model.TabletimeRow;
 import ua.com.foxminded.university.data.model.Teacher;
 import ua.com.foxminded.university.data.service.CourseService;
 import ua.com.foxminded.university.data.service.GroupService;
+import ua.com.foxminded.university.data.service.TabletimeService;
 import ua.com.foxminded.university.data.service.TeacherService;
 
 @Controller
@@ -39,7 +40,13 @@ public class GroupsController {
     private GroupService groupService;
     private CourseService courseService;
     private TeacherService teacherService;
+    private TabletimeService tabletimeService;
     private Logger logger = LoggerFactory.getLogger(GroupsController.class);
+
+    @Autowired
+    public void setTabletimeService(TabletimeService tabletimeService) {
+        this.tabletimeService = tabletimeService;
+    }
 
     @Autowired
     public void setTeacherService(TeacherService teacherService) {
@@ -85,7 +92,7 @@ public class GroupsController {
             @RequestParam("begin") @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime begin,
             @RequestParam("end") @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime end)  {
         Group group = groupService.getById(groupId);
-        Set<TabletimeRow> tabletime = groupService.getTabletime(group, begin, end);
+        List<TabletimeRow> tabletime = tabletimeService.getTabletimeForGroup(groupId, begin, end);
         model.addAttribute("group", group );
         model.addAttribute("begin", begin);
         model.addAttribute("end", end);
@@ -121,7 +128,7 @@ public class GroupsController {
         Teacher teacher = teacherService.getById(teacherId);
 
         TabletimeRow tableTimeRow = new TabletimeRow(begin, course, group, teacher);
-        groupService.addTabletimeRows(Collections.singletonList(tableTimeRow));
+        tabletimeService.save(tableTimeRow);
 
         return REDIRECT_TO_GROUPS + "/" + groupId + "/edit";
     }
@@ -168,7 +175,7 @@ public class GroupsController {
     @PatchMapping("/{id}")
     public String update(@ModelAttribute Group group, @PathVariable("id") long id) {
         group.setId(id);
-        groupService.update(group);
+        groupService.save(group);
         return REDIRECT_TO_GROUPS;
     }
 

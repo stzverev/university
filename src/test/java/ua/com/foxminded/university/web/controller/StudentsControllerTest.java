@@ -107,7 +107,7 @@ class StudentsControllerTest {
                 .flashAttr("student", student)
                 .param("groupId", "" + group.getId()))
             .andExpect(status().is3xxRedirection());
-        verify(studentService).update(student);
+        verify(studentService).save(student);
     }
 
     @Test

@@ -7,11 +7,12 @@ import javax.sql.DataSource;
 
 import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
@@ -19,10 +20,10 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-@Configuration
-@ComponentScan(basePackages = {"ua.com.foxminded.university.data.db.dao.jpa",
-        "ua.com.foxminded.university.data.service"})
+@TestConfiguration
+@ComponentScan(basePackages = {"ua.com.foxminded.university.data"})
 @EnableTransactionManagement
+@EnableJpaRepositories
 @PropertySource("classpath:config.properties")
 public class ConfigTest {
 
@@ -43,7 +44,7 @@ public class ConfigTest {
     }
 
     @Bean
-    public JpaTransactionManager jpaTransactionManager() throws NamingException {
+    public JpaTransactionManager transactionManager() throws NamingException {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
         transactionManager.setEntityManagerFactory(entityManagerFactory().getObject());
         return transactionManager;
@@ -63,7 +64,6 @@ public class ConfigTest {
 
     @Bean
     public DataSource dataSource() {
-
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(environment.getProperty("driver"));
         dataSource.setUrl(environment.getProperty("url"));
