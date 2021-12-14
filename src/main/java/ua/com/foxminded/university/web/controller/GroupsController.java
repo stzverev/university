@@ -65,7 +65,7 @@ public class GroupsController {
 
     @GetMapping()
     public String showGroups(Model model) {
-        model.addAttribute("groups", groupService.getAll());
+        model.addAttribute("groups", groupService.findAll());
         return "groups/list";
     }
 
@@ -76,7 +76,7 @@ public class GroupsController {
 
     @GetMapping("/{id}/edit")
     public String showEdit(Model model, @PathVariable("id") long id) {
-        Group group = groupService.getById(id);
+        Group group = groupService.findById(id);
         Set<Student> students = groupService.getStudents(group);
         logger.debug("students: {}", students.size());
         Set<Course> courses = groupService.getCourses(group);
@@ -91,7 +91,7 @@ public class GroupsController {
     public String showTableTime(Model model, @PathVariable("id") long groupId,
             @RequestParam("begin") @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime begin,
             @RequestParam("end") @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime end)  {
-        Group group = groupService.getById(groupId);
+        Group group = groupService.findById(groupId);
         List<TabletimeRow> tabletime = tabletimeService.getTabletimeForGroup(groupId, begin, end);
         model.addAttribute("group", group );
         model.addAttribute("begin", begin);
@@ -102,7 +102,7 @@ public class GroupsController {
 
     @GetMapping("/{id}/tabletime/new")
     public String showAddingNewRecordToTabletime(Model model, @PathVariable("id") long groupId) {
-        Group group = groupService.getById(groupId);
+        Group group = groupService.findById(groupId);
         group.setCourses(groupService.getCourses(group));
         List<Group> allGroups = Collections.singletonList(group);
         List<Teacher> teachers = group.getCourses()
@@ -123,9 +123,9 @@ public class GroupsController {
             @RequestParam("courseId") long courseId,
             @RequestParam("teacherId") long teacherId,
             @RequestParam("begin") @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime begin) {
-        Group group = groupService.getById(groupId);
-        Course course = courseService.getById(courseId);
-        Teacher teacher = teacherService.getById(teacherId);
+        Group group = groupService.findById(groupId);
+        Course course = courseService.findById(courseId);
+        Teacher teacher = teacherService.findById(teacherId);
 
         TabletimeRow tableTimeRow = new TabletimeRow(begin, course, group, teacher);
         tabletimeService.save(tableTimeRow);
@@ -135,8 +135,8 @@ public class GroupsController {
 
     @GetMapping("/{groupId}/add-course")
     public String showAddingCourse(@PathVariable("groupId") long groupId, Model model) {
-        Group group = groupService.getById(groupId);
-        List<Course> courses = courseService.getAll();
+        Group group = groupService.findById(groupId);
+        List<Course> courses = courseService.findAll();
         model.addAttribute("group", group);
         model.addAttribute("allCourses", courses);
         return "groups/add-course";
@@ -144,7 +144,7 @@ public class GroupsController {
 
     @GetMapping("/{groupId}/delete-course")
     public String showDeletingCourse(@PathVariable("groupId") long groupId, Model model) {
-        Group group = groupService.getById(groupId);
+        Group group = groupService.findById(groupId);
         group.setCourses(groupService.getCourses(group));
         model.addAttribute("group", group);
         return "groups/delete-course";
@@ -152,17 +152,17 @@ public class GroupsController {
 
     @DeleteMapping("/delete-course")
     public String deleteCourse(@RequestParam("groupId") long groupId, @RequestParam("courseId") long courseId) {
-        Group group = groupService.getById(groupId);
-        Course course = courseService.getById(courseId);
+        Group group = groupService.findById(groupId);
+        Course course = courseService.findById(courseId);
         groupService.removeFromCourse(group, course);
         return REDIRECT_TO_GROUPS;
     }
 
     @PostMapping("/add-course")
     public String addCourse(@RequestParam("groupId") long groupId, @RequestParam("courseId") long courseId) {
-        Group group = groupService.getById(groupId);
-        Course course = courseService.getById(courseId);
-        groupService.addToCourses(group, Collections.singleton(course));
+        Group group = groupService.findById(groupId);
+        Course course = courseService.findById(courseId);
+        groupService.addToCourse(group, course);
         return REDIRECT_TO_GROUPS;
     }
 
@@ -181,7 +181,7 @@ public class GroupsController {
 
     @DeleteMapping("/{id}")
     public String delete(@PathVariable("id") long id) {
-        groupService.delete(id);
+        groupService.deleteById(id);
         return REDIRECT_TO_GROUPS;
     }
 

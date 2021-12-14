@@ -10,6 +10,8 @@ public interface GroupService extends CommonService<Group> {
 
     void addToCourses(Group group, Set<Course> courses);
 
+    void addToCourse(Group group, Course course);
+
     void removeFromCourse(Group group, Course course);
 
     Set<Student> getStudents(Group group);

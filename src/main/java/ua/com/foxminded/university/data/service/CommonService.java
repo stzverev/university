@@ -10,10 +10,10 @@ public interface CommonService<T extends AbstractEntity> {
 
     void save(List<T> objects);
 
-    void delete(long id);
+    void deleteById(long id);
 
-    List<T> getAll();
+    List<T> findAll();
 
-    T getById(long id);
+    T findById(long id);
 
 }

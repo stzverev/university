@@ -50,12 +50,12 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public List<Course> getAll() {
+    public List<Course> findAll() {
         return courseDao.findAll();
     }
 
     @Override
-    public Course getById(long id) {
+    public Course findById(long id) {
         return courseDao.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundById(id, ENTITY_CLASS));
     }
@@ -82,7 +82,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public void removeGroup(Course course, Group group) {
+    public void removeGroupFromCourse(Course course, Group group) {
         course = courseDao.getById(course.getId());
         group = groupDao.getById(group.getId());
         course.getGroups().remove(group);
@@ -103,7 +103,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public void delete(long id) {
+    public void deleteById(long id) {
         courseDao.deleteById(id);
     }
 

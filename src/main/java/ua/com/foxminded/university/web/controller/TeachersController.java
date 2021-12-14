@@ -40,7 +40,7 @@ public class TeachersController {
 
     @GetMapping()
     public String showTeachers(Model model) {
-        List<Teacher> teachers = teacherService.getAll();
+        List<Teacher> teachers = teacherService.findAll();
         teachers.stream().forEach(teacher ->
             teacher.setCourses(teacherService.getCourses(teacher)));
         model.addAttribute("teachers", teachers);
@@ -54,7 +54,7 @@ public class TeachersController {
 
     @GetMapping("/{id}/edit")
     public String showEditCard(Model model, @PathVariable("id") long id) {
-        Teacher teacher = teacherService.getById(id);
+        Teacher teacher = teacherService.findById(id);
         Set<Course> courses = teacherService.getCourses(teacher);
         model.addAttribute("teacher", teacher);
         model.addAttribute("courses", courses);
@@ -76,14 +76,14 @@ public class TeachersController {
 
     @DeleteMapping("/{id}")
     public String delete(@PathVariable("id") long id) {
-        teacherService.delete(id);
+        teacherService.deleteById(id);
         return REDIRECT_TO_TEACHERS;
     }
 
     @GetMapping("/{teacherId}/add-course")
     public String showAddingCourse(@PathVariable("teacherId") long teacherId, Model model) {
-        Teacher teacher = teacherService.getById(teacherId);
-        List<Course> courses = courseService.getAll();
+        Teacher teacher = teacherService.findById(teacherId);
+        List<Course> courses = courseService.findAll();
         model.addAttribute("teacher", teacher);
         model.addAttribute("allCourses", courses);
         return "teachers/add-course";
@@ -91,7 +91,7 @@ public class TeachersController {
 
     @GetMapping("/{teacherId}/delete-course")
     public String showDeletingCourse(@PathVariable("teacherId") long teacherId, Model model) {
-        Teacher teacher = teacherService.getById(teacherId);
+        Teacher teacher = teacherService.findById(teacherId);
         teacher.setCourses(teacherService.getCourses(teacher));
         model.addAttribute("teacher", teacher);
         return "teachers/delete-course";
@@ -99,16 +99,16 @@ public class TeachersController {
 
     @DeleteMapping("/delete-course")
     public String deleteCourse(@RequestParam("teacherId") long teacherId, @RequestParam("courseId") long courseId) {
-        Teacher teacher = teacherService.getById(teacherId);
-        Course course = courseService.getById(courseId);
+        Teacher teacher = teacherService.findById(teacherId);
+        Course course = courseService.findById(courseId);
         teacherService.removeCourse(teacher, course);
         return REDIRECT_TO_TEACHERS;
     }
 
     @PostMapping("/add-course")
     public String addCourse(@RequestParam("teacherId") long teacherId, @RequestParam("courseId") long courseId) {
-        Teacher teacher = teacherService.getById(teacherId);
-        Course course = courseService.getById(courseId);
+        Teacher teacher = teacherService.findById(teacherId);
+        Course course = courseService.findById(courseId);
         teacherService.addToCourse(teacher, course);
         return REDIRECT_TO_TEACHERS;
     }

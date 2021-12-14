@@ -83,18 +83,18 @@ class GroupsControllerTest {
     void shouldGetGroupsListWhenGetGroups() throws Exception {
         mockMvc.perform(get("/groups"))
             .andExpect(status().isOk());
-        verify(groupService).getAll();
+        verify(groupService).findAll();
     }
 
     @Test
     void shouldGetByIdWhenGetWithId() throws Exception {
         Group testGroup = new Group("test");
         Set<Student> students = new HashSet<>();
-        when(groupService.getById(GROUP_TEST_ID)).thenReturn(testGroup);
+        when(groupService.findById(GROUP_TEST_ID)).thenReturn(testGroup);
         when(groupService.getStudents(testGroup)).thenReturn(students);
         mockMvc.perform(get("/groups/" + GROUP_TEST_ID + "/edit"))
             .andExpect(status().isOk());
-        verify(groupService).getById(GROUP_TEST_ID);
+        verify(groupService).findById(GROUP_TEST_ID);
     }
 
     @Test
@@ -106,7 +106,7 @@ class GroupsControllerTest {
     @Test
     void shouldHandleEmptyDataAccesExceptionWhenGroupNotExist() throws Exception {
         ObjectNotFoundById ex = new ObjectNotFoundById(GROUP_TEST_ID, Group.class);
-        when(groupService.getById(GROUP_TEST_ID))
+        when(groupService.findById(GROUP_TEST_ID))
             .thenThrow(ex);
         mockMvc.perform(get("/groups/" + GROUP_TEST_ID + "/edit"))
             .andExpect(status().isNotFound());
@@ -142,28 +142,28 @@ class GroupsControllerTest {
                 .flashAttr("group", testGroup);
         mockMvc.perform(request)
             .andExpect(status().is3xxRedirection());
-        verify(groupService).delete(GROUP_TEST_ID);
+        verify(groupService).deleteById(GROUP_TEST_ID);
     }
 
     @Test
     void shouldShowAddingACourse() throws Exception {
         Group testGroup = new Group("test");
-        when(groupService.getById(GROUP_TEST_ID)).thenReturn(testGroup);
-        when(courseService.getAll()).thenReturn(new ArrayList<>());
+        when(groupService.findById(GROUP_TEST_ID)).thenReturn(testGroup);
+        when(courseService.findAll()).thenReturn(new ArrayList<>());
         mockMvc.perform(get("/groups/" + GROUP_TEST_ID + "/add-course"))
             .andExpect(status().isOk());
-        verify(groupService).getById(GROUP_TEST_ID);
-        verify(courseService).getAll();
+        verify(groupService).findById(GROUP_TEST_ID);
+        verify(courseService).findAll();
     }
 
     @Test
     void shouldShowDeletingACourse() throws Exception {
         Group testGroup = new Group("test");
-        when(groupService.getById(GROUP_TEST_ID)).thenReturn(testGroup);
+        when(groupService.findById(GROUP_TEST_ID)).thenReturn(testGroup);
         when(groupService.getCourses(testGroup)).thenReturn(new HashSet<>());
         mockMvc.perform(get("/groups/" + GROUP_TEST_ID + "/delete-course"))
             .andExpect(status().isOk());
-        verify(groupService).getById(GROUP_TEST_ID);
+        verify(groupService).findById(GROUP_TEST_ID);
         verify(groupService).getCourses(testGroup);
     }
 
@@ -176,8 +176,8 @@ class GroupsControllerTest {
         testCourse.setId(COURSE_TEST_ID);
         testCourse.setName("test");
 
-        when(groupService.getById(testGroup.getId())).thenReturn(testGroup);
-        when(courseService.getById(testCourse.getId())).thenReturn(testCourse);
+        when(groupService.findById(testGroup.getId())).thenReturn(testGroup);
+        when(courseService.findById(testCourse.getId())).thenReturn(testCourse);
 
         mockMvc.perform(delete("/groups/delete-course")
                 .param("groupId", "" + testGroup.getId())
@@ -195,14 +195,14 @@ class GroupsControllerTest {
         testCourse.setId(COURSE_TEST_ID);
         testCourse.setName("test");
 
-        when(groupService.getById(testGroup.getId())).thenReturn(testGroup);
-        when(courseService.getById(testCourse.getId())).thenReturn(testCourse);
+        when(groupService.findById(testGroup.getId())).thenReturn(testGroup);
+        when(courseService.findById(testCourse.getId())).thenReturn(testCourse);
 
         mockMvc.perform(post("/groups/add-course")
                 .param("groupId", "" + testGroup.getId())
                 .param("courseId", "" + testCourse.getId()))
             .andExpect(status().is3xxRedirection());
-        verify(groupService).addToCourses(Mockito.any(), Mockito.any());
+        verify(groupService).addToCourse(Mockito.any(), Mockito.any());
     }
 
     @Test
@@ -215,7 +215,7 @@ class GroupsControllerTest {
         LocalDateTime end = LocalDateTime.now();
         TabletimeRow tabletimeRow = new TabletimeRow(end, new Course(), group, new Teacher());
 
-        when(groupService.getById(group.getId())).thenReturn(group);
+        when(groupService.findById(group.getId())).thenReturn(group);
         when(tabletimeService.getTabletimeForGroup(group.getId(), begin, end))
             .thenReturn(Collections.singletonList(tabletimeRow));
 
@@ -235,7 +235,7 @@ class GroupsControllerTest {
         course.setName("test course");
         course.setId(COURSE_TEST_ID);
 
-        when(groupService.getById(group.getId())).thenReturn(group);
+        when(groupService.findById(group.getId())).thenReturn(group);
         when(groupService.getCourses(group)).thenReturn(Collections.singleton(course));
 
         mockMvc.perform(get("/groups/" + group.getId() + "/tabletime/new"))
@@ -257,9 +257,9 @@ class GroupsControllerTest {
         teacher.setLastName("Teacher");
         teacher.setId(TEACHER_TEST_ID);
 
-        when(groupService.getById(group.getId())).thenReturn(group);
-        when(courseService.getById(course.getId())).thenReturn(course);
-        when(teacherService.getById(teacher.getId())).thenReturn(teacher);
+        when(groupService.findById(group.getId())).thenReturn(group);
+        when(courseService.findById(course.getId())).thenReturn(course);
+        when(teacherService.findById(teacher.getId())).thenReturn(teacher);
 
         LocalDateTime begin = LocalDateTime.now();
         mockMvc.perform(post("/groups/" + group.getId() + "/tabletime")

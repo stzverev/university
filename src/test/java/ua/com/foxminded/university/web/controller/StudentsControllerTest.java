@@ -57,7 +57,7 @@ class StudentsControllerTest {
     void shouldGetStudentsListWhenGetStudents() throws Exception {
         mockMvc.perform(get("/students"))
             .andExpect(status().isOk());
-        verify(studentService).getAll();
+        verify(studentService).findAll();
     }
 
     @Test
@@ -65,7 +65,7 @@ class StudentsControllerTest {
         int id = 1;
         mockMvc.perform(get("/students/" + id + "/edit"))
             .andExpect(status().isOk());
-        verify(studentService).getById(id);
+        verify(studentService).findById(id);
     }
 
     @Test
@@ -84,7 +84,7 @@ class StudentsControllerTest {
         Group group = new Group("test");
         group.setId(GROUP_TEST_ID);
 
-        when(groupService.getById(GROUP_TEST_ID)).thenReturn(group);
+        when(groupService.findById(GROUP_TEST_ID)).thenReturn(group);
 
         mockMvc.perform(post("/students")
                 .flashAttr("student", student)
@@ -114,7 +114,7 @@ class StudentsControllerTest {
     void shouldDelete() throws Exception {
         mockMvc.perform(delete("/students/" + STUDENT_TEST_ID))
             .andExpect(status().is3xxRedirection());
-        verify(studentService).delete(STUDENT_TEST_ID);
+        verify(studentService).deleteById(STUDENT_TEST_ID);
     }
 
 }

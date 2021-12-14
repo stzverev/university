@@ -1,5 +1,6 @@
 package ua.com.foxminded.university.data.model;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -19,6 +20,8 @@ import javax.persistence.Table;
     query = "FROM Tabletime WHERE group = :group AND id.dateTime BETWEEN :begin AND :end")
 public class Group extends AbstractEntity {
 
+    private static final long serialVersionUID = 7265594806602299033L;
+
     @Column(name = "name")
     private String name;
 
@@ -26,10 +29,10 @@ public class Group extends AbstractEntity {
     @JoinTable(name = "groups_courses",
         joinColumns = @JoinColumn(name = "group_id"),
         inverseJoinColumns = @JoinColumn(name = "course_id"))
-    private Set<Course> courses;
+    private Set<Course> courses = new HashSet<>();
 
     @OneToMany(mappedBy = "group")
-    private Set<Student> students;
+    private Set<Student> students = new HashSet<>();
 
     @OneToMany(mappedBy = "group")
     private Set<TabletimeRow> tabletime;

@@ -14,7 +14,7 @@ public interface CourseService extends CommonService<Course> {
 
     void addGroup(Course course, Group group);
 
-    void removeGroup(Course course, Group group);
+    void removeGroupFromCourse(Course course, Group group);
 
     void addTeacher(Course course, Teacher teacher);
 

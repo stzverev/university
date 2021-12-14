@@ -35,7 +35,7 @@ public class CourseController {
 
     @GetMapping()
     public String showCourses(@ModelAttribute Course course, Model model) {
-        List<Course> courses = courseService.getAll();
+        List<Course> courses = courseService.findAll();
         logger.debug("Getting {} courses", courses.size());
         model.addAttribute("courses", courses);
         return "courses/list";
@@ -48,7 +48,7 @@ public class CourseController {
 
     @GetMapping("/{id}/edit")
     public String showEdit(Model model, @PathVariable("id") long id) {
-        Course course = courseService.getById(id);
+        Course course = courseService.findById(id);
         Set<Group> groups = courseService.getGroups(course);
         course.setGroups(groups);
         model.addAttribute("course", course);
@@ -70,7 +70,7 @@ public class CourseController {
 
     @DeleteMapping("/{id}")
     public String delete(@PathVariable("id") long id) {
-        courseService.delete(id);
+        courseService.deleteById(id);
         return REDIRECT_TO_COURSES;
     }
 

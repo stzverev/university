@@ -12,6 +12,16 @@ public abstract class Person extends AbstractEntity {
     @Column(name = "last_name")
     private String lastName;
 
+    protected Person() {
+        super();
+    }
+
+    protected Person(String firstName, String lastName) {
+        super();
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
     public String getFirstName() {
         return firstName;
     }

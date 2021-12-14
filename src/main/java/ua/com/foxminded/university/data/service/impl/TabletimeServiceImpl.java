@@ -50,17 +50,17 @@ public class TabletimeServiceImpl implements TabletimeService {
     }
 
     @Override
-    public void delete(long id) {
+    public void deleteById(long id) {
         tabletimeDao.deleteById(id);
     }
 
     @Override
-    public List<TabletimeRow> getAll() {
+    public List<TabletimeRow> findAll() {
         return tabletimeDao.findAll();
     }
 
     @Override
-    public TabletimeRow getById(long id) {
+    public TabletimeRow findById(long id) {
         return tabletimeDao.getById(id);
     }
 

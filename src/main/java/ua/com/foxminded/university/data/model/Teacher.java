@@ -32,6 +32,10 @@ public class Teacher extends Person {
         super();
     }
 
+    public Teacher(String firstName, String lastName) {
+        super(firstName, lastName);
+    }
+
     public Set<Course> getCourses() {
         return courses;
     }

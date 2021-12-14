@@ -50,16 +50,16 @@ class CourseControllerTest {
     void shouldGetCoursesListWhenGetCourses() throws Exception {
         mockMvc.perform(get("/courses"))
             .andExpect(status().isOk());
-        verify(courseService).getAll();
+        verify(courseService).findAll();
     }
 
     @Test
     void shouldGetByIdWhenGetWithId() throws Exception {
         int id = 1;
-        when(courseService.getById(id)).thenReturn(new Course());
+        when(courseService.findById(id)).thenReturn(new Course());
         mockMvc.perform(get("/courses/" + id + "/edit"))
             .andExpect(status().isOk());
-        verify(courseService).getById(id);
+        verify(courseService).findById(id);
     }
 
     @Test
@@ -96,7 +96,7 @@ class CourseControllerTest {
     void shouldDelete() throws Exception {
         mockMvc.perform(delete("/courses/" + COURSE_TEST_ID))
             .andExpect(status().is3xxRedirection());
-        verify(courseService).delete(COURSE_TEST_ID);
+        verify(courseService).deleteById(COURSE_TEST_ID);
     }
 
 }

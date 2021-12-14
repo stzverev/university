@@ -42,12 +42,12 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     @Override
-    public List<Teacher> getAll() {
+    public List<Teacher> findAll() {
         return teacherDao.findAll();
     }
 
     @Override
-    public Teacher getById(long id) {
+    public Teacher findById(long id) {
         return teacherDao.getById(id);
     }
 
@@ -74,7 +74,7 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     @Override
-    public void delete(long id) {
+    public void deleteById(long id) {
         teacherDao.deleteById(id);
     }
 

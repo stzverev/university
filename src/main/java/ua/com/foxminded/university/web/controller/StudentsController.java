@@ -39,28 +39,28 @@ public class StudentsController {
 
     @GetMapping()
     public String showStudents(Model model) {
-        List<Student> students = studentService.getAll();
+        List<Student> students = studentService.findAll();
         model.addAttribute("students", students);
         return "/students/list";
     }
 
     @GetMapping("/new")
     public String showCreatingNew(@ModelAttribute Student student, Model model) {
-        model.addAttribute("allGroups", groupService.getAll());
+        model.addAttribute("allGroups", groupService.findAll());
         return "/students/card";
     }
 
     @GetMapping("/{id}/edit")
     public String showEditCard(Model model, @PathVariable("id") long id) {
-        Student student = studentService.getById(id);
+        Student student = studentService.findById(id);
         model.addAttribute("student", student);
-        model.addAttribute("allGroups", groupService.getAll());
+        model.addAttribute("allGroups", groupService.findAll());
         return "/students/card";
     }
 
     @PostMapping
     public String create(@ModelAttribute Student student, @RequestParam("groupId") long groupId) {
-        Group group = groupService.getById(groupId);
+        Group group = groupService.findById(groupId);
         student.setGroup(group);
         studentService.save(student);
         return REDIRECT_TO_STUDENTS;
@@ -70,7 +70,7 @@ public class StudentsController {
     public String update(@ModelAttribute Student student, @PathVariable("id") long id,
             @RequestParam("groupId") long groupId) {
         student.setId(id);
-        Group group = groupService.getById(groupId);
+        Group group = groupService.findById(groupId);
         student.setGroup(group);
         studentService.save(student);
         return REDIRECT_TO_STUDENTS;
@@ -78,7 +78,7 @@ public class StudentsController {
 
     @DeleteMapping("/{id}")
     public String delete(@PathVariable("id") long id) {
-        studentService.delete(id);
+        studentService.deleteById(id);
         return REDIRECT_TO_STUDENTS;
     }
 
