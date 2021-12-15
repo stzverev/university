@@ -3,7 +3,6 @@ package ua.com.foxminded.university.web.controller;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -24,13 +23,21 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
-import ua.com.foxminded.university.data.model.Student;
 import ua.com.foxminded.university.data.model.TabletimeRow;
 import ua.com.foxminded.university.data.model.Teacher;
 import ua.com.foxminded.university.data.service.CourseService;
 import ua.com.foxminded.university.data.service.GroupService;
 import ua.com.foxminded.university.data.service.TabletimeService;
 import ua.com.foxminded.university.data.service.TeacherService;
+import ua.com.foxminded.university.web.dto.CourseDto;
+import ua.com.foxminded.university.web.dto.GroupDto;
+import ua.com.foxminded.university.web.dto.StudentDto;
+import ua.com.foxminded.university.web.dto.TabletimeDto;
+import ua.com.foxminded.university.web.mapper.CourseMapper;
+import ua.com.foxminded.university.web.mapper.GroupMapper;
+import ua.com.foxminded.university.web.mapper.StudentMapper;
+import ua.com.foxminded.university.web.mapper.TabletimeMapper;
+import ua.com.foxminded.university.web.mapper.TeacherMapper;
 
 @Controller
 @RequestMapping("/groups")
@@ -42,6 +49,36 @@ public class GroupsController {
     private TeacherService teacherService;
     private TabletimeService tabletimeService;
     private Logger logger = LoggerFactory.getLogger(GroupsController.class);
+    private GroupMapper groupMapper;
+    private StudentMapper studentMapper;
+    private CourseMapper courseMapper;
+    private TeacherMapper teacherMapper;
+    private TabletimeMapper tabletimeMapper;
+
+    @Autowired
+    public void setCourseMapper(CourseMapper courseMapper) {
+        this.courseMapper = courseMapper;
+    }
+
+    @Autowired
+    public void setTeacherMapper(TeacherMapper teacherMapper) {
+        this.teacherMapper = teacherMapper;
+    }
+
+    @Autowired
+    public void setTabletimeMapper(TabletimeMapper tabletimeMapper) {
+        this.tabletimeMapper = tabletimeMapper;
+    }
+
+    @Autowired
+    public void setGroupMapper(GroupMapper groupMapper) {
+        this.groupMapper = groupMapper;
+    }
+
+    @Autowired
+    public void setStudentMapper(StudentMapper studentMapper) {
+        this.studentMapper = studentMapper;
+    }
 
     @Autowired
     public void setTabletimeService(TabletimeService tabletimeService) {
@@ -65,25 +102,32 @@ public class GroupsController {
 
     @GetMapping()
     public String showGroups(Model model) {
-        model.addAttribute("groups", groupService.findAll());
+        List<GroupDto> groupsDto = findAllGroupsAsDto();
+        model.addAttribute("groups", groupsDto);
         return "groups/list";
     }
 
     @GetMapping("/new")
-    public String showCreatingNew(@ModelAttribute Group group) {
+    public String showCreatingNew(@ModelAttribute(name = "group") GroupDto groupDto) {
         return "groups/card";
     }
 
     @GetMapping("/{id}/edit")
     public String showEdit(Model model, @PathVariable("id") long id) {
         Group group = groupService.findById(id);
-        Set<Student> students = groupService.getStudents(group);
-        logger.debug("students: {}", students.size());
-        Set<Course> courses = groupService.getCourses(group);
-        logger.debug("courses: {}", courses.size());
-        model.addAttribute("group", group);
-        model.addAttribute("students", students);
-        model.addAttribute("courses", courses);
+        GroupDto groupDto = groupMapper.toDto(group);
+        List<StudentDto> studentsDto = groupService.getStudents(group)
+                .stream()
+                .map(studentMapper::toDto)
+                .collect(Collectors.toList());
+
+        List<CourseDto> coursesDto = groupService.getCourses(group).stream()
+                .map(courseMapper::toDto)
+                .collect(Collectors.toList());
+
+        model.addAttribute("group", groupDto);
+        model.addAttribute("students", studentsDto);
+        model.addAttribute("courses", coursesDto);
         return "groups/card";
     }
 
@@ -92,11 +136,16 @@ public class GroupsController {
             @RequestParam("begin") @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime begin,
             @RequestParam("end") @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime end)  {
         Group group = groupService.findById(groupId);
-        List<TabletimeRow> tabletime = tabletimeService.getTabletimeForGroup(groupId, begin, end);
-        model.addAttribute("group", group );
+        GroupDto groupDto = groupMapper.toDto(group);
+        List<TabletimeDto> tabletimeDto = tabletimeService.getTabletimeForGroup(groupId, begin, end)
+                .stream()
+                .map(tabletimeMapper::toDto)
+                .collect(Collectors.toList());
+
+        model.addAttribute("group", groupDto);
         model.addAttribute("begin", begin);
         model.addAttribute("end", end);
-        model.addAttribute("tabletime", tabletime);
+        model.addAttribute("tabletime", tabletimeDto);
         return "groups/tabletime";
     }
 
@@ -183,6 +232,13 @@ public class GroupsController {
     public String delete(@PathVariable("id") long id) {
         groupService.deleteById(id);
         return REDIRECT_TO_GROUPS;
+    }
+
+    private List<GroupDto> findAllGroupsAsDto() {
+        return groupService.findAll()
+                .stream()
+                .map(groupMapper::toDto)
+                .collect(Collectors.toList());
     }
 
 }
