@@ -10,19 +10,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import ua.com.foxminded.university.data.db.dao.CourseDao;
-import ua.com.foxminded.university.data.db.dao.TabletimeDao;
 import ua.com.foxminded.university.data.db.dao.TeacherDao;
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Teacher;
 import ua.com.foxminded.university.data.service.TeacherService;
+import ua.com.foxminded.university.exceptions.ObjectNotFoundException;
 
 @Service
 @Transactional
 public class TeacherServiceImpl implements TeacherService {
 
+    private static final Class<Teacher> ENTITY_CLASS = Teacher.class;
     private TeacherDao teacherDao;
     private CourseDao courseDao;
-    private TabletimeDao tabletimeDao;
 
     @Autowired
     public TeacherServiceImpl(TeacherDao teacherDao, CourseDao courseDao) {
@@ -48,7 +48,8 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     public Teacher findById(long id) {
-        return teacherDao.getById(id);
+        return teacherDao.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException(ENTITY_CLASS));
     }
 
     @Override
@@ -70,7 +71,9 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     public Set<Course> getCourses(Teacher teacher) {
-        return teacherDao.getById(teacher.getId()).getCourses();
+        return teacherDao.findFetchCoursesById(teacher.getId())
+                .orElseThrow(() -> new ObjectNotFoundException(teacher.getId(), ENTITY_CLASS))
+                .getCourses();
     }
 
     @Override

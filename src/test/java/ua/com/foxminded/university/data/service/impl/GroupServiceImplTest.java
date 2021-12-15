@@ -1,13 +1,12 @@
 package ua.com.foxminded.university.data.service.impl;
 
 import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Collections;
-
-import javax.transaction.Transactional;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +20,9 @@ import ua.com.foxminded.university.data.model.Student;
 import ua.com.foxminded.university.data.service.CourseService;
 import ua.com.foxminded.university.data.service.GroupService;
 import ua.com.foxminded.university.data.service.StudentService;
-import ua.com.foxminded.university.exceptions.ObjectNotFoundById;
+import ua.com.foxminded.university.exceptions.ObjectNotFoundException;
 
 @SpringJUnitConfig(ConfigTest.class)
-@Transactional
 @Sql(scripts = "classpath:data.sql")
 class GroupServiceImplTest {
 
@@ -71,7 +69,7 @@ class GroupServiceImplTest {
         long groupId = group.getId();
         groupService.deleteById(groupId);
 
-        ObjectNotFoundById ex = assertThrows(ObjectNotFoundById.class,
+        ObjectNotFoundException ex = assertThrows(ObjectNotFoundException.class,
                 () -> groupService.findById(groupId));
         assertEquals("ua.com.foxminded.university.data.model.Group not found by id: 1",
                 ex.getMessage());
@@ -86,10 +84,36 @@ class GroupServiceImplTest {
         Student student = new Student(STUDENT_FIRST_NAME, STUDENT_LAST_NAME);
         student.setGroup(group);
         studentService.save(student);
-        assertThat(studentService.findAll(), hasItem(student));
-        assertEquals(student.getGroup(), group);
 
+        assertThat(studentService.findAll(), hasItem(student));
         assertThat(groupService.getStudents(group), hasItem(student));
+    }
+
+    @Test
+    void shouldNotContainCourseWhenGetCourseAfterDeleting() {
+        Group group = new Group(GROUP_NAME);
+        groupService.save(group);
+
+        Course course = new Course(COURSE_NAME);
+        courseService.save(course);
+
+        groupService.addToCourse(group, course);
+        assertThat(groupService.getCourses(group), hasItem(course));
+
+        groupService.removeFromCourse(group, course);
+        assertThat(groupService.getCourses(group), not(hasItem(course)));
+    }
+
+    @Test
+    void shouldContainsCourseWhenAddListOfCoursesToGroup() {
+        Group group = new Group(GROUP_NAME);
+        groupService.save(group);
+
+        Course course = new Course(COURSE_NAME);
+        courseService.save(course);
+
+        groupService.addToCourses(group, Collections.singleton(course));
+        assertThat(groupService.getCourses(group), hasItem(course));
     }
 
 }

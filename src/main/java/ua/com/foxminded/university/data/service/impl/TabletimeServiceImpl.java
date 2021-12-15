@@ -11,11 +11,13 @@ import org.springframework.stereotype.Service;
 import ua.com.foxminded.university.data.db.dao.TabletimeDao;
 import ua.com.foxminded.university.data.model.TabletimeRow;
 import ua.com.foxminded.university.data.service.TabletimeService;
+import ua.com.foxminded.university.exceptions.ObjectNotFoundException;
 
 @Service
 @Transactional
 public class TabletimeServiceImpl implements TabletimeService {
 
+    private static final Class<TabletimeRow> ENTITY_CLASS = TabletimeRow.class;
     private TabletimeDao tabletimeDao;
 
     @Autowired
@@ -61,7 +63,8 @@ public class TabletimeServiceImpl implements TabletimeService {
 
     @Override
     public TabletimeRow findById(long id) {
-        return tabletimeDao.getById(id);
+        return tabletimeDao.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException(id, ENTITY_CLASS));
     }
 
 }

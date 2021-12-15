@@ -36,7 +36,7 @@ import ua.com.foxminded.university.data.service.GroupService;
 import ua.com.foxminded.university.data.service.StudentService;
 import ua.com.foxminded.university.data.service.TabletimeService;
 import ua.com.foxminded.university.data.service.TeacherService;
-import ua.com.foxminded.university.exceptions.ObjectNotFoundById;
+import ua.com.foxminded.university.exceptions.ObjectNotFoundException;
 import ua.com.foxminded.university.web.exceptions.RestResponseEntityExceptionHandler;
 
 @ExtendWith(MockitoExtension.class)
@@ -105,7 +105,7 @@ class GroupsControllerTest {
 
     @Test
     void shouldHandleEmptyDataAccesExceptionWhenGroupNotExist() throws Exception {
-        ObjectNotFoundById ex = new ObjectNotFoundById(GROUP_TEST_ID, Group.class);
+        ObjectNotFoundException ex = new ObjectNotFoundException(GROUP_TEST_ID, Group.class);
         when(groupService.findById(GROUP_TEST_ID))
             .thenThrow(ex);
         mockMvc.perform(get("/groups/" + GROUP_TEST_ID + "/edit"))

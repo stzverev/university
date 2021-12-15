@@ -10,11 +10,13 @@ import org.springframework.stereotype.Service;
 import ua.com.foxminded.university.data.db.dao.StudentDao;
 import ua.com.foxminded.university.data.model.Student;
 import ua.com.foxminded.university.data.service.StudentService;
+import ua.com.foxminded.university.exceptions.ObjectNotFoundException;
 
 @Service
 @Transactional
 public class StudentServiceImpl implements StudentService {
 
+    private static final Class<Student> ENTITY_CLASS = Student.class;
     private StudentDao studentDao;
 
     @Autowired
@@ -40,12 +42,14 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public Student findById(long id) {
-        return studentDao.getById(id);
+        return studentDao.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException(id, ENTITY_CLASS));
     }
 
     @Override
     public Student getByFullName(String firstName, String lastName) {
-        return studentDao.findByFirstNameAndLastName(firstName, lastName);
+        return studentDao.findByFirstNameAndLastName(firstName, lastName)
+                .orElseThrow(() -> new ObjectNotFoundException(ENTITY_CLASS));
     }
 
     @Override

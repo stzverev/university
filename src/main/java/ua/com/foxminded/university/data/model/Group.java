@@ -8,16 +8,11 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "groups")
-@NamedQuery(name = "Group.getByName", query = "FROM Group WHERE name = :name")
-@NamedQuery(name = "Group.getAll", query = "FROM Group")
-@NamedQuery(name = "Group.getTabletime",
-    query = "FROM Tabletime WHERE group = :group AND id.dateTime BETWEEN :begin AND :end")
 public class Group extends AbstractEntity {
 
     private static final long serialVersionUID = 7265594806602299033L;

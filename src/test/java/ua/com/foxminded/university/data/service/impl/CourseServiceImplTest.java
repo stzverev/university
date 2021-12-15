@@ -10,8 +10,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import javax.transaction.Transactional;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
@@ -24,10 +22,9 @@ import ua.com.foxminded.university.data.model.Teacher;
 import ua.com.foxminded.university.data.service.CourseService;
 import ua.com.foxminded.university.data.service.GroupService;
 import ua.com.foxminded.university.data.service.TeacherService;
-import ua.com.foxminded.university.exceptions.ObjectNotFoundById;
+import ua.com.foxminded.university.exceptions.ObjectNotFoundException;
 
 @SpringJUnitConfig(ConfigTest.class)
-@Transactional
 @Sql(scripts = "classpath:data.sql")
 class CourseServiceImplTest {
 
@@ -99,7 +96,7 @@ class CourseServiceImplTest {
         assertEquals(course, courseService.findById(courseId));
 
         courseService.deleteById(courseId);
-        ObjectNotFoundById e = assertThrows(ObjectNotFoundById.class,
+        ObjectNotFoundException e = assertThrows(ObjectNotFoundException.class,
                 () -> courseService.findById(courseId));
         String message = "ua.com.foxminded.university.data.model.Course not found by id: 1";
         assertEquals(message, e.getMessage());
@@ -114,8 +111,7 @@ class CourseServiceImplTest {
 
         Teacher teacher = new Teacher(TEACHER_FIRST_NAME, TEACHER_LAST_NAME);
         teacherService.save(teacher);
-        long teacherId = teacher.getId();
-        assertEquals(teacher, teacherService.findById(teacherId));
+        assertThat(teacherService.findAll(), hasItem(teacher));
 
         courseService.addTeacher(course, teacher);
         assertThat(courseService.getTeachers(course), hasItem(teacher));

@@ -7,13 +7,13 @@ import ua.com.foxminded.university.data.model.TabletimeRow;
 
 public interface TabletimeService extends CommonService<TabletimeRow> {
 
-    List<TabletimeRow> getTabletimeForCourse(long id, LocalDateTime begin,
+    List<TabletimeRow> getTabletimeForCourse(long courseId, LocalDateTime begin,
             LocalDateTime end);
 
-    List<TabletimeRow> getTabletimeForTeacher(long id, LocalDateTime begin,
+    List<TabletimeRow> getTabletimeForTeacher(long teacherId, LocalDateTime begin,
             LocalDateTime end);
 
-    List<TabletimeRow> getTabletimeForGroup(long id, LocalDateTime begin,
+    List<TabletimeRow> getTabletimeForGroup(long groupId, LocalDateTime begin,
             LocalDateTime end);
 
 }

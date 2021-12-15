@@ -17,7 +17,7 @@ import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.Teacher;
 import ua.com.foxminded.university.data.service.CourseService;
-import ua.com.foxminded.university.exceptions.ObjectNotFoundById;
+import ua.com.foxminded.university.exceptions.ObjectNotFoundException;
 
 @Service
 @Transactional
@@ -57,20 +57,20 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public Course findById(long id) {
         return courseDao.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundById(id, ENTITY_CLASS));
+                .orElseThrow(() -> new ObjectNotFoundException(id, ENTITY_CLASS));
     }
 
     @Override
     public Set<Teacher> getTeachers(Course course) {
         return courseDao.findFetchTeachersById(course.getId())
-                .orElseThrow(() -> new ObjectNotFoundById(course.getId(), ENTITY_CLASS))
+                .orElseThrow(() -> new ObjectNotFoundException(course.getId(), ENTITY_CLASS))
                 .getTeachers();
     }
 
     @Override
     public Set<Group> getGroups(Course course) {
         return courseDao.findFetchGroupsById(course.getId())
-                .orElseThrow(() -> new ObjectNotFoundById(course.getId(), ENTITY_CLASS))
+                .orElseThrow(() -> new ObjectNotFoundException(course.getId(), ENTITY_CLASS))
                 .getGroups();
     }
 
@@ -78,28 +78,28 @@ public class CourseServiceImpl implements CourseService {
     public void addGroup(Course course, Group group) {
         course = courseDao.getById(course.getId());
         group = groupDao.getById(group.getId());
-        course.getGroups().add(group);
+        group.getCourses().add(course);
     }
 
     @Override
     public void removeGroupFromCourse(Course course, Group group) {
         course = courseDao.getById(course.getId());
         group = groupDao.getById(group.getId());
-        course.getGroups().remove(group);
+        group.getCourses().remove(course);
     }
 
     @Override
     public void addTeacher(Course course, Teacher teacher) {
         course = courseDao.getById(course.getId());
         teacher = teacherDao.getById(teacher.getId());
-        course.getTeachers().add(teacher);
+        teacher.getCourses().add(course);
     }
 
     @Override
     public void removeTeacherFromCourse(Course course, Teacher teacher) {
         course = courseDao.getById(course.getId());
         teacher = teacherDao.getById(teacher.getId());
-        course.getTeachers().remove(teacher);
+        teacher.getCourses().remove(course);
     }
 
     @Override
