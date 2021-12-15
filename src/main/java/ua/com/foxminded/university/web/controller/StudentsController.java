@@ -1,6 +1,7 @@
 package ua.com.foxminded.university.web.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,14 +19,31 @@ import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.Student;
 import ua.com.foxminded.university.data.service.GroupService;
 import ua.com.foxminded.university.data.service.StudentService;
+import ua.com.foxminded.university.web.dto.GroupDto;
+import ua.com.foxminded.university.web.dto.StudentDto;
+import ua.com.foxminded.university.web.mapper.GroupMapper;
+import ua.com.foxminded.university.web.mapper.StudentMapper;
 
 @Controller
 @RequestMapping("/students")
 public class StudentsController {
 
+    private static final String REDIRECT_TO_STUDENTS = "redirect:/students";
+
     private StudentService studentService;
     private GroupService groupService;
-    private static final String REDIRECT_TO_STUDENTS = "redirect:/students";
+    private StudentMapper studentMapper;
+    private GroupMapper groupMapper;
+
+    @Autowired
+    protected void setGroupMapper(GroupMapper groupMapper) {
+        this.groupMapper = groupMapper;
+    }
+
+    @Autowired
+    public void setStudentMapper(StudentMapper studentMapper) {
+        this.studentMapper = studentMapper;
+    }
 
     @Autowired
     public void setGroupService(GroupService groupService) {
@@ -39,39 +57,57 @@ public class StudentsController {
 
     @GetMapping()
     public String showStudents(Model model) {
-        List<Student> students = studentService.findAll();
-        model.addAttribute("students", students);
+        List<StudentDto> studentsDto = studentService.findAll()
+                .stream()
+                .map(studentMapper::toDto)
+                .collect(Collectors.toList());
+        model.addAttribute("students", studentsDto);
+
         return "/students/list";
     }
 
     @GetMapping("/new")
-    public String showCreatingNew(@ModelAttribute Student student, Model model) {
-        model.addAttribute("allGroups", groupService.findAll());
+    public String showCreatingNew(@ModelAttribute(name = "student") StudentDto studentDto, Model model) {
+        List<GroupDto> groupsDto = groupService.findAll()
+                .stream()
+                .map(groupMapper::toDto)
+                .collect(Collectors.toList());
+
+        model.addAttribute("allGroups", groupsDto);
         return "/students/card";
     }
 
     @GetMapping("/{id}/edit")
     public String showEditCard(Model model, @PathVariable("id") long id) {
         Student student = studentService.findById(id);
-        model.addAttribute("student", student);
-        model.addAttribute("allGroups", groupService.findAll());
+        StudentDto studentDto = studentMapper.toDto(student);
+
+        List<GroupDto> groupsDto = groupService.findAll()
+                .stream()
+                .map(groupMapper::toDto)
+                .collect(Collectors.toList());
+
+        model.addAttribute("student", studentDto);
+        model.addAttribute("allGroups", groupsDto);
         return "/students/card";
     }
 
     @PostMapping
-    public String create(@ModelAttribute Student student, @RequestParam("groupId") long groupId) {
+    public String create(@ModelAttribute(name = "student") StudentDto studentDto,
+            @RequestParam("groupId") long groupId) {
         Group group = groupService.findById(groupId);
-        student.setGroup(group);
+        Student student = studentMapper.toEntity(studentDto, group);
         studentService.save(student);
         return REDIRECT_TO_STUDENTS;
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute Student student, @PathVariable("id") long id,
+    public String update(@ModelAttribute(name = "student") StudentDto studentDto,
+            @PathVariable("id") long id,
             @RequestParam("groupId") long groupId) {
-        student.setId(id);
         Group group = groupService.findById(groupId);
-        student.setGroup(group);
+        studentDto.setId(id);
+        Student student = studentMapper.toEntity(studentDto, group);
         studentService.save(student);
         return REDIRECT_TO_STUDENTS;
     }
