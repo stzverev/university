@@ -31,7 +31,7 @@
 						class="form-select" name="groupId" id="group">
 						<option th:each="optionGroup: ${allGroups}"
 							th:value="${optionGroup.id}" th:text="${optionGroup.name}"
-							th:selected="${!isNew && (optionGroup.getId() == student.getGroup().getId())}"></option>
+							th:selected="${!isNew && (optionGroup.getId() == student.getGroupId())}"></option>
 					</select>
 				</div>
 			</div>
@@ -60,7 +60,7 @@
 			</tr>
 			<tr th:each="student: ${students}">
 				<td th:text="${student.firstName + ' ' + student.lastName}"/>
-				<td th:text="${student.group.name}">
+				<td th:text="${student.groupName}">
 				<td><a th:href="@{/students/{id}/edit(id = ${student.getId()})}"
 					class="btn btn-light" role="button">View/Edit</a></td>
 			</tr>
