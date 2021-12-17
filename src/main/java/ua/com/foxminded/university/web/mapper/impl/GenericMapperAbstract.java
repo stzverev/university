@@ -27,4 +27,9 @@ public abstract class GenericMapperAbstract<E extends Serializable, D extends Se
         return modelMapper.map(entity, dtoClass);
     }
 
+    @Override
+    public E toEntity(D dto) {
+        return modelMapper.map(dto, entityClass);
+    }
+
 }

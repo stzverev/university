@@ -29,7 +29,7 @@
 						<div class="col col-6">
 							<label for="course" class="form-label">Course</label> <select
 								class="form-select" name="courseId" id="course">
-								<option th:each="optionCourse: ${group.courses}"
+								<option th:each="optionCourse: ${courses}"
 									th:value="${optionCourse.id}" th:text="${optionCourse.name}"></option>
 							</select>
 						</div>

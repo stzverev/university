@@ -20,15 +20,22 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.service.CourseService;
+import ua.com.foxminded.university.web.dto.CourseDto;
 import ua.com.foxminded.university.web.exceptions.RestResponseEntityExceptionHandler;
+import ua.com.foxminded.university.web.mapper.CourseMapper;
 
 @ExtendWith(MockitoExtension.class)
 class CourseControllerTest {
 
-    private static final long COURSE_TEST_ID = 0;
+    private static final long COURSE_ID = 0;
+
+    private static final String COURSE_NAME = null;
 
     @Mock
     private CourseService courseService;
+
+    @Mock
+    private CourseMapper courseMapper;
 
     @InjectMocks
     private CourseController courseController;
@@ -55,11 +62,10 @@ class CourseControllerTest {
 
     @Test
     void shouldGetByIdWhenGetWithId() throws Exception {
-        int id = 1;
-        when(courseService.findById(id)).thenReturn(new Course());
-        mockMvc.perform(get("/courses/" + id + "/edit"))
+        when(courseService.findById(COURSE_ID)).thenReturn(buildCourse());
+        mockMvc.perform(get("/courses/" + COURSE_ID + "/edit"))
             .andExpect(status().isOk());
-        verify(courseService).findById(id);
+        verify(courseService).findById(COURSE_ID);
     }
 
     @Test
@@ -70,33 +76,47 @@ class CourseControllerTest {
 
     @Test
     void shouldCreateNew() throws Exception {
-        Course course = new Course();
-        course.setName("test course");
-        course.setId(COURSE_TEST_ID);
+        Course course = buildCourse();
+        CourseDto courseDto = buildCourseDto();
+        when(courseMapper.toEntity(courseDto)).thenReturn(course);
 
         mockMvc.perform(post("/courses")
-                .flashAttr("course", course))
+                .flashAttr("course", courseDto))
             .andExpect(status().is3xxRedirection());
         verify(courseService).save(course);
     }
 
     @Test
     void shouldUpdate() throws Exception {
-        Course course = new Course();
-        course.setName("test course");
-        course.setId(COURSE_TEST_ID);
+        Course course = buildCourse();
+        CourseDto courseDto = buildCourseDto();
+        when(courseMapper.toEntity(courseDto)).thenReturn(course);
 
-        mockMvc.perform(patch("/courses/" + COURSE_TEST_ID)
-                .flashAttr("course", course))
+        mockMvc.perform(patch("/courses/" + COURSE_ID)
+                .flashAttr("course", courseDto))
             .andExpect(status().is3xxRedirection());
         verify(courseService).save(course);
     }
 
     @Test
     void shouldDelete() throws Exception {
-        mockMvc.perform(delete("/courses/" + COURSE_TEST_ID))
+        mockMvc.perform(delete("/courses/" + COURSE_ID))
             .andExpect(status().is3xxRedirection());
-        verify(courseService).deleteById(COURSE_TEST_ID);
+        verify(courseService).deleteById(COURSE_ID);
+    }
+
+    private Course buildCourse() {
+        Course course = new Course();
+        course.setId(COURSE_ID);
+        course.setName(COURSE_NAME);
+        return course;
+    }
+
+    private CourseDto buildCourseDto() {
+        CourseDto courseDto = new CourseDto();
+        courseDto.setId(COURSE_ID);
+        courseDto.setName(COURSE_NAME);
+        return courseDto;
     }
 
 }

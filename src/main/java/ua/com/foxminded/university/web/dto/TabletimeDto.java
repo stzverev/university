@@ -9,9 +9,14 @@ public class TabletimeDto implements Serializable {
 
     private Long id;
     private LocalDateTime dateTime;
-    private String group;
-    private String course;
-    private String teacher;
+    private String groupName;
+    private String courseName;
+    private String teacherFirstName;
+    private String teacherLastName;
+
+    public TabletimeDto() {
+        super();
+    }
 
     public Long getId() {
         return id;
@@ -29,32 +34,36 @@ public class TabletimeDto implements Serializable {
         this.dateTime = dateTime;
     }
 
-    public String getGroup() {
-        return group;
+    public String getGroupName() {
+        return groupName;
     }
 
-    public void setGroup(String group) {
-        this.group = group;
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 
-    public String getCourse() {
-        return course;
+    public String getCourseName() {
+        return courseName;
     }
 
-    public void setCourse(String course) {
-        this.course = course;
+    public void setCourseName(String courseName) {
+        this.courseName = courseName;
     }
 
-    public String getTeacher() {
-        return teacher;
+    public String getTeacherFirstName() {
+        return teacherFirstName;
     }
 
-    public void setTeacher(String teacher) {
-        this.teacher = teacher;
+    public void setTeacherFirstName(String teacherFirstName) {
+        this.teacherFirstName = teacherFirstName;
     }
 
-    public TabletimeDto() {
-        super();
+    public String getTeacherLastName() {
+        return teacherLastName;
+    }
+
+    public void setTeacherLastName(String teacherLastName) {
+        this.teacherLastName = teacherLastName;
     }
 
 }

@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
@@ -33,6 +31,7 @@ import ua.com.foxminded.university.web.dto.CourseDto;
 import ua.com.foxminded.university.web.dto.GroupDto;
 import ua.com.foxminded.university.web.dto.StudentDto;
 import ua.com.foxminded.university.web.dto.TabletimeDto;
+import ua.com.foxminded.university.web.dto.TeacherDto;
 import ua.com.foxminded.university.web.mapper.CourseMapper;
 import ua.com.foxminded.university.web.mapper.GroupMapper;
 import ua.com.foxminded.university.web.mapper.StudentMapper;
@@ -48,7 +47,6 @@ public class GroupsController {
     private CourseService courseService;
     private TeacherService teacherService;
     private TabletimeService tabletimeService;
-    private Logger logger = LoggerFactory.getLogger(GroupsController.class);
     private GroupMapper groupMapper;
     private StudentMapper studentMapper;
     private CourseMapper courseMapper;
@@ -116,12 +114,12 @@ public class GroupsController {
     public String showEdit(Model model, @PathVariable("id") long id) {
         Group group = groupService.findById(id);
         GroupDto groupDto = groupMapper.toDto(group);
-        List<StudentDto> studentsDto = groupService.getStudents(group)
+        List<StudentDto> studentsDto = groupService.findStudents(group)
                 .stream()
                 .map(studentMapper::toDto)
                 .collect(Collectors.toList());
 
-        List<CourseDto> coursesDto = groupService.getCourses(group).stream()
+        List<CourseDto> coursesDto = groupService.findCourses(group).stream()
                 .map(courseMapper::toDto)
                 .collect(Collectors.toList());
 
@@ -135,8 +133,7 @@ public class GroupsController {
     public String showTableTime(Model model, @PathVariable("id") long groupId,
             @RequestParam("begin") @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime begin,
             @RequestParam("end") @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime end)  {
-        Group group = groupService.findById(groupId);
-        GroupDto groupDto = groupMapper.toDto(group);
+        GroupDto groupDto = findGroupByIdAsDto(groupId);
         List<TabletimeDto> tabletimeDto = tabletimeService.getTabletimeForGroup(groupId, begin, end)
                 .stream()
                 .map(tabletimeMapper::toDto)
@@ -151,17 +148,23 @@ public class GroupsController {
 
     @GetMapping("/{id}/tabletime/new")
     public String showAddingNewRecordToTabletime(Model model, @PathVariable("id") long groupId) {
-        Group group = groupService.findById(groupId);
-        group.setCourses(groupService.getCourses(group));
-        List<Group> allGroups = Collections.singletonList(group);
-        List<Teacher> teachers = group.getCourses()
+        Group group = groupService.findWithCoursesById(groupId);
+        GroupDto groupDto = groupMapper.toDto(group);
+        List<GroupDto> allGroupsDto = Collections.singletonList(groupDto);
+        List<CourseDto> coursesDto = group.getCourses().stream()
+                .map(courseMapper::toDto)
+                .collect(Collectors.toList());
+
+        List<TeacherDto> teachersDto = group.getCourses()
                 .stream()
                 .flatMap(course -> courseService.getTeachers(course).stream())
+                .map(teacherMapper::toDto)
                 .collect(Collectors.toList());
-        model.addAttribute("group", group);
-        model.addAttribute("allGroups", allGroups);
-        model.addAttribute("allCourses", group.getCourses());
-        model.addAttribute("allTeachers", teachers);
+
+        model.addAttribute("group", groupDto);
+        model.addAttribute("allGroups", allGroupsDto);
+        model.addAttribute("allCourses", coursesDto);
+        model.addAttribute("allTeachers", teachersDto);
 
         return "groups/tabletime-new";
     }
@@ -184,20 +187,30 @@ public class GroupsController {
 
     @GetMapping("/{groupId}/add-course")
     public String showAddingCourse(@PathVariable("groupId") long groupId, Model model) {
-        Group group = groupService.findById(groupId);
-        List<Course> courses = courseService.findAll();
-        model.addAttribute("group", group);
-        model.addAttribute("allCourses", courses);
+        model.addAttribute("group", findGroupByIdAsDto(groupId));
+        model.addAttribute("allCourses", findAllCoursesAsDto());
         return "groups/add-course";
+    }
+
+    private List<CourseDto> findAllCoursesAsDto() {
+        return courseService.findAll().stream()
+                .map(courseMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    private GroupDto findGroupByIdAsDto(long groupId) {
+        Group group = groupService.findById(groupId);
+        return groupMapper.toDto(group);
     }
 
     @GetMapping("/{groupId}/delete-course")
     public String showDeletingCourse(@PathVariable("groupId") long groupId, Model model) {
-        Group group = groupService.findById(groupId);
-        group.setCourses(groupService.getCourses(group));
-        model.addAttribute("group", group);
+        Group group = groupService.findWithCoursesById(groupId);
+        model.addAttribute("group", groupMapper.toDto(group));
+        model.addAttribute("courses", findCoursesAsDto(group));
         return "groups/delete-course";
     }
+
 
     @DeleteMapping("/delete-course")
     public String deleteCourse(@RequestParam("groupId") long groupId, @RequestParam("courseId") long courseId) {
@@ -216,14 +229,16 @@ public class GroupsController {
     }
 
     @PostMapping()
-    public String create(@ModelAttribute Group group) {
+    public String create(@ModelAttribute(name = "group") GroupDto groupDto) {
+        Group group = groupMapper.toEntity(groupDto);
         groupService.save(group);
         return REDIRECT_TO_GROUPS;
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute Group group, @PathVariable("id") long id) {
-        group.setId(id);
+    public String update(@ModelAttribute(name = "group") GroupDto groupDto, @PathVariable("id") long id) {
+        groupDto.setId(id);
+        Group group = groupMapper.toEntity(groupDto);
         groupService.save(group);
         return REDIRECT_TO_GROUPS;
     }
@@ -238,6 +253,13 @@ public class GroupsController {
         return groupService.findAll()
                 .stream()
                 .map(groupMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    private List<CourseDto> findCoursesAsDto(Group group) {
+        return groupService.findCourses(group)
+                .stream()
+                .map(courseMapper::toDto)
                 .collect(Collectors.toList());
     }
 

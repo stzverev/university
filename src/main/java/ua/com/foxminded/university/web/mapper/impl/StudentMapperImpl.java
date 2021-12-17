@@ -1,6 +1,6 @@
 package ua.com.foxminded.university.web.mapper.impl;
 
-import org.modelmapper.PropertyMap;
+import org.modelmapper.TypeMap;
 import org.springframework.stereotype.Component;
 
 import ua.com.foxminded.university.data.model.Group;
@@ -15,15 +15,10 @@ public class StudentMapperImpl extends GenericMapperAbstract<Student, StudentDto
     public StudentMapperImpl() {
         super(Student.class, StudentDto.class);
 
-        getModelMapper()
-            .createTypeMap(dtoClass, entityClass)
-            .addMappings(new PropertyMap<StudentDto, Student>() {
+        TypeMap<StudentDto, Student> typeMap = getModelMapper()
+            .createTypeMap(dtoClass, entityClass);
 
-                @Override
-                protected void configure() {
-                    skip().setGroup(null);
-                }
-            });
+        typeMap.addMappings(mapper -> mapper.skip(Student::setId));
     }
 
     @Override

@@ -1,4 +1,4 @@
-package ua.com.foxminded.university.data.db.dao;
+package ua.com.foxminded.university.data.db.repository;
 
 import java.util.Optional;
 
@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import ua.com.foxminded.university.data.model.Group;
 
-public interface GroupDao extends JpaRepository<Group, Long> {
+public interface GroupRepository extends JpaRepository<Group, Long> {
 
     Optional<Group> findByName(String name);
 

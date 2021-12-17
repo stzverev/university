@@ -6,4 +6,6 @@ public interface GenericMapper<E extends Serializable, D extends Serializable> {
 
     D toDto(E entity);
 
+    E toEntity(D dto);
+
 }

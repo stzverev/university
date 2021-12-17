@@ -1,4 +1,4 @@
-package ua.com.foxminded.university.data.db.dao;
+package ua.com.foxminded.university.data.db.repository;
 
 import java.util.Optional;
 
@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import ua.com.foxminded.university.data.model.Course;
 
-public interface CourseDao extends JpaRepository<Course, Long> {
+public interface CourseRepository extends JpaRepository<Course, Long> {
 
     Optional<Course> findByName(String name);
 

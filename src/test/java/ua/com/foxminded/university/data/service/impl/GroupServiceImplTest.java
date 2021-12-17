@@ -50,7 +50,7 @@ class GroupServiceImplTest {
         courseService.save(course);
 
         groupService.addToCourse(group, course);
-        assertThat(groupService.getCourses(group), hasItem(course));
+        assertThat(groupService.findCourses(group), hasItem(course));
     }
 
     @Test
@@ -86,7 +86,7 @@ class GroupServiceImplTest {
         studentService.save(student);
 
         assertThat(studentService.findAll(), hasItem(student));
-        assertThat(groupService.getStudents(group), hasItem(student));
+        assertThat(groupService.findStudents(group), hasItem(student));
     }
 
     @Test
@@ -98,10 +98,10 @@ class GroupServiceImplTest {
         courseService.save(course);
 
         groupService.addToCourse(group, course);
-        assertThat(groupService.getCourses(group), hasItem(course));
+        assertThat(groupService.findCourses(group), hasItem(course));
 
         groupService.removeFromCourse(group, course);
-        assertThat(groupService.getCourses(group), not(hasItem(course)));
+        assertThat(groupService.findCourses(group), not(hasItem(course)));
     }
 
     @Test
@@ -113,7 +113,7 @@ class GroupServiceImplTest {
         courseService.save(course);
 
         groupService.addToCourses(group, Collections.singleton(course));
-        assertThat(groupService.getCourses(group), hasItem(course));
+        assertThat(groupService.findCourses(group), hasItem(course));
     }
 
 }

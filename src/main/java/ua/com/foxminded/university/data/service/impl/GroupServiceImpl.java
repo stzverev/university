@@ -9,9 +9,8 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import ua.com.foxminded.university.data.db.dao.CourseDao;
-import ua.com.foxminded.university.data.db.dao.GroupDao;
-import ua.com.foxminded.university.data.db.dao.StudentDao;
+import ua.com.foxminded.university.data.db.repository.CourseRepository;
+import ua.com.foxminded.university.data.db.repository.GroupRepository;
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.Student;
@@ -23,48 +22,46 @@ import ua.com.foxminded.university.exceptions.ObjectNotFoundException;
 public class GroupServiceImpl implements GroupService {
 
     private static final Class<Group> ENTITY_CLASS = Group.class;
-    private GroupDao groupDao;
-    private CourseDao courseDao;
-    private StudentDao studentDao;
+    private GroupRepository groupRepository;
+    private CourseRepository courseRepository;
 
     @Autowired
-    public GroupServiceImpl(GroupDao groupDao, CourseDao courseDao, StudentDao studentDao) {
+    public GroupServiceImpl(GroupRepository groupRepository, CourseRepository courseRepository) {
         super();
-        this.groupDao = groupDao;
-        this.courseDao = courseDao;
-        this.studentDao = studentDao;
+        this.groupRepository = groupRepository;
+        this.courseRepository = courseRepository;
     }
 
     @Override
     public void save(Group group) {
-        groupDao.save(group);
+        groupRepository.save(group);
     }
 
     @Override
     public void save(List<Group> groups) {
-        groupDao.saveAll(groups);
+        groupRepository.saveAll(groups);
     }
 
     @Override
     public List<Group> findAll() {
-        return groupDao.findAll();
+        return groupRepository.findAll();
     }
 
     @Override
     public Group findById(long id) {
-        return groupDao.findById(id)
+        return groupRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException(id, ENTITY_CLASS));
     }
 
     @Override
     public void addToCourses(Group group, Set<Course> courses) {
         long id = group.getId();
-        group = groupDao.findById(id)
+        group = groupRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException(id, ENTITY_CLASS));
         Set<Long> coursesId = courses.stream()
                 .map(Course::getId)
                 .collect(Collectors.toSet());
-        courseDao.findAllById(coursesId)
+        courseRepository.findAllById(coursesId)
             .stream()
             .forEach(group.getCourses()::add);
     }
@@ -72,27 +69,27 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public void removeFromCourse(Group group, Course course) {
         long id = group.getId();
-        group = groupDao.findById(id)
+        group = groupRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException(id, ENTITY_CLASS));
-        course = courseDao.getById(course.getId());
+        course = courseRepository.getById(course.getId());
         group.getCourses().remove(course);
     }
 
     @Override
-    public Set<Student> getStudents(Group group) {
-        return groupDao.findFetchStudentsById(group.getId())
+    public Set<Student> findStudents(Group group) {
+        return groupRepository.findFetchStudentsById(group.getId())
                 .orElseThrow(() -> new ObjectNotFoundException(group.getId(), ENTITY_CLASS))
                 .getStudents();
     }
 
     @Override
     public void deleteById(long id) {
-        groupDao.deleteById(id);
+        groupRepository.deleteById(id);
     }
 
     @Override
-    public Set<Course> getCourses(Group group) {
-        return groupDao.findFetchCoursesById(group.getId())
+    public Set<Course> findCourses(Group group) {
+        return groupRepository.findFetchCoursesById(group.getId())
                 .orElseThrow(() -> new ObjectNotFoundException(group.getId(), ENTITY_CLASS))
                 .getCourses();
     }
@@ -100,12 +97,18 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public void addToCourse(Group group, Course course) {
         long id = group.getId();
-        group = groupDao.findById(id)
+        group = groupRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException(id, ENTITY_CLASS));
         long courseId = course.getId();
-        course = courseDao.findById(courseId)
+        course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new ObjectNotFoundException(courseId, Course.class));
         group.getCourses().add(course);
+    }
+
+    @Override
+    public Group findWithCoursesById(long groupId) {
+        return groupRepository.findFetchCoursesById(groupId)
+                .orElseThrow(() -> new ObjectNotFoundException(groupId, ENTITY_CLASS));
     }
 
 }

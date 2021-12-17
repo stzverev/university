@@ -36,10 +36,10 @@
 							<tbody>
 								<tr th:each="tabletimeRow: ${tabletime}">
 									<td th:text="${tabletimeRow.dateTime}">
-									<td th:text="${tabletimeRow.group.name}">
-									<td th:text="${tabletimeRow.course.name}">
+									<td th:text="${tabletimeRow.groupName}">
+									<td th:text="${tabletimeRow.courseName}">
 									<td
-										th:text="${tabletimeRow.teacher.firstName + ' ' + tabletimeRow.teacher.lastName}">
+										th:text="${tabletimeRow.teacherFirstName + ' ' + tabletimeRow.teacherLastName}">
 								</tr>
 							</tbody>
 						</table>

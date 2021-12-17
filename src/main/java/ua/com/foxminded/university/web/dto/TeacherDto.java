@@ -1,6 +1,7 @@
 package ua.com.foxminded.university.web.dto;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class TeacherDto implements Serializable {
 
@@ -9,6 +10,11 @@ public class TeacherDto implements Serializable {
     private Long id;
     private String firstName;
     private String lastName;
+    private List<String> courses;
+
+    public TeacherDto() {
+        super();
+    }
 
     public String getFirstName() {
         return firstName;
@@ -34,8 +40,12 @@ public class TeacherDto implements Serializable {
         this.id = id;
     }
 
-    public TeacherDto() {
-        super();
+    public List<String> getCourses() {
+        return courses;
+    }
+
+    public void setCourses(List<String> courses) {
+        this.courses = courses;
     }
 
 }

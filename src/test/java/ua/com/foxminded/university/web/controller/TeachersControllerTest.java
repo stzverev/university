@@ -27,6 +27,7 @@ import ua.com.foxminded.university.data.model.Teacher;
 import ua.com.foxminded.university.data.service.CourseService;
 import ua.com.foxminded.university.data.service.TeacherService;
 import ua.com.foxminded.university.web.exceptions.RestResponseEntityExceptionHandler;
+import ua.com.foxminded.university.web.mapper.TeacherMapper;
 
 @ExtendWith(MockitoExtension.class)
 class TeachersControllerTest {
@@ -36,6 +37,9 @@ class TeachersControllerTest {
 
     @Mock
     private CourseService courseService;
+
+    @Mock
+    private TeacherMapper teacherMapper;
 
     @InjectMocks
     private TeachersController teachersController;

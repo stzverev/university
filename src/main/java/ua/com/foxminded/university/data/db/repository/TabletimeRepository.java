@@ -1,4 +1,4 @@
-package ua.com.foxminded.university.data.db.dao;
+package ua.com.foxminded.university.data.db.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import ua.com.foxminded.university.data.model.TabletimeRow;
 
-public interface TabletimeDao extends JpaRepository<TabletimeRow, Long>  {
+public interface TabletimeRepository extends JpaRepository<TabletimeRow, Long>  {
 
     List<TabletimeRow> findByGroupIdAndDateTimeBetween(long id, LocalDateTime begin, LocalDateTime end);
 

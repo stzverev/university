@@ -14,8 +14,10 @@ public interface GroupService extends CommonService<Group> {
 
     void removeFromCourse(Group group, Course course);
 
-    Set<Student> getStudents(Group group);
+    Set<Student> findStudents(Group group);
 
-    Set<Course> getCourses(Group group);
+    Set<Course> findCourses(Group group);
+
+    Group findWithCoursesById(long groupId);
 
 }

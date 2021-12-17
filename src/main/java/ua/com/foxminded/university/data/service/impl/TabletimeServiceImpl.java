@@ -8,7 +8,7 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import ua.com.foxminded.university.data.db.dao.TabletimeDao;
+import ua.com.foxminded.university.data.db.repository.TabletimeRepository;
 import ua.com.foxminded.university.data.model.TabletimeRow;
 import ua.com.foxminded.university.data.service.TabletimeService;
 import ua.com.foxminded.university.exceptions.ObjectNotFoundException;
@@ -18,52 +18,52 @@ import ua.com.foxminded.university.exceptions.ObjectNotFoundException;
 public class TabletimeServiceImpl implements TabletimeService {
 
     private static final Class<TabletimeRow> ENTITY_CLASS = TabletimeRow.class;
-    private TabletimeDao tabletimeDao;
+    private TabletimeRepository tabletimeRepository;
 
     @Autowired
-    public TabletimeServiceImpl(TabletimeDao tabletimeDao) {
+    public TabletimeServiceImpl(TabletimeRepository tabletimeRepository) {
         super();
-        this.tabletimeDao = tabletimeDao;
+        this.tabletimeRepository = tabletimeRepository;
     }
 
     @Override
     public List<TabletimeRow> getTabletimeForCourse(long id, LocalDateTime begin, LocalDateTime end) {
-        return tabletimeDao.findByCourseIdAndDateTimeBetween(id, begin, end);
+        return tabletimeRepository.findByCourseIdAndDateTimeBetween(id, begin, end);
     }
 
     @Override
     public List<TabletimeRow> getTabletimeForTeacher(long id, LocalDateTime begin, LocalDateTime end) {
-        return tabletimeDao.findByTeacherIdAndDateTimeBetween(id, begin, end);
+        return tabletimeRepository.findByTeacherIdAndDateTimeBetween(id, begin, end);
     }
 
     @Override
     public List<TabletimeRow> getTabletimeForGroup(long id, LocalDateTime begin, LocalDateTime end) {
-        return tabletimeDao.findByGroupIdAndDateTimeBetween(id, begin, end);
+        return tabletimeRepository.findByGroupIdAndDateTimeBetween(id, begin, end);
     }
 
     @Override
     public void save(TabletimeRow tabletime) {
-        tabletimeDao.save(tabletime);
+        tabletimeRepository.save(tabletime);
     }
 
     @Override
     public void save(List<TabletimeRow> tabletimeRows) {
-        tabletimeDao.saveAll(tabletimeRows);
+        tabletimeRepository.saveAll(tabletimeRows);
     }
 
     @Override
     public void deleteById(long id) {
-        tabletimeDao.deleteById(id);
+        tabletimeRepository.deleteById(id);
     }
 
     @Override
     public List<TabletimeRow> findAll() {
-        return tabletimeDao.findAll();
+        return tabletimeRepository.findAll();
     }
 
     @Override
     public TabletimeRow findById(long id) {
-        return tabletimeDao.findById(id)
+        return tabletimeRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException(id, ENTITY_CLASS));
     }
 
