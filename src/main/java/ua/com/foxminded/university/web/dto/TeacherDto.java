@@ -10,7 +10,7 @@ public class TeacherDto implements Serializable {
     private Long id;
     private String firstName;
     private String lastName;
-    private List<String> courses;
+    private List<CourseDto> courses;
 
     public TeacherDto() {
         super();
@@ -40,11 +40,11 @@ public class TeacherDto implements Serializable {
         this.id = id;
     }
 
-    public List<String> getCourses() {
+    public List<CourseDto> getCourses() {
         return courses;
     }
 
-    public void setCourses(List<String> courses) {
+    public void setCourses(List<CourseDto> courses) {
         this.courses = courses;
     }
 

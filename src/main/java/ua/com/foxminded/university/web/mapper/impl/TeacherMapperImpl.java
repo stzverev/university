@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Teacher;
+import ua.com.foxminded.university.web.dto.CourseDto;
 import ua.com.foxminded.university.web.dto.TeacherDto;
 import ua.com.foxminded.university.web.mapper.TeacherMapper;
 
@@ -16,7 +17,7 @@ import ua.com.foxminded.university.web.mapper.TeacherMapper;
 public class TeacherMapperImpl extends GenericMapperAbstract<Teacher, TeacherDto>
         implements TeacherMapper {
 
-    public TeacherMapperImpl(Converter<Collection<Course>, List<String>> coursesToStringConverter) {
+    public TeacherMapperImpl(Converter<Collection<Course>, List<CourseDto>> coursesToStringConverter) {
         super(Teacher.class, TeacherDto.class);
         TypeMap<Teacher, TeacherDto> typeMap = getModelMapper().createTypeMap(entityClass, dtoClass);
 

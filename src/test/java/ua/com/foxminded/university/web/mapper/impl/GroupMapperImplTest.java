@@ -1,7 +1,9 @@
 package ua.com.foxminded.university.web.mapper.impl;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Collections;
@@ -11,15 +13,14 @@ import org.junit.jupiter.api.Test;
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.web.dto.GroupDto;
-import ua.com.foxminded.university.web.mapper.impl.converter.CoursesToStringListConverter;
 
 class GroupMapperImplTest {
 
+    private static final String FIELD_NAME = "name";
     private static final String COURSE_NAME = "test course";
     private static final long GROUP_ID = 1L;
     private static final String GROUP_NAME = "test group";
-    private CoursesToStringListConverter courseListConverter = new CoursesToStringListConverter();
-    private GroupMapperImpl groupMapper = new GroupMapperImpl(courseListConverter);
+    private GroupMapperImpl groupMapper = new GroupMapperImpl();
 
     @Test
     void shouldCorrectWhenConvertDtoToEntity() {
@@ -45,7 +46,7 @@ class GroupMapperImplTest {
 
         assertEquals(entity.getName(), dto.getName());
         assertEquals(entity.getId(), dto.getId());
-        assertThat(dto.getCourses(), hasItem(course.getName()));
+        assertThat(dto.getCourses(), hasItem(hasProperty(FIELD_NAME, equalTo(COURSE_NAME))));
     }
 
 }

@@ -9,17 +9,17 @@ public class CourseDto implements Serializable {
 
     private Long id;
     private String name;
-    private List<String> groups;
+    private List<GroupDto> groups;
 
     public CourseDto() {
         super();
     }
 
-    public List<String> getGroups() {
+    public List<GroupDto> getGroups() {
         return groups;
     }
 
-    public void setGroups(List<String> groups) {
+    public void setGroups(List<GroupDto> groups) {
         this.groups = groups;
     }
 
