@@ -1,67 +1,72 @@
 package ua.com.foxminded.university.data.service.impl;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import ua.com.foxminded.university.data.db.dao.StudentDao;
+import ua.com.foxminded.university.data.ConfigTest;
 import ua.com.foxminded.university.data.model.Student;
-import ua.com.foxminded.university.data.service.DataInitializer;
+import ua.com.foxminded.university.data.service.StudentService;
+import ua.com.foxminded.university.exceptions.ObjectNotFoundException;
 
-@ExtendWith(MockitoExtension.class)
+@SpringJUnitConfig(ConfigTest.class)
+@Sql(scripts = "classpath:data.sql")
 class StudentServiceImplTest {
 
-    private static final int STUDENT_TEST_ID = 1;
+    private static final String STUDENT_FIRST_NAME = "Sheldon";
+    private static final String STUDENT_LAST_NAME = "Cooper";
 
-    @Mock
-    private StudentDao studentDao;
-
-    @InjectMocks
-    private StudentServiceImpl studentService;
-
-    @InjectMocks
-    private  DataInitializer dataInitializer;
+    @Autowired
+    private StudentService studentService;
 
     @Test
-    void shouldSaveStudentWhenSave() {
-        Student student = new Student();
+    void shouldGetStudentByFullNameWhenSaveStudent() {
+        Student expected = new Student(STUDENT_FIRST_NAME, STUDENT_LAST_NAME);
+        studentService.save(expected);
+
+        Student actual = studentService
+                .getByFullName(STUDENT_FIRST_NAME, STUDENT_LAST_NAME);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void shouldGetStudentByIdWhenSaveListOfStudents() {
+        Student expected = new Student(STUDENT_FIRST_NAME, STUDENT_LAST_NAME);
+        studentService.save(Collections.singletonList(expected));
+        assertNotEquals(0, expected.getId());
+
+        Student actual = studentService.findById(expected.getId());
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void shouldNotContainStudentWhenGetStudentAfterDeleting() {
+        Student student = new Student(STUDENT_FIRST_NAME, STUDENT_LAST_NAME);
         studentService.save(student);
-        verify(studentDao).save(student);
+        assertThat(studentService.findAll(), hasItem(student));
+
+        studentService.deleteById(student.getId());
+
+        assertThat(studentService.findAll(), not(hasItem(student)));
     }
 
     @Test
-    void shouldGetStudentsWhenGet() {
-        studentService.getAll();
-        verify(studentDao).getAll();
-    }
-
-    @Test
-    void shouldGetByFullNameWhenGetByName() {
-        studentService.getByFullName("", "");
-        verify(studentDao).getByFullName("", "");
-    }
-
-    @Test
-    void shouldGetStudentByIdWhenGetById() {
-        when(studentDao.getById(STUDENT_TEST_ID)).thenReturn(Optional.of(new Student()));
-        studentService.getById(STUDENT_TEST_ID);
-        verify(studentDao).getById(STUDENT_TEST_ID);
-    }
-
-    @Test
-    void shouldSaveStudentsWhenSaveListStudents() {
-        List<Student> students = new ArrayList<>();
-        studentService.save(students);
-        verify(studentDao).save(students);
+    void shouldThrowExceptionWhenNotFoundByFullName() {
+        ObjectNotFoundException ex = assertThrows(ObjectNotFoundException.class,
+                () -> studentService.getByFullName(STUDENT_FIRST_NAME, STUDENT_LAST_NAME));
+        assertEquals("ua.com.foxminded.university.data.model.Student not found", ex.getMessage());
     }
 
 }

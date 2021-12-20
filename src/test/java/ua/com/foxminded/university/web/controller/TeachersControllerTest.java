@@ -27,6 +27,7 @@ import ua.com.foxminded.university.data.model.Teacher;
 import ua.com.foxminded.university.data.service.CourseService;
 import ua.com.foxminded.university.data.service.TeacherService;
 import ua.com.foxminded.university.web.exceptions.RestResponseEntityExceptionHandler;
+import ua.com.foxminded.university.web.mapper.TeacherMapper;
 
 @ExtendWith(MockitoExtension.class)
 class TeachersControllerTest {
@@ -36,6 +37,9 @@ class TeachersControllerTest {
 
     @Mock
     private CourseService courseService;
+
+    @Mock
+    private TeacherMapper teacherMapper;
 
     @InjectMocks
     private TeachersController teachersController;
@@ -60,7 +64,7 @@ class TeachersControllerTest {
     void shouldGetTeachersListWhenGetTeachers() throws Exception {
         mockMvc.perform(get("/teachers"))
             .andExpect(status().isOk());
-        verify(teacherService).getAll();
+        verify(teacherService).findAll();
     }
 
     @Test
@@ -68,10 +72,10 @@ class TeachersControllerTest {
         Teacher teacher = new Teacher();
         teacher.setFirstName("Test");
         teacher.setLastName("Teacher");
-        when(teacherService.getById(TEACHER_TEST_ID)).thenReturn(teacher);
+        when(teacherService.findById(TEACHER_TEST_ID)).thenReturn(teacher);
         mockMvc.perform(get("/teachers/" + TEACHER_TEST_ID + "/edit"))
             .andExpect(status().isOk());
-        verify(teacherService).getById(TEACHER_TEST_ID);
+        verify(teacherService).findById(TEACHER_TEST_ID);
     }
 
     @Test
@@ -103,14 +107,14 @@ class TeachersControllerTest {
         mockMvc.perform(patch("/teachers/" + teacher.getId())
                 .flashAttr("teacher", teacher))
             .andExpect(status().is3xxRedirection());
-        verify(teacherService).update(teacher);
+        verify(teacherService).save(teacher);
     }
 
     @Test
     void shouldDelete() throws Exception {
         mockMvc.perform(delete("/teachers/" + TEACHER_TEST_ID))
             .andExpect(status().is3xxRedirection());
-        verify(teacherService).delete(TEACHER_TEST_ID);
+        verify(teacherService).deleteById(TEACHER_TEST_ID);
     }
 
     @Test
@@ -120,12 +124,12 @@ class TeachersControllerTest {
         teacher.setLastName("Teacher");
         teacher.setId(TEACHER_TEST_ID);
 
-        when(teacherService.getById(teacher.getId())).thenReturn(teacher);
-        when(courseService.getAll()).thenReturn(new ArrayList<>());
+        when(teacherService.findById(teacher.getId())).thenReturn(teacher);
+        when(courseService.findAll()).thenReturn(new ArrayList<>());
         mockMvc.perform(get("/teachers/" + teacher.getId() + "/add-course"))
             .andExpect(status().isOk());
-        verify(teacherService).getById(teacher.getId());
-        verify(courseService).getAll();
+        verify(teacherService).findById(teacher.getId());
+        verify(courseService).findAll();
     }
 
     @Test
@@ -135,11 +139,11 @@ class TeachersControllerTest {
         teacher.setLastName("Teacher");
         teacher.setId(TEACHER_TEST_ID);
 
-        when(teacherService.getById(teacher.getId())).thenReturn(teacher);
+        when(teacherService.findById(teacher.getId())).thenReturn(teacher);
         when(teacherService.getCourses(teacher)).thenReturn(new HashSet<>());
         mockMvc.perform(get("/teachers/" + teacher.getId() + "/delete-course"))
             .andExpect(status().isOk());
-        verify(teacherService).getById(teacher.getId());
+        verify(teacherService).findById(teacher.getId());
         verify(teacherService).getCourses(teacher);
     }
 
@@ -154,14 +158,14 @@ class TeachersControllerTest {
         testCourse.setId(COURSE_TEST_ID);
         testCourse.setName("test");
 
-        when(teacherService.getById(teacher.getId())).thenReturn(teacher);
-        when(courseService.getById(testCourse.getId())).thenReturn(testCourse);
+        when(teacherService.findById(teacher.getId())).thenReturn(teacher);
+        when(courseService.findById(testCourse.getId())).thenReturn(testCourse);
 
         mockMvc.perform(delete("/teachers/delete-course")
                 .param("teacherId", "" + teacher.getId())
                 .param("courseId", "" + testCourse.getId()))
             .andExpect(status().is3xxRedirection());
-        verify(teacherService).removeFromCourse(teacher, testCourse);
+        verify(teacherService).removeCourse(teacher, testCourse);
     }
 
     @Test
@@ -175,8 +179,8 @@ class TeachersControllerTest {
         testCourse.setId(COURSE_TEST_ID);
         testCourse.setName("test");
 
-        when(teacherService.getById(teacher.getId())).thenReturn(teacher);
-        when(courseService.getById(testCourse.getId())).thenReturn(testCourse);
+        when(teacherService.findById(teacher.getId())).thenReturn(teacher);
+        when(courseService.findById(testCourse.getId())).thenReturn(testCourse);
 
         mockMvc.perform(post("/teachers/add-course")
                 .param("teacherId", "" + teacher.getId())

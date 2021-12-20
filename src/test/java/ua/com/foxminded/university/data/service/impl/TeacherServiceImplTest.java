@@ -1,94 +1,93 @@
 package ua.com.foxminded.university.data.service.impl;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import ua.com.foxminded.university.data.db.dao.TeacherDao;
+import ua.com.foxminded.university.data.ConfigTest;
 import ua.com.foxminded.university.data.model.Course;
-import ua.com.foxminded.university.data.model.TabletimeRow;
 import ua.com.foxminded.university.data.model.Teacher;
+import ua.com.foxminded.university.data.service.CourseService;
+import ua.com.foxminded.university.data.service.TeacherService;
+import ua.com.foxminded.university.exceptions.ObjectNotFoundException;
 
-@ExtendWith(MockitoExtension.class)
+@SpringJUnitConfig(ConfigTest.class)
+@Sql(scripts = "classpath:data.sql")
 class TeacherServiceImplTest {
 
-    private static final int TEACHER_ID_TEST = 1;
+    private static final String COURSE_NAME = "TEST COURSE";
+    private static final String TEACHER_LAST_NAME = "TEACHER";
+    private static final String TEACHER_FIRST_NAME = "TEST";
 
-    @Mock
-    private TeacherDao teacherDao;
+    @Autowired
+    private TeacherService teacherService;
 
-    @InjectMocks
-    private TeacherServiceImpl teacherService;
+    @Autowired
+    private CourseService courseService;
 
     @Test
-    void shouldSaveTeacherWhenSave() {
-        Teacher teacher = new Teacher();
+    void shouldFindCourseWhenAddCourseForTeacher() {
+        Teacher teacher = new Teacher(TEACHER_FIRST_NAME, TEACHER_LAST_NAME);
         teacherService.save(teacher);
-        verify(teacherDao).save(teacher);
+        assertThat(teacherService.findAll(), hasItem(teacher));
+
+        Course course = new Course(COURSE_NAME);
+        courseService.save(course);
+
+        teacherService.addToCourse(teacher, course);
+        assertThat(teacherService.getCourses(teacher), hasItem(course));
     }
 
     @Test
-    void shouldGetTeachersWhenGet() {
-        teacherService.getAll();
-        verify(teacherDao).getAll();
+    void shouldFindCourseWhenAddListOfCoursesForTeacher() {
+        Teacher teacher = new Teacher(TEACHER_FIRST_NAME, TEACHER_LAST_NAME);
+        teacherService.save(Collections.singletonList(teacher));
+        assertThat(teacherService.findAll(), hasItem(teacher));
+
+        Course course = new Course(COURSE_NAME);
+        courseService.save(course);
+
+        teacherService.addCourses(teacher, Collections.singleton(course));
+        assertThat(teacherService.getCourses(teacher), hasItem(course));
     }
 
     @Test
-    void shouldGetTeacherByIdWhenGetById() {
-        when(teacherDao.getById(TEACHER_ID_TEST)).thenReturn(Optional.of(new Teacher()));
-        teacherService.getById(TEACHER_ID_TEST);
-        verify(teacherDao).getById(TEACHER_ID_TEST);
-    }
+    void shouldNotContainCourseWhenGetCourseAfterDeleting() {
+        Teacher teacher = new Teacher(TEACHER_FIRST_NAME, TEACHER_LAST_NAME);
+        teacherService.save(teacher);
+        assertThat(teacherService.findAll(), hasItem(teacher));
 
-    @Test
-    void shouldSaveTeachersWhenSaveListTeachers() {
-        List<Teacher> teachers = new ArrayList<>();
-        teacherService.save(teachers);
-        verify(teacherDao).save(teachers);
-    }
+        Course course = new Course(COURSE_NAME);
+        courseService.save(course);
 
-    @Test
-    void shouldAddTabletimeRowsWhenAddTabletime() {
-        List<TabletimeRow> rows = new ArrayList<>();
-        teacherService.addTabletimeRows(rows);
-        verify(teacherDao).addTabletimeRows(rows);
-    }
+        teacherService.addToCourse(teacher, course);
+        assertThat(teacherService.getCourses(teacher), hasItem(course));
 
-    @Test
-    void shouldAddCoursesWhenAddCourses() {
-        Teacher teacher = new Teacher();
-        Set<Course> courses = new HashSet<>();
-        teacherService.addCourses(teacher, courses);
-        verify(teacherDao).addToCourses(teacher, courses);
-    }
-
-    @Test
-    void shouldGetTabletimeWhenGetTabletime() {
-        Teacher teacher = new Teacher();
-        LocalDateTime begin = LocalDateTime.now();
-        LocalDateTime end = LocalDateTime.now();
-        teacherService.getTabletime(teacher, begin, end);
-        verify(teacherDao).getTabletime(teacher, begin, end);
-    }
-
-    @Test
-    void shouldRemoveFromCourseWhenRemove() {
-        Teacher teacher = new Teacher();
-        Course course = new Course();
         teacherService.removeCourse(teacher, course);
-        verify(teacherDao).removeCourse(teacher, course);
+        assertThat(teacherService.getCourses(teacher), not(hasItem(course)));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenFindByIdAfterDeleting() {
+        Teacher teacher = new Teacher(TEACHER_FIRST_NAME, TEACHER_LAST_NAME);
+        teacherService.save(teacher);
+        assertEquals(teacher, teacherService.findById(teacher.getId()));
+
+        long teacherId = teacher.getId();
+        teacherService.deleteById(teacherId);
+        ObjectNotFoundException ex = assertThrows(ObjectNotFoundException.class,
+                () -> teacherService.findById(teacherId));
+        assertEquals("ua.com.foxminded.university.data.model.Teacher not found", ex.getMessage());
     }
 
 }

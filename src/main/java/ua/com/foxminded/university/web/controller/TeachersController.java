@@ -2,6 +2,7 @@ package ua.com.foxminded.university.web.controller;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,6 +20,8 @@ import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Teacher;
 import ua.com.foxminded.university.data.service.CourseService;
 import ua.com.foxminded.university.data.service.TeacherService;
+import ua.com.foxminded.university.web.dto.TeacherDto;
+import ua.com.foxminded.university.web.mapper.TeacherMapper;
 
 @Controller
 @RequestMapping("/teachers")
@@ -26,7 +29,13 @@ public class TeachersController {
 
     private TeacherService teacherService;
     private CourseService courseService;
+    private TeacherMapper teacherMapper;
     private static final String REDIRECT_TO_TEACHERS = "redirect:/teachers";
+
+    @Autowired
+    public void setTeacherMapper(TeacherMapper teacherMapper) {
+        this.teacherMapper = teacherMapper;
+    }
 
     @Autowired
     public void setCourseService(CourseService courseService) {
@@ -40,21 +49,18 @@ public class TeachersController {
 
     @GetMapping()
     public String showTeachers(Model model) {
-        List<Teacher> teachers = teacherService.getAll();
-        teachers.stream().forEach(teacher ->
-            teacher.setCourses(teacherService.getCourses(teacher)));
-        model.addAttribute("teachers", teachers);
+        model.addAttribute("teachers", findAllTeachersWithCoursesAsDto());
         return "/teachers/list";
     }
 
     @GetMapping("/new")
-    public String showCreatingNew(@ModelAttribute Teacher teacher, Model model) {
+    public String showCreatingNew(@ModelAttribute(name = "teacher") TeacherDto teacherDto, Model model) {
         return "/teachers/card";
     }
 
     @GetMapping("/{id}/edit")
     public String showEditCard(Model model, @PathVariable("id") long id) {
-        Teacher teacher = teacherService.getById(id);
+        Teacher teacher = teacherService.findById(id);
         Set<Course> courses = teacherService.getCourses(teacher);
         model.addAttribute("teacher", teacher);
         model.addAttribute("courses", courses);
@@ -70,20 +76,20 @@ public class TeachersController {
     @PatchMapping("/{id}")
     public String update(@ModelAttribute Teacher teacher, @PathVariable("id") long id) {
         teacher.setId(id);
-        teacherService.update(teacher);
+        teacherService.save(teacher);
         return REDIRECT_TO_TEACHERS;
     }
 
     @DeleteMapping("/{id}")
     public String delete(@PathVariable("id") long id) {
-        teacherService.delete(id);
+        teacherService.deleteById(id);
         return REDIRECT_TO_TEACHERS;
     }
 
     @GetMapping("/{teacherId}/add-course")
     public String showAddingCourse(@PathVariable("teacherId") long teacherId, Model model) {
-        Teacher teacher = teacherService.getById(teacherId);
-        List<Course> courses = courseService.getAll();
+        Teacher teacher = teacherService.findById(teacherId);
+        List<Course> courses = courseService.findAll();
         model.addAttribute("teacher", teacher);
         model.addAttribute("allCourses", courses);
         return "teachers/add-course";
@@ -91,7 +97,7 @@ public class TeachersController {
 
     @GetMapping("/{teacherId}/delete-course")
     public String showDeletingCourse(@PathVariable("teacherId") long teacherId, Model model) {
-        Teacher teacher = teacherService.getById(teacherId);
+        Teacher teacher = teacherService.findById(teacherId);
         teacher.setCourses(teacherService.getCourses(teacher));
         model.addAttribute("teacher", teacher);
         return "teachers/delete-course";
@@ -99,18 +105,28 @@ public class TeachersController {
 
     @DeleteMapping("/delete-course")
     public String deleteCourse(@RequestParam("teacherId") long teacherId, @RequestParam("courseId") long courseId) {
-        Teacher teacher = teacherService.getById(teacherId);
-        Course course = courseService.getById(courseId);
-        teacherService.removeFromCourse(teacher, course);
+        Teacher teacher = teacherService.findById(teacherId);
+        Course course = courseService.findById(courseId);
+        teacherService.removeCourse(teacher, course);
         return REDIRECT_TO_TEACHERS;
     }
 
     @PostMapping("/add-course")
     public String addCourse(@RequestParam("teacherId") long teacherId, @RequestParam("courseId") long courseId) {
-        Teacher teacher = teacherService.getById(teacherId);
-        Course course = courseService.getById(courseId);
+        Teacher teacher = teacherService.findById(teacherId);
+        Course course = courseService.findById(courseId);
         teacherService.addToCourse(teacher, course);
         return REDIRECT_TO_TEACHERS;
+    }
+
+    private List<TeacherDto> findAllTeachersWithCoursesAsDto() {
+        List<Teacher> teachers = teacherService.findAll();
+        teachers.stream()
+            .forEach(teacher -> teacher.setCourses(
+                    teacherService.getCourses(teacher)));
+        return teachers.stream()
+                .map(teacherMapper::toDto)
+                .collect(Collectors.toList());
     }
 
 }

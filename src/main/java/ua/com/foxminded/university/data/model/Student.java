@@ -1,18 +1,27 @@
 package ua.com.foxminded.university.data.model;
 
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "students")
-@NamedQuery(name = "Student.getByFullName",
-    query = "FROM Student WHERE firstName = :firstName AND lastName = :lastName")
 public class Student extends Person {
 
+    private static final long serialVersionUID = -2114857038032581600L;
+
     @ManyToOne
+    @JoinColumn(name = "group_id")
     private Group group;
+
+    public Student() {
+        super();
+    }
+
+    public Student(String firstName, String lastName) {
+        super(firstName, lastName);
+    }
 
     public Group getGroup() {
         return group;

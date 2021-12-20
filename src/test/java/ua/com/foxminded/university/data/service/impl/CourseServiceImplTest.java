@@ -1,114 +1,142 @@
 package ua.com.foxminded.university.data.service.impl;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import ua.com.foxminded.university.data.db.dao.CourseDao;
-import ua.com.foxminded.university.data.db.dao.GroupDao;
-import ua.com.foxminded.university.data.db.dao.TeacherDao;
+import ua.com.foxminded.university.data.ConfigTest;
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.Teacher;
+import ua.com.foxminded.university.data.service.CourseService;
+import ua.com.foxminded.university.data.service.GroupService;
+import ua.com.foxminded.university.data.service.TeacherService;
+import ua.com.foxminded.university.exceptions.ObjectNotFoundException;
 
-@ExtendWith(MockitoExtension.class)
+@SpringJUnitConfig(ConfigTest.class)
+@Sql(scripts = "classpath:data.sql")
 class CourseServiceImplTest {
 
-    private static final int COURSE_TEST_ID = 1;
+    private static final String TEACHER_LAST_NAME = "Teacher";
+    private static final String TEACHER_FIRST_NAME = "Test";
+    private static final String COURSE_NAME = "Test course";
+    private static final String GROUP_NAME = "Test group";
 
-    @Mock
-    private CourseDao courseDao;
+    @Autowired
+    private CourseService courseService;
 
-    @Mock
-    private GroupDao groupDao;
+    @Autowired
+    private GroupService groupService;
 
-    @Mock
-    private TeacherDao teacherDao;
-
-    @InjectMocks
-    private CourseServiceImpl courseService;
-
-    @Test
-    void shouldAddToCoursesWhenAddGroupToCourse() {
-        Group group = new Group();
-        Course course = new Course();
-        courseService.addGroup(course, group);
-        verify(groupDao).addToCourses(Mockito.eq(group), Mockito.eq(Collections.singleton(course)));
-    }
+    @Autowired
+    private TeacherService teacherService;
 
     @Test
-    void shouldAddToCoursesWhenAddTeacherToCourse() {
-        Teacher teacher = new Teacher();
-        courseService.addTeacher(new Course(), teacher);
-        verify(teacherDao).addToCourses(Mockito.eq(teacher), Mockito.any());
-    }
-
-    @Test
-    void shouldSaveCourseWhenSave() {
-        Course course = new Course();
+    void shouldContainsGroupWhenAddedGroup() {
+        Group group = new Group(GROUP_NAME);
+        Course course = new Course(COURSE_NAME);
+        groupService.save(group);
         courseService.save(course);
-        verify(courseDao).save(course);
+        courseService.addGroup(course, group);
+
+        Set<Group> actual = courseService.getGroups(course);
+
+        assertThat(actual, hasItem(group));
     }
 
     @Test
-    void shouldGetCoursesWhenGet() {
-        courseService.getAll();
-        verify(courseDao).getAll();
+    void shouldContainsTeacherWhenAddedTeacher() {
+        Teacher teacher = new Teacher(TEACHER_FIRST_NAME, TEACHER_LAST_NAME);
+        Course course = new Course(COURSE_NAME);
+        teacherService.save(teacher);
+        courseService.save(course);
+        courseService.addTeacher(course, teacher);
+
+        Set<Teacher> actual = courseService.getTeachers(course);
+
+        assertThat(actual, hasItem(teacher));
     }
 
     @Test
-    void shouldGetCourseByIdWhenGetById() {
-        when(courseDao.getById(COURSE_TEST_ID)).thenReturn(Optional.of(new Course()));
-        courseService.getById(COURSE_TEST_ID);
-        verify(courseDao).getById(COURSE_TEST_ID);
+    void shouldContainsCourseWhenFindAllCoursesAfterCreatingNew() {
+        Course course = new Course(COURSE_NAME);
+        courseService.save(course);
+
+        List<Course> actual = courseService.findAll();
+
+        assertThat(actual, hasItem(course));
     }
 
     @Test
-    void shouldSaveCoursesWhenSaveListCourses() {
-        List<Course> courses = new ArrayList<>();
-        courseService.save(courses);
-        verify(courseDao).save(courses);
+    void shouldContainsCourseWhenFindAllCoursesAfterSavingListCourses() {
+        Course course = new Course(COURSE_NAME);
+        courseService.save(Collections.singletonList(course));
+
+        List<Course> actual = courseService.findAll();
+
+        assertThat(actual, hasItem(course));
     }
 
     @Test
-    void shouldGetGroupWhenGetGroup() {
-        Course course = new Course();
-        courseService.getGroups(course);
-        verify(courseDao).getGroups(course);
+    void shouldThrowExceptionWhenFindCourseAfterCourseHasDeleted() {
+        Course course = new Course(COURSE_NAME);
+        courseService.save(course);
+        long courseId = course.getId();
+        assertEquals(course, courseService.findById(courseId));
+
+        courseService.deleteById(courseId);
+        ObjectNotFoundException e = assertThrows(ObjectNotFoundException.class,
+                () -> courseService.findById(courseId));
+        String message = "ua.com.foxminded.university.data.model.Course not found by id: 1";
+        assertEquals(message, e.getMessage());
     }
 
     @Test
-    void shouldGetTeachersWhenGetTeacher() {
-        Course course = new Course();
-        courseService.getTeachers(course);
-        verify(courseDao).getTeachers(course);
-    }
+    void shouldNotContainTeacherAfterDeletingTeacherFromCourse() {
+        Course course = new Course(COURSE_NAME);
+        courseService.save(course);
+        long courseId = course.getId();
+        assertEquals(course, courseService.findById(courseId));
 
-    @Test
-    void shouldRemoveGroupWhenRemoveGroup() {
-        Course course = new Course();
-        Group group = new Group();
-        courseService.removeGroup(course, group);
-        verify(groupDao).deleteFromCourse(group, course);
-    }
+        Teacher teacher = new Teacher(TEACHER_FIRST_NAME, TEACHER_LAST_NAME);
+        teacherService.save(teacher);
+        assertThat(teacherService.findAll(), hasItem(teacher));
 
-    @Test
-    void shouldRemoveTeacherWhenRemoveTeacher() {
-        Course course = new Course();
-        Teacher teacher = new Teacher();
+        courseService.addTeacher(course, teacher);
+        assertThat(courseService.getTeachers(course), hasItem(teacher));
+
         courseService.removeTeacherFromCourse(course, teacher);
-        verify(teacherDao).removeCourse(teacher, course);
+        assertThat(courseService.getTeachers(course), not(hasItem(teacher)));
+    }
+
+    @Test
+    void shouldNotContainGroupAfterDeletingGroupFromCourse() {
+        Course course = new Course(COURSE_NAME);
+        courseService.save(course);
+        long courseId = course.getId();
+        assertEquals(course, courseService.findById(courseId));
+
+        Group group = new Group(GROUP_NAME);
+        groupService.save(group);
+        long groupId = group.getId();
+        assertEquals(group, groupService.findById(groupId));
+
+        courseService.addGroup(course, group);
+        assertThat(courseService.getGroups(course), hasItem(group));
+
+        courseService.removeGroupFromCourse(course, group);
+        assertThat(courseService.getGroups(course), not(hasItem(group)));
     }
 
 }

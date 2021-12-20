@@ -1,90 +1,114 @@
 package ua.com.foxminded.university.data.service.impl;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import ua.com.foxminded.university.data.db.dao.GroupDao;
+import ua.com.foxminded.university.data.db.repository.CourseRepository;
+import ua.com.foxminded.university.data.db.repository.GroupRepository;
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.Student;
-import ua.com.foxminded.university.data.model.TabletimeRow;
 import ua.com.foxminded.university.data.service.GroupService;
-import ua.com.foxminded.university.exceptions.ObjectNotFoundById;
+import ua.com.foxminded.university.exceptions.ObjectNotFoundException;
 
 @Service
+@Transactional
 public class GroupServiceImpl implements GroupService {
 
     private static final Class<Group> ENTITY_CLASS = Group.class;
-    private GroupDao groupDao;
+    private GroupRepository groupRepository;
+    private CourseRepository courseRepository;
 
     @Autowired
-    public GroupServiceImpl(GroupDao groupDao) {
+    public GroupServiceImpl(GroupRepository groupRepository, CourseRepository courseRepository) {
         super();
-        this.groupDao = groupDao;
+        this.groupRepository = groupRepository;
+        this.courseRepository = courseRepository;
     }
 
     @Override
     public void save(Group group) {
-        groupDao.save(group);
+        groupRepository.save(group);
     }
 
     @Override
     public void save(List<Group> groups) {
-        groupDao.save(groups);
+        groupRepository.saveAll(groups);
     }
 
     @Override
-    public List<Group> getAll() {
-        return groupDao.getAll();
+    public List<Group> findAll() {
+        return groupRepository.findAll();
     }
 
     @Override
-    public Group getById(long id) {
-        return groupDao.getById(id).orElseThrow(() -> new ObjectNotFoundById(id, ENTITY_CLASS));
+    public Group findById(long id) {
+        return groupRepository.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException(id, ENTITY_CLASS));
     }
 
     @Override
     public void addToCourses(Group group, Set<Course> courses) {
-        groupDao.addToCourses(group, courses);
+        long id = group.getId();
+        group = groupRepository.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException(id, ENTITY_CLASS));
+        Set<Long> coursesId = courses.stream()
+                .map(Course::getId)
+                .collect(Collectors.toSet());
+        courseRepository.findAllById(coursesId)
+            .stream()
+            .forEach(group.getCourses()::add);
     }
 
     @Override
     public void removeFromCourse(Group group, Course course) {
-        groupDao.deleteFromCourse(group, course);
+        long id = group.getId();
+        group = groupRepository.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException(id, ENTITY_CLASS));
+        course = courseRepository.getById(course.getId());
+        group.getCourses().remove(course);
     }
 
     @Override
-    public Set<TabletimeRow> getTabletime(Group group, LocalDateTime begin, LocalDateTime end) {
-        return groupDao.getTabletime(group, begin, end);
+    public Set<Student> findStudents(Group group) {
+        return groupRepository.findFetchStudentsById(group.getId())
+                .orElseThrow(() -> new ObjectNotFoundException(group.getId(), ENTITY_CLASS))
+                .getStudents();
     }
 
     @Override
-    public void addTabletimeRows(List<TabletimeRow> tabletimeRows) {
-        groupDao.addTabletimeRows(tabletimeRows);
+    public void deleteById(long id) {
+        groupRepository.deleteById(id);
     }
 
     @Override
-    public void update(Group group) {
-        groupDao.update(group);
+    public Set<Course> findCourses(Group group) {
+        return groupRepository.findFetchCoursesById(group.getId())
+                .orElseThrow(() -> new ObjectNotFoundException(group.getId(), ENTITY_CLASS))
+                .getCourses();
     }
 
     @Override
-    public Set<Student> getStudents(Group group) {
-        return groupDao.getStudents(group);
+    public void addToCourse(Group group, Course course) {
+        long id = group.getId();
+        group = groupRepository.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException(id, ENTITY_CLASS));
+        long courseId = course.getId();
+        course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new ObjectNotFoundException(courseId, Course.class));
+        group.getCourses().add(course);
     }
 
     @Override
-    public void delete(long id) {
-        groupDao.delete(id);
-    }
-
-    @Override
-    public Set<Course> getCourses(Group group) {
-        return groupDao.getCourses(group);
+    public Group findWithCoursesById(long groupId) {
+        return groupRepository.findFetchCoursesById(groupId)
+                .orElseThrow(() -> new ObjectNotFoundException(groupId, ENTITY_CLASS));
     }
 
 }

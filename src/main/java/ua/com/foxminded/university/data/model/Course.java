@@ -1,5 +1,6 @@
 package ua.com.foxminded.university.data.model;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -11,24 +12,26 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "courses")
-@NamedQuery(name = "Course.getByName", query = "FROM Course WHERE name = :name")
 @NamedQuery(name = "Course.getTabletime",
     query = "FROM Tabletime WHERE course = :course AND id.dateTime BETWEEN :begin AND :end")
-@NamedQuery(name = "Course.getGroups",
-    query = "From Course AS course JOIN FETCH course.groups WHERE course.id = :id")
 public class Course extends AbstractEntity {
 
     @Column(name = "name")
     private String name;
 
     @ManyToMany(mappedBy = "courses")
-    private Set<Teacher> teachers;
+    private Set<Teacher> teachers = new HashSet<>();
 
     @ManyToMany(mappedBy = "courses")
-    private Set<Group> groups;
+    private Set<Group> groups = new HashSet<>();
 
     @OneToMany(mappedBy = "course")
-    private Set<TabletimeRow> tabletime;
+    private Set<TabletimeRow> tabletime = new HashSet<>();
+
+    public Course(String name) {
+        super();
+        this.name = name;
+    }
 
     public Course() {
         super();
