@@ -2,13 +2,20 @@ package ua.com.foxminded.university.web.dto;
 
 import java.io.Serializable;
 
+import javax.validation.constraints.NotBlank;
+
 public class StudentDto implements Serializable {
 
     private static final long serialVersionUID = 3476497836448273698L;
 
     private Long id;
+
+    @NotBlank(message = "First name is mandatory")
     private String firstName;
+
+    @NotBlank(message = "Last name is mandatory")
     private String lastName;
+
     private String group;
     private Long groupId;
     private String groupName;

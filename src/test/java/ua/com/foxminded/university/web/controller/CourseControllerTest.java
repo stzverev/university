@@ -29,7 +29,7 @@ class CourseControllerTest {
 
     private static final long COURSE_ID = 0;
 
-    private static final String COURSE_NAME = null;
+    private static final String COURSE_NAME = "test";
 
     @Mock
     private CourseService courseService;

@@ -3,12 +3,17 @@ package ua.com.foxminded.university.web.dto;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.validation.constraints.NotBlank;
+
 public class GroupDto implements Serializable {
 
     private static final long serialVersionUID = 2395786904105415866L;
 
     private Long id;
+
+    @NotBlank(message = "Name is mandatory")
     private String name;
+
     private List<CourseDto> courses;
 
     public GroupDto() {

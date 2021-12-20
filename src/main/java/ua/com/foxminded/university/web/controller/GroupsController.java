@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
@@ -229,14 +231,14 @@ public class GroupsController {
     }
 
     @PostMapping()
-    public String create(@ModelAttribute(name = "group") GroupDto groupDto) {
+    public String create(@ModelAttribute(name = "group")  @Valid GroupDto groupDto) {
         Group group = groupMapper.toEntity(groupDto);
         groupService.save(group);
         return REDIRECT_TO_GROUPS;
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute(name = "group") GroupDto groupDto, @PathVariable("id") long id) {
+    public String update(@ModelAttribute(name = "group")  @Valid GroupDto groupDto, @PathVariable("id") long id) {
         groupDto.setId(id);
         Group group = groupMapper.toEntity(groupDto);
         groupService.save(group);

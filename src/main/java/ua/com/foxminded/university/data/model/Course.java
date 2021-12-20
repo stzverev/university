@@ -9,6 +9,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "courses")
@@ -17,6 +18,7 @@ import javax.persistence.Table;
 public class Course extends AbstractEntity {
 
     @Column(name = "name")
+    @NotBlank(message = "Name is mandatory")
     private String name;
 
     @ManyToMany(mappedBy = "courses")

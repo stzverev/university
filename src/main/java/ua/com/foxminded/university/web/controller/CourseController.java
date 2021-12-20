@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -68,13 +70,13 @@ public class CourseController {
     }
 
     @PostMapping()
-    public String create(@ModelAttribute(name = "course") CourseDto courseDto) {
+    public String create(@ModelAttribute(name = "course")  @Valid CourseDto courseDto) {
         courseService.save(courseMapper.toEntity(courseDto));
         return REDIRECT_TO_COURSES;
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute(name = "course") CourseDto courseDto,
+    public String update(@ModelAttribute(name = "course")  @Valid CourseDto courseDto,
             @PathVariable("id") long id) {
         courseDto.setId(id);
         courseService.save(courseMapper.toEntity(courseDto));
