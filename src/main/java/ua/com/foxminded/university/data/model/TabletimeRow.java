@@ -7,24 +7,29 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 @Entity(name = "Tabletime")
 @Table(name = "tabletime")
 public class TabletimeRow extends AbstractEntity {
 
     @Column(name = "date_time")
+    @NotNull(message = "Date/time is mandatory")
     private LocalDateTime dateTime;
 
     @ManyToOne
     @JoinColumn(name = "group_id")
+    @NotNull(message = "Group is mandatory")
     private Group group;
 
     @ManyToOne
     @JoinColumn(name = "course_id")
+    @NotNull(message = "Course is mandatory")
     private Course course;
 
     @ManyToOne
     @JoinColumn(name = "teacher_id")
+    @NotNull(message = "Teacher is mandatory")
     private Teacher teacher;
 
     public TabletimeRow() {

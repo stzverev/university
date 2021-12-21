@@ -6,14 +6,11 @@ import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
-import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "courses")
-@NamedQuery(name = "Course.getTabletime",
-    query = "FROM Tabletime WHERE course = :course AND id.dateTime BETWEEN :begin AND :end")
 public class Course extends AbstractEntity {
 
     @Column(name = "name")

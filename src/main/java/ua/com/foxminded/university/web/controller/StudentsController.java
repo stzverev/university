@@ -3,6 +3,8 @@ package ua.com.foxminded.university.web.controller;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -93,7 +95,7 @@ public class StudentsController {
     }
 
     @PostMapping
-    public String create(@ModelAttribute(name = "student") StudentDto studentDto,
+    public String create(@ModelAttribute(name = "student") @Valid StudentDto studentDto,
             @RequestParam("groupId") long groupId) {
         Group group = groupService.findById(groupId);
         Student student = studentMapper.toEntity(studentDto, group);
@@ -102,7 +104,7 @@ public class StudentsController {
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute(name = "student") StudentDto studentDto,
+    public String update(@ModelAttribute(name = "student") @Valid StudentDto studentDto,
             @PathVariable("id") long id,
             @RequestParam("groupId") long groupId) {
         Group group = groupService.findById(groupId);

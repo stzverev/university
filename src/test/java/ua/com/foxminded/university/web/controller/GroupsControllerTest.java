@@ -1,11 +1,14 @@
 package ua.com.foxminded.university.web.controller;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDateTime;
@@ -13,7 +16,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.IntStream;
 
+import org.hamcrest.core.Is;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,9 +54,17 @@ import ua.com.foxminded.university.web.mapper.TeacherMapper;
 @ExtendWith(MockitoExtension.class)
 class GroupsControllerTest {
 
+    private static final int GROUP_NAME_MAX_LENGTH = 150;
+    private static final String VALID_ERROR_GROUP_NAME_BLANK = "must not be blank";
+    private static final String VALID_ERROR_GROUP_NAME_SIZE = ""
+            + "size must be between 0 and " + GROUP_NAME_MAX_LENGTH;
+    private static final String TEACHER_FIRST_NAME = "Test";
+    private static final String TEACHER_LAST_NAME = "Teacher";
     private static final String COURSE_NAME = "test course";
-
     private static final String GROUP_NAME = "test";
+    private final static long GROUP_ID = 1L;
+    private static final long COURSE_ID = 1L;
+    private static final long TEACHER_ID = 1L;
 
     @Mock
     private GroupService groupService;
@@ -92,9 +105,6 @@ class GroupsControllerTest {
 
     private MockMvc mockMvc;
 
-    private final static long GROUP_ID = 1L;
-    private static final long COURSE_ID = 1L;
-    private static final long TEACHER_TEST_ID = 1L;
 
     @BeforeEach
     void init() {
@@ -112,10 +122,10 @@ class GroupsControllerTest {
 
     @Test
     void shouldGetByIdWhenGetWithId() throws Exception {
-        Group testGroup = new Group(GROUP_NAME);
+        Group group = buildGroup();
         Set<Student> students = new HashSet<>();
-        when(groupService.findById(GROUP_ID)).thenReturn(testGroup);
-        when(groupService.findStudents(testGroup)).thenReturn(students);
+        when(groupService.findById(GROUP_ID)).thenReturn(group);
+        when(groupService.findStudents(group)).thenReturn(students);
         mockMvc.perform(get("/groups/" + GROUP_ID + "/edit"))
             .andExpect(status().isOk());
         verify(groupService).findById(GROUP_ID);
@@ -139,8 +149,8 @@ class GroupsControllerTest {
 
     @Test
     void shouldCreateNewGroup() throws Exception {
-        Group group = buildTestGroup();
-        GroupDto groupDto = buildTestGroupDto();
+        Group group = buildGroup();
+        GroupDto groupDto = buildGroupDto();
         when(groupMapper.toEntity(groupDto)).thenReturn(group);
 
         RequestBuilder request = post("/groups")
@@ -152,8 +162,8 @@ class GroupsControllerTest {
 
     @Test
     void shouldUpdateGroup() throws Exception {
-        Group group = buildTestGroup();
-        GroupDto groupDto = buildTestGroupDto();
+        Group group = buildGroup();
+        GroupDto groupDto = buildGroupDto();
         when(groupMapper.toEntity(groupDto)).thenReturn(group);
 
         RequestBuilder request = patch("/groups/" + GROUP_ID)
@@ -163,24 +173,11 @@ class GroupsControllerTest {
         verify(groupService).save(group);
     }
 
-    private GroupDto buildTestGroupDto() {
-        GroupDto groupDto = new GroupDto();
-        groupDto.setId(GROUP_ID);
-        groupDto.setName(GROUP_NAME);
-        return groupDto;
-    }
-
-    private Group buildTestGroup() {
-        Group group = new Group(GROUP_NAME);
-        group.setId(GROUP_ID);
-        return group;
-    }
-
     @Test
     void shouldDeleteGroup() throws Exception {
-        Group testGroup = buildTestGroup();
+        Group group = buildGroup();
         RequestBuilder request = delete("/groups/" + GROUP_ID)
-                .flashAttr("group", testGroup);
+                .flashAttr("group", group);
         mockMvc.perform(request)
             .andExpect(status().is3xxRedirection());
         verify(groupService).deleteById(GROUP_ID);
@@ -188,8 +185,8 @@ class GroupsControllerTest {
 
     @Test
     void shouldShowAddingACourse() throws Exception {
-        Group testGroup = new Group(GROUP_NAME);
-        when(groupService.findById(GROUP_ID)).thenReturn(testGroup);
+        Group group = buildGroup();
+        when(groupService.findById(GROUP_ID)).thenReturn(group);
         when(courseService.findAll()).thenReturn(new ArrayList<>());
         mockMvc.perform(get("/groups/" + GROUP_ID + "/add-course"))
             .andExpect(status().isOk());
@@ -199,7 +196,7 @@ class GroupsControllerTest {
 
     @Test
     void shouldShowDeletingACourse() throws Exception {
-        Group group = buildTestGroup();
+        Group group = buildGroup();
         when(groupService.findWithCoursesById(GROUP_ID)).thenReturn(group);
         when(groupService.findCourses(group)).thenReturn(new HashSet<>());
 
@@ -211,45 +208,37 @@ class GroupsControllerTest {
 
     @Test
     void shouldDeleteACourse() throws Exception {
-        Group testGroup = buildTestGroup();
+        Group group = buildGroup();
+        Course course = buildCourse();
 
-        Course testCourse = new Course();
-        testCourse.setId(COURSE_ID);
-        testCourse.setName(GROUP_NAME);
-
-        when(groupService.findById(testGroup.getId())).thenReturn(testGroup);
-        when(courseService.findById(testCourse.getId())).thenReturn(testCourse);
+        when(groupService.findById(group.getId())).thenReturn(group);
+        when(courseService.findById(course.getId())).thenReturn(course);
 
         mockMvc.perform(delete("/groups/delete-course")
-                .param("groupId", "" + testGroup.getId())
-                .param("courseId", "" + testCourse.getId()))
+                .param("groupId", "" + group.getId())
+                .param("courseId", "" + course.getId()))
             .andExpect(status().is3xxRedirection());
-        verify(groupService).removeFromCourse(testGroup, testCourse);
+        verify(groupService).removeFromCourse(group, course);
     }
 
     @Test
     void shouldAddCourses() throws Exception {
-        Group testGroup = buildTestGroup();
+        Group group = buildGroup();
+        Course course = buildCourse();
 
-        Course testCourse = new Course();
-        testCourse.setId(COURSE_ID);
-        testCourse.setName(GROUP_NAME);
-
-        when(groupService.findById(testGroup.getId())).thenReturn(testGroup);
-        when(courseService.findById(testCourse.getId())).thenReturn(testCourse);
+        when(groupService.findById(group.getId())).thenReturn(group);
+        when(courseService.findById(course.getId())).thenReturn(course);
 
         mockMvc.perform(post("/groups/add-course")
-                .param("groupId", "" + testGroup.getId())
-                .param("courseId", "" + testCourse.getId()))
+                .param("groupId", "" + group.getId())
+                .param("courseId", "" + course.getId()))
             .andExpect(status().is3xxRedirection());
         verify(groupService).addToCourse(Mockito.any(), Mockito.any());
     }
 
     @Test
     void shouldShowTabletime() throws Exception {
-        Group group = new Group();
-        group.setName("test group");
-        group.setId(GROUP_ID);
+        Group group = buildGroup();
 
         LocalDateTime begin = LocalDateTime.now();
         LocalDateTime end = LocalDateTime.now();
@@ -267,11 +256,11 @@ class GroupsControllerTest {
 
     @Test
     void shouldAddingNewRecordToTabletime() throws Exception {
-        Course course = buildTestCourse();
-        Group group = buildTestGroup();
+        Course course = buildCourse();
+        Group group = buildGroup();
         group.setCourses(Collections.singleton(course));
-        GroupDto groupDto = buildTestGroupDto();
-        CourseDto courseDto = buildTestCourseDto();
+        GroupDto groupDto = buildGroupDto();
+        CourseDto courseDto = buildCourseDto();
 
         when(groupMapper.toDto(group)).thenReturn(groupDto);
         when(courseMapper.toDto(course)).thenReturn(courseDto);
@@ -281,34 +270,11 @@ class GroupsControllerTest {
             .andExpect(status().isOk());
     }
 
-    private CourseDto buildTestCourseDto() {
-        CourseDto courseDto = new CourseDto();
-        courseDto.setName(COURSE_NAME);
-        courseDto.setId(COURSE_ID);
-        return courseDto;
-    }
-
-    private Course buildTestCourse() {
-        Course course = new Course();
-        course.setName(COURSE_NAME);
-        course.setId(COURSE_ID);
-        return course;
-    }
-
     @Test
     void shouldCreateNewRecordToTabletime() throws Exception {
-        Group group = new Group();
-        group.setName("test group");
-        group.setId(GROUP_ID);
-
-        Course course = new Course();
-        course.setName(COURSE_NAME);
-        course.setId(COURSE_ID);
-
-        Teacher teacher = new Teacher();
-        teacher.setFirstName("Test");
-        teacher.setLastName("Teacher");
-        teacher.setId(TEACHER_TEST_ID);
+        Group group = buildGroup();
+        Course course = buildCourse();
+        Teacher teacher = buldTeacher();
 
         when(groupService.findById(group.getId())).thenReturn(group);
         when(courseService.findById(course.getId())).thenReturn(course);
@@ -322,7 +288,67 @@ class GroupsControllerTest {
             .andExpect(status().is3xxRedirection());
 
         TabletimeRow tabletimeRow = new TabletimeRow(begin, course, group, teacher);
-        verify(tabletimeService).save(Mockito.eq(tabletimeRow));
+        verify(tabletimeService).save(tabletimeRow);
+    }
+
+    @Test
+    void shouldBadRequestWhenSaveGroupWithNameLengthMoreMaxLength() throws Exception {
+        GroupDto groupDto = buildGroupDto();
+        StringBuilder builder = new StringBuilder();
+        IntStream.range(0, GROUP_NAME_MAX_LENGTH + 1).forEach(i -> builder.append('a'));
+        groupDto.setName(builder.toString());
+        assertThat(groupDto.getName().length(), greaterThan(GROUP_NAME_MAX_LENGTH));
+
+        mockMvc.perform(post("/groups")
+                .flashAttr("group", groupDto))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.name", Is.is(VALID_ERROR_GROUP_NAME_SIZE)));
+    }
+
+    @Test
+    void shouldBadRequestWhenSaveGroupWithBlankName() throws Exception {
+        GroupDto groupDto = buildGroupDto();
+        groupDto.setName("");
+
+        mockMvc.perform(post("/groups")
+                .flashAttr("group", groupDto))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.name", Is.is(VALID_ERROR_GROUP_NAME_BLANK)));
+    }
+
+    private Teacher buldTeacher() {
+        Teacher teacher = new Teacher();
+        teacher.setFirstName(TEACHER_FIRST_NAME);
+        teacher.setLastName(TEACHER_LAST_NAME);
+        teacher.setId(TEACHER_ID);
+        return teacher;
+    }
+
+    private CourseDto buildCourseDto() {
+        CourseDto courseDto = new CourseDto();
+        courseDto.setName(COURSE_NAME);
+        courseDto.setId(COURSE_ID);
+        return courseDto;
+    }
+
+    private Course buildCourse() {
+        Course course = new Course();
+        course.setName(COURSE_NAME);
+        course.setId(COURSE_ID);
+        return course;
+    }
+
+    private GroupDto buildGroupDto() {
+        GroupDto groupDto = new GroupDto();
+        groupDto.setId(GROUP_ID);
+        groupDto.setName(GROUP_NAME);
+        return groupDto;
+    }
+
+    private Group buildGroup() {
+        Group group = new Group(GROUP_NAME);
+        group.setId(GROUP_ID);
+        return group;
     }
 
 }

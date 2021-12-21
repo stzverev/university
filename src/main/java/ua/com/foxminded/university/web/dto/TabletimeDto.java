@@ -8,6 +8,7 @@ public class TabletimeDto implements Serializable {
     private static final long serialVersionUID = -6001766765168537465L;
 
     private Long id;
+
     private LocalDateTime dateTime;
     private String groupName;
     private String courseName;
