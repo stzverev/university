@@ -1,16 +1,21 @@
 package ua.com.foxminded.university.web.controller;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.stream.IntStream;
 
+import org.hamcrest.core.Is;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,6 +41,12 @@ class TeachersControllerTest {
     private static final String COURSE_NAME = "test";
     private static final String TEACHER_LAST_NAME = "Teacher";
     private static final String TEACHER_FIRST_NAME = "Test";
+    private final static long TEACHER_ID = 1L;
+    private static final long COURSE_ID = 1L;
+    private static final int TEACHER_FIRST_NAME_MAX_LENGTH = 100;
+    private static final String VALID_ERROR_TEACHER_FIRST_NAME_SIZE = ""
+            + "size must be between 0 and " + TEACHER_FIRST_NAME_MAX_LENGTH;
+    private static final String VALID_ERROR_TEACHER_FIRST_NAME_BLANK = "must not be blank";
 
     @Mock
     private TeacherService teacherService;
@@ -54,9 +65,6 @@ class TeachersControllerTest {
         new RestResponseEntityExceptionHandler();
 
     private MockMvc mockMvc;
-    private final static long TEACHER_ID = 1L;
-
-    private static final long COURSE_ID = 0;
 
     @BeforeEach
     void init() {
@@ -170,6 +178,31 @@ class TeachersControllerTest {
                 .param("courseId", "" + course.getId()))
             .andExpect(status().is3xxRedirection());
         verify(teacherService).addToCourse(Mockito.any(), Mockito.any());
+    }
+
+    @Test
+    void shouldBadRequestWhenSaveTeacherWithNameLengthMoreMaxLength() throws Exception {
+        TeacherDto teacherDto = buildTeacherDto();
+        StringBuilder builder = new StringBuilder();
+        IntStream.range(0, TEACHER_FIRST_NAME_MAX_LENGTH + 1).forEach(i -> builder.append('a'));
+        teacherDto.setFirstName(builder.toString());
+        assertThat(teacherDto.getFirstName().length(), greaterThan(TEACHER_FIRST_NAME_MAX_LENGTH));
+
+        mockMvc.perform(post("/teachers")
+                .flashAttr("teacher", teacherDto))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.firstName", Is.is(VALID_ERROR_TEACHER_FIRST_NAME_SIZE)));
+    }
+
+    @Test
+    void shouldBadRequestWhenSaveTeacherWithBlankName() throws Exception {
+        TeacherDto teacherDto = buildTeacherDto();
+        teacherDto.setFirstName("");
+
+        mockMvc.perform(post("/teachers")
+                .flashAttr("teacher", teacherDto))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.firstName", Is.is(VALID_ERROR_TEACHER_FIRST_NAME_BLANK)));
     }
 
     private Course buildCourse() {

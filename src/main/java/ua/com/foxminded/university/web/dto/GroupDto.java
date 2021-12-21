@@ -4,14 +4,17 @@ import java.io.Serializable;
 import java.util.List;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 public class GroupDto implements Serializable {
 
     private static final long serialVersionUID = 2395786904105415866L;
+    private static final int NAME_MAX_LENGTH = 150;
 
     private Long id;
 
-    @NotBlank(message = "Name is mandatory")
+    @NotBlank
+    @Size(max = NAME_MAX_LENGTH)
     private String name;
 
     private List<CourseDto> courses;

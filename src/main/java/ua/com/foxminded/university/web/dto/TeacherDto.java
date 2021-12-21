@@ -4,18 +4,24 @@ import java.io.Serializable;
 import java.util.List;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 public class TeacherDto implements Serializable {
 
     private static final long serialVersionUID = 4444782064687733846L;
+    private static final int FIRST_NAME_MAX_LENGTH = 100;
+    private static final int LAST_NAME_MAX_LENGTH = 100;
 
     private Long id;
 
-    @NotBlank(message = "First name is mandatory")
+    @NotBlank
+    @Size(max = FIRST_NAME_MAX_LENGTH)
     private String firstName;
 
-    @NotBlank(message = "Last name is mandatory")
+    @NotBlank
+    @Size(max = LAST_NAME_MAX_LENGTH)
     private String lastName;
+
     private List<CourseDto> courses;
 
     public TeacherDto() {

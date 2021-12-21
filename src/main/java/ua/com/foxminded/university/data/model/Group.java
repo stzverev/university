@@ -10,8 +10,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "groups")
@@ -20,7 +18,6 @@ public class Group extends AbstractEntity {
     private static final long serialVersionUID = 7265594806602299033L;
 
     @Column(name = "name")
-    @NotBlank(message = "Name is mandatory")
     private String name;
 
     @ManyToMany
@@ -30,7 +27,6 @@ public class Group extends AbstractEntity {
     private Set<Course> courses = new HashSet<>();
 
     @OneToMany(mappedBy = "group")
-    @Size(max = 32, message = "Group must not contains more 32 students")
     private Set<Student> students = new HashSet<>();
 
     @OneToMany(mappedBy = "group")

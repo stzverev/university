@@ -1,13 +1,19 @@
 package ua.com.foxminded.university.web.controller;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.stream.IntStream;
+
+import org.hamcrest.core.Is;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,8 +33,11 @@ import ua.com.foxminded.university.web.mapper.CourseMapper;
 @ExtendWith(MockitoExtension.class)
 class CourseControllerTest {
 
+    private static final int COURSE_NAME_MAX_LENGTH = 150;
+    private static final String VALID_ERROR_COURSE_NAME_BLANK = "must not be blank";
+    private static final String VALID_ERROR_COURSE_NAME_SIZE =
+            "size must be between 0 and " + COURSE_NAME_MAX_LENGTH;
     private static final long COURSE_ID = 0;
-
     private static final String COURSE_NAME = "test";
 
     @Mock
@@ -103,6 +112,31 @@ class CourseControllerTest {
         mockMvc.perform(delete("/courses/" + COURSE_ID))
             .andExpect(status().is3xxRedirection());
         verify(courseService).deleteById(COURSE_ID);
+    }
+
+    @Test
+    void shouldBadRequestWhenSaveCourseWithNameLengthMoreMaxLength() throws Exception {
+        CourseDto courseDto = buildCourseDto();
+        StringBuilder builder = new StringBuilder();
+        IntStream.range(0, COURSE_NAME_MAX_LENGTH + 1).forEach(i -> builder.append('a'));
+        courseDto.setName(builder.toString());
+        assertThat(courseDto.getName().length(), greaterThan(COURSE_NAME_MAX_LENGTH));
+
+        mockMvc.perform(post("/courses")
+                .flashAttr("course", courseDto))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.name", Is.is(VALID_ERROR_COURSE_NAME_SIZE)));
+    }
+
+    @Test
+    void shouldBadRequestWhenSaveCourseWithBlankName() throws Exception {
+        CourseDto courseDto = buildCourseDto();
+        courseDto.setName("");
+
+        mockMvc.perform(post("/courses")
+                .flashAttr("course", courseDto))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.name", Is.is(VALID_ERROR_COURSE_NAME_BLANK)));
     }
 
     private Course buildCourse() {
