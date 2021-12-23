@@ -36,7 +36,7 @@ import ua.com.foxminded.university.web.mapper.StudentMapper;
 @ExtendWith(MockitoExtension.class)
 class StudentsControllerTest {
 
-    private static final int STUDENT_FIRST_NAME_MAX_LENGTH = 150;
+    private static final int STUDENT_FIRST_NAME_MAX_LENGTH = 100;
     private static final String VALID_ERROR_STUDENT_FIRST_NAME_BLANK = "must not be blank";
     private static final String VALID_ERROR_STUDENT_FIRST_NAME_SIZE =
             "size must be between 0 and " + STUDENT_FIRST_NAME_MAX_LENGTH;

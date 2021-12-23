@@ -47,13 +47,6 @@ public class CourseController {
         return "courses/list";
     }
 
-    private List<CourseDto> findAllCoursesAsDto() {
-        return courseService.findAll()
-                .stream()
-                .map(courseMapper::toDto)
-                .collect(Collectors.toList());
-    }
-
     @GetMapping("/new")
     public String showCreatingNew(@ModelAttribute(name = "course") CourseDto courseDto) {
         return "courses/card";
@@ -87,6 +80,13 @@ public class CourseController {
     public String delete(@PathVariable("id") long id) {
         courseService.deleteById(id);
         return REDIRECT_TO_COURSES;
+    }
+
+    private List<CourseDto> findAllCoursesAsDto() {
+        return courseService.findAll()
+                .stream()
+                .map(courseMapper::toDto)
+                .collect(Collectors.toList());
     }
 
 }

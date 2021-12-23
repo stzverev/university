@@ -21,7 +21,6 @@ public class StudentDto implements Serializable {
     @Size(max = LAST_NAME_MAX_LENGTH)
     private String lastName;
 
-    private String group;
     private Long groupId;
     private String groupName;
 
@@ -51,14 +50,6 @@ public class StudentDto implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getGroup() {
-        return group;
-    }
-
-    public void setGroup(String group) {
-        this.group = group;
     }
 
     public Long getGroupId() {
