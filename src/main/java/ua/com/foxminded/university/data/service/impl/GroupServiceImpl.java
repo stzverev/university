@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import ua.com.foxminded.university.data.db.repository.CourseRepository;
@@ -109,6 +111,11 @@ public class GroupServiceImpl implements GroupService {
     public Group findWithCoursesById(long groupId) {
         return groupRepository.findFetchCoursesById(groupId)
                 .orElseThrow(() -> new ObjectNotFoundException(groupId, ENTITY_CLASS));
+    }
+
+    @Override
+    public Page<Group> findAll(PageRequest pageRequest) {
+        return groupRepository.findAll(pageRequest);
     }
 
 }

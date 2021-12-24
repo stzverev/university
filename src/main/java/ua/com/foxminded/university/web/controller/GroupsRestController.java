@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -39,8 +41,10 @@ public class GroupsRestController {
     }
 
     @GetMapping
-    public List<GroupDto> getGroups() {
-        return groupService.findAll()
+    public List<GroupDto> getGroups(@RequestParam int limit, @RequestParam int offset) {
+        Sort sortByName = Sort.by("name").descending();
+        PageRequest pageRequest = PageRequest.of(offset, limit, sortByName);
+        return groupService.findAll(pageRequest)
                 .stream()
                 .map(groupMapper::toDto)
                 .collect(Collectors.toList());

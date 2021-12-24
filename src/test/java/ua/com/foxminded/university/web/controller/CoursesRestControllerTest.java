@@ -16,7 +16,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -32,6 +36,8 @@ import ua.com.foxminded.university.web.mapper.CourseMapper;
 @ExtendWith(MockitoExtension.class)
 class CoursesRestControllerTest {
 
+    private static final int OFFSET = 100;
+    private static final int LIMIT = 100;
     private static final String REQUEST_MAIN = "/courses-rest";
     private static final String COURSE_NAME = "test course";
     private static final long COURSE_ID = 1L;
@@ -60,11 +66,14 @@ class CoursesRestControllerTest {
     void shouldGetAllCoursesWhenGetRequest() throws Exception {
         CourseDto courseDto = buildCourseDto();
         Course course = buildCourse();
+        Page<Course> page = new PageImpl<>(Collections.singletonList(course));
 
-        when(courseService.findAll()).thenReturn(Collections.singletonList(course));
+        when(courseService.findAll(Mockito.any(PageRequest.class))).thenReturn(page);
         when(courseMapper.toDto(course)).thenReturn(courseDto);
 
-        mockMvc.perform(get(REQUEST_MAIN))
+        mockMvc.perform(get(REQUEST_MAIN)
+                .param("limit", "" + LIMIT)
+                .param("offset", "" + OFFSET))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$[0].id", Is.is((int) COURSE_ID)))
             .andExpect(jsonPath("$[0].name", Is.is(COURSE_NAME)));

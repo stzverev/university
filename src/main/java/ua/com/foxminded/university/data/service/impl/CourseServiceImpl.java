@@ -8,6 +8,8 @@ import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import ua.com.foxminded.university.data.db.repository.CourseRepository;
@@ -106,6 +108,11 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public void deleteById(long id) {
         courseRepository.deleteById(id);
+    }
+
+    @Override
+    public Page<Course> findAll(PageRequest pageRequest) {
+        return courseRepository.findAll(pageRequest);
     }
 
 }

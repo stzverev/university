@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -47,8 +49,13 @@ public class TeachersRestController {
     }
 
     @GetMapping
-    public List<TeacherDto> findTeachers() {
-        return teacherService.findAll()
+    public List<TeacherDto> findTeachers(@RequestParam int offset, @RequestParam int limit) {
+        Sort sortByFullName = Sort.by("firstName")
+                .descending()
+                .and(Sort.by("lastName")
+                        .descending());
+        PageRequest pageRequest = PageRequest.of(offset, limit, sortByFullName);
+        return teacherService.findAll(pageRequest)
                 .stream()
                 .map(teacherMapper::toDto)
                 .collect(Collectors.toList());

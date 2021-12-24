@@ -16,8 +16,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -36,6 +40,8 @@ import ua.com.foxminded.university.web.mapper.TeacherMapper;
 @ExtendWith(MockitoExtension.class)
 class TeachersRestControllerTest {
 
+    private static final int OFFSET = 0;
+    private static final int LIMIT = 100;
     private static final String COURSE_NAME = "test course";
     private static final long COURSE_ID = 1L;
     private static final String REQUEST_MAIN = "/teachers-rest";
@@ -76,11 +82,14 @@ class TeachersRestControllerTest {
     void shouldGetAllTeacherWhenGetRequest() throws Exception {
         TeacherDto teacherDto = buildTeacherDto();
         Teacher teacher = buildTeacher();
+        Page<Teacher> page = new PageImpl<>(Collections.singletonList(teacher));
 
-        when(teacherService.findAll()).thenReturn(Collections.singletonList(teacher));
+        when(teacherService.findAll(Mockito.any(PageRequest.class))).thenReturn(page);
         when(teacherMapper.toDto(teacher)).thenReturn(teacherDto);
 
-        mockMvc.perform(get(REQUEST_MAIN))
+        mockMvc.perform(get(REQUEST_MAIN)
+                .param("limit", "" + LIMIT)
+                .param("offset", "" + OFFSET))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$[0].id", Is.is((int) TEACHER_ID)))
             .andExpect(jsonPath("$[0].firstName", Is.is(TEACHER_FIRST_NAME)))

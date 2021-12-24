@@ -16,7 +16,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -32,9 +36,12 @@ import ua.com.foxminded.university.web.mapper.GroupMapper;
 @ExtendWith(MockitoExtension.class)
 class GroupsRestControllerTest {
 
+    private static final int OFFSET = 0;
+    private static final int LIMIT = 100;
     private static final String REQUEST_MAIN = "/groups-rest";
     private static final String GROUP_NAME = "test group";
     private static final long GROUP_ID = 1L;
+    private static final String List = null;
 
     @Mock
     private GroupService groupService;
@@ -60,11 +67,14 @@ class GroupsRestControllerTest {
     void shouldGetAllGroupsWhenGetRequest() throws Exception {
         GroupDto groupDto = buildGroupDto();
         Group group = buildGroup();
+        Page<Group> page = new PageImpl<>(Collections.singletonList(group));
 
-        when(groupService.findAll()).thenReturn(Collections.singletonList(group));
+        when(groupService.findAll(Mockito.any(PageRequest.class))).thenReturn(page);
         when(groupMapper.toDto(group)).thenReturn(groupDto);
 
-        mockMvc.perform(get(REQUEST_MAIN))
+        mockMvc.perform(get(REQUEST_MAIN)
+                .param("limit", "" + LIMIT)
+                .param("offset", "" + OFFSET))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$[0].id", Is.is((int) GROUP_ID)))
             .andExpect(jsonPath("$[0].name", Is.is(GROUP_NAME)));
