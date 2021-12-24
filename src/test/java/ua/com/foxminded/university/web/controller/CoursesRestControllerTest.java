@@ -1,6 +1,7 @@
 package ua.com.foxminded.university.web.controller;
 
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -29,7 +30,7 @@ import ua.com.foxminded.university.web.exceptions.RestResponseEntityExceptionHan
 import ua.com.foxminded.university.web.mapper.CourseMapper;
 
 @ExtendWith(MockitoExtension.class)
-class CourseRestControllerTest {
+class CoursesRestControllerTest {
 
     private static final String REQUEST_MAIN = "/courses-rest";
     private static final String COURSE_NAME = "test course";
@@ -108,6 +109,13 @@ class CourseRestControllerTest {
         mockMvc.perform(post(REQUEST_MAIN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    void shoudIsOkWhenDeleteRequest() throws Exception {
+        mockMvc.perform(delete(REQUEST_MAIN)
+                .param("id", "" + COURSE_ID))
             .andExpect(status().isOk());
     }
 

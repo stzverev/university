@@ -24,7 +24,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Teacher;
+import ua.com.foxminded.university.data.service.CourseService;
 import ua.com.foxminded.university.data.service.GroupService;
 import ua.com.foxminded.university.data.service.TeacherService;
 import ua.com.foxminded.university.web.dto.TeacherDto;
@@ -34,12 +36,19 @@ import ua.com.foxminded.university.web.mapper.TeacherMapper;
 @ExtendWith(MockitoExtension.class)
 class TeachersRestControllerTest {
 
+    private static final String COURSE_NAME = "test course";
+    private static final long COURSE_ID = 1L;
+    private static final String REQUEST_MAIN = "/teachers-rest";
     private static final long TEACHER_ID = 1;
+    private static final String REQUEST_COURSES = REQUEST_MAIN + "/" + TEACHER_ID + "/courses";
     private static final String TEACHER_LAST_NAME = "teacher";
     private static final String TEACHER_FIRST_NAME = "Test";
 
     @Mock
     private TeacherService teacherService;
+
+    @Mock
+    private CourseService courseService;
 
     @Mock
     private TeacherMapper teacherMapper;
@@ -71,7 +80,7 @@ class TeachersRestControllerTest {
         when(teacherService.findAll()).thenReturn(Collections.singletonList(teacher));
         when(teacherMapper.toDto(teacher)).thenReturn(teacherDto);
 
-        mockMvc.perform(get("/teachers-rest"))
+        mockMvc.perform(get(REQUEST_MAIN))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$[0].id", Is.is((int) TEACHER_ID)))
             .andExpect(jsonPath("$[0].firstName", Is.is(TEACHER_FIRST_NAME)))
@@ -86,7 +95,7 @@ class TeachersRestControllerTest {
         when(teacherService.findById(TEACHER_ID)).thenReturn(teacher);
         when(teacherMapper.toDto(teacher)).thenReturn(teacherDto);
 
-        mockMvc.perform(get("/teachers-rest/" + TEACHER_ID))
+        mockMvc.perform(get(REQUEST_MAIN + "/" + TEACHER_ID))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id", Is.is((int) TEACHER_ID)))
             .andExpect(jsonPath("$.firstName", Is.is(TEACHER_FIRST_NAME)))
@@ -98,7 +107,7 @@ class TeachersRestControllerTest {
         TeacherDto teacherDto = buildTeacherDto();
 
         String json = mapper.writeValueAsString(teacherDto);
-        mockMvc.perform(post("/teachers-rest")
+        mockMvc.perform(post(REQUEST_MAIN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
             .andExpect(status().isOk());
@@ -109,7 +118,7 @@ class TeachersRestControllerTest {
         TeacherDto teacherDto = buildTeacherDto();
 
         String json = mapper.writeValueAsString(teacherDto);
-        mockMvc.perform(patch("/teachers-rest")
+        mockMvc.perform(patch(REQUEST_MAIN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
             .andExpect(status().isOk());
@@ -117,9 +126,42 @@ class TeachersRestControllerTest {
 
     @Test
     void shouldIsOkWhenDeleteRequest() throws Exception {
-        mockMvc.perform(delete("/teachers-rest")
+        mockMvc.perform(delete(REQUEST_MAIN)
                 .param("id", "" + TEACHER_ID))
             .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldIsOkWhenAddCourse() throws Exception {
+        Teacher teacher = buildTeacher();
+        Course course = buildCourse();
+
+        when(teacherService.findById(TEACHER_ID)).thenReturn(teacher);
+        when(courseService.findById(COURSE_ID)).thenReturn(course);
+
+        mockMvc.perform(post(REQUEST_COURSES)
+                .param("courseId", "" + COURSE_ID))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldIsOkWhenDeleteCourse() throws Exception {
+        Teacher teacher = buildTeacher();
+        Course course = buildCourse();
+
+        when(teacherService.findById(TEACHER_ID)).thenReturn(teacher);
+        when(courseService.findById(COURSE_ID)).thenReturn(course);
+
+        mockMvc.perform(delete(REQUEST_COURSES)
+                .param("courseId", "" + COURSE_ID))
+            .andExpect(status().isOk());
+    }
+
+    private Course buildCourse() {
+        Course course = new Course();
+        course.setId(COURSE_ID);
+        course.setName(COURSE_NAME);
+        return course;
     }
 
     private TeacherDto buildTeacherDto() {

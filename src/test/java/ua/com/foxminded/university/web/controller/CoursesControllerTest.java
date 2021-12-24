@@ -31,7 +31,7 @@ import ua.com.foxminded.university.web.exceptions.RestResponseEntityExceptionHan
 import ua.com.foxminded.university.web.mapper.CourseMapper;
 
 @ExtendWith(MockitoExtension.class)
-class CourseControllerTest {
+class CoursesControllerTest {
 
     private static final int COURSE_NAME_MAX_LENGTH = 150;
     private static final String VALID_ERROR_COURSE_NAME_BLANK = "must not be blank";
