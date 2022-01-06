@@ -5,6 +5,8 @@ import java.util.List;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import ua.com.foxminded.university.data.db.repository.StudentRepository;
@@ -55,6 +57,11 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public void deleteById(long id) {
         studentRepository.deleteById(id);
+    }
+
+    @Override
+    public Page<Student> findAll(PageRequest pageRequest) {
+        return studentRepository.findAll(pageRequest);
     }
 
 }

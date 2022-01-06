@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -36,7 +35,7 @@ import ua.com.foxminded.university.web.mapper.StudentMapper;
 @ExtendWith(MockitoExtension.class)
 class StudentsControllerTest {
 
-    private static final int STUDENT_FIRST_NAME_MAX_LENGTH = 150;
+    private static final int STUDENT_FIRST_NAME_MAX_LENGTH = 100;
     private static final String VALID_ERROR_STUDENT_FIRST_NAME_BLANK = "must not be blank";
     private static final String VALID_ERROR_STUDENT_FIRST_NAME_SIZE =
             "size must be between 0 and " + STUDENT_FIRST_NAME_MAX_LENGTH;
@@ -62,7 +61,6 @@ class StudentsControllerTest {
     @InjectMocks
     private StudentsController studentsController;
 
-    @Spy
     private RestResponseEntityExceptionHandler controllerAdvice =
         new RestResponseEntityExceptionHandler();
 
