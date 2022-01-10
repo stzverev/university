@@ -17,14 +17,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import springfox.documentation.annotations.ApiIgnore;
+import io.swagger.v3.oas.annotations.Hidden;
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.service.CourseService;
 import ua.com.foxminded.university.web.dto.CourseDto;
 import ua.com.foxminded.university.web.mapper.CourseMapper;
 
-@ApiIgnore
+@Hidden
 @Controller
 @RequestMapping("/courses")
 public class CourseController {

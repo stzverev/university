@@ -7,6 +7,10 @@ import java.util.Objects;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema
 public class CourseDto implements Serializable {
 
     private static final long serialVersionUID = 362044286549937480L;
@@ -18,6 +22,7 @@ public class CourseDto implements Serializable {
     @Size(max = NAME_MAX_LENGTH)
     private String name;
 
+    @Hidden
     private List<GroupDto> groups;
 
     public CourseDto() {
