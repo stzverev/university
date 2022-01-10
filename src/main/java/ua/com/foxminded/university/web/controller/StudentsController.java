@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.Student;
 import ua.com.foxminded.university.data.service.GroupService;
@@ -26,6 +27,7 @@ import ua.com.foxminded.university.web.dto.StudentDto;
 import ua.com.foxminded.university.web.mapper.GroupMapper;
 import ua.com.foxminded.university.web.mapper.StudentMapper;
 
+@Hidden
 @Controller
 @RequestMapping("/students")
 public class StudentsController {

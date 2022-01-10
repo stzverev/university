@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.TabletimeRow;
@@ -40,6 +41,7 @@ import ua.com.foxminded.university.web.mapper.StudentMapper;
 import ua.com.foxminded.university.web.mapper.TabletimeMapper;
 import ua.com.foxminded.university.web.mapper.TeacherMapper;
 
+@Hidden
 @Controller
 @RequestMapping("/groups")
 public class GroupsController {

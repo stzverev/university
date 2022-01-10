@@ -6,6 +6,8 @@ import java.util.List;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+import io.swagger.v3.oas.annotations.Hidden;
+
 public class TeacherDto implements Serializable {
 
     private static final long serialVersionUID = 4444782064687733846L;
@@ -22,6 +24,7 @@ public class TeacherDto implements Serializable {
     @Size(max = LAST_NAME_MAX_LENGTH)
     private String lastName;
 
+    @Hidden
     private List<CourseDto> courses;
 
     public TeacherDto() {
