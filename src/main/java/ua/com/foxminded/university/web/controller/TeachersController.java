@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import io.swagger.v3.oas.annotations.Hidden;
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Teacher;
 import ua.com.foxminded.university.data.service.CourseService;
@@ -26,7 +25,6 @@ import ua.com.foxminded.university.data.service.TeacherService;
 import ua.com.foxminded.university.web.dto.TeacherDto;
 import ua.com.foxminded.university.web.mapper.TeacherMapper;
 
-@Hidden
 @Controller
 @RequestMapping("/teachers")
 public class TeachersController {
