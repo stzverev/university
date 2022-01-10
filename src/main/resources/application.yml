@@ -5,8 +5,5 @@ spring:
                 enabled: true
     datasource:
         jndi-name: jdbc/UniversityDatabase
-springdoc: 
-    swagger-ui: 
-        version: '@springdoc.version@'
     
         
