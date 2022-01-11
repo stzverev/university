@@ -27,7 +27,7 @@ import ua.com.foxminded.university.web.mapper.GroupMapper;
 
 @RestController
 @RequestMapping("/groups-rest")
-@Tag(name = "Groups REST controller", description = "This conroller for managing groups")
+@Tag(name = "Groups controller", description = "This conroller for managing groups")
 public class GroupsRestController {
 
     private GroupService groupService;
