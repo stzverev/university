@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.stereotype.Controller;
@@ -21,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import lombok.RequiredArgsConstructor;
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.TabletimeRow;
@@ -42,63 +42,19 @@ import ua.com.foxminded.university.web.mapper.TeacherMapper;
 
 @Controller
 @RequestMapping("/groups")
+@RequiredArgsConstructor
 public class GroupsController {
 
     private static final String REDIRECT_TO_GROUPS = "redirect:/groups";
-    private GroupService groupService;
-    private CourseService courseService;
-    private TeacherService teacherService;
-    private TabletimeService tabletimeService;
-    private GroupMapper groupMapper;
-    private StudentMapper studentMapper;
-    private CourseMapper courseMapper;
-    private TeacherMapper teacherMapper;
-    private TabletimeMapper tabletimeMapper;
-
-    @Autowired
-    public void setCourseMapper(CourseMapper courseMapper) {
-        this.courseMapper = courseMapper;
-    }
-
-    @Autowired
-    public void setTeacherMapper(TeacherMapper teacherMapper) {
-        this.teacherMapper = teacherMapper;
-    }
-
-    @Autowired
-    public void setTabletimeMapper(TabletimeMapper tabletimeMapper) {
-        this.tabletimeMapper = tabletimeMapper;
-    }
-
-    @Autowired
-    public void setGroupMapper(GroupMapper groupMapper) {
-        this.groupMapper = groupMapper;
-    }
-
-    @Autowired
-    public void setStudentMapper(StudentMapper studentMapper) {
-        this.studentMapper = studentMapper;
-    }
-
-    @Autowired
-    public void setTabletimeService(TabletimeService tabletimeService) {
-        this.tabletimeService = tabletimeService;
-    }
-
-    @Autowired
-    public void setTeacherService(TeacherService teacherService) {
-        this.teacherService = teacherService;
-    }
-
-    @Autowired
-    public void setCourseService(CourseService courseService) {
-        this.courseService = courseService;
-    }
-
-    @Autowired
-    public void setGroupService(GroupService groupService) {
-        this.groupService = groupService;
-    }
+    private final GroupService groupService;
+    private final CourseService courseService;
+    private final TeacherService teacherService;
+    private final TabletimeService tabletimeService;
+    private final GroupMapper groupMapper;
+    private final StudentMapper studentMapper;
+    private final CourseMapper courseMapper;
+    private final TeacherMapper teacherMapper;
+    private final TabletimeMapper tabletimeMapper;
 
     @GetMapping()
     public String showGroups(Model model) {

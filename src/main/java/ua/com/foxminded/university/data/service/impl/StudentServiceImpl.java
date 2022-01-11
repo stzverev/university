@@ -4,11 +4,11 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
 import ua.com.foxminded.university.data.db.repository.StudentRepository;
 import ua.com.foxminded.university.data.model.Student;
 import ua.com.foxminded.university.data.service.StudentService;
@@ -16,16 +16,11 @@ import ua.com.foxminded.university.exceptions.ObjectNotFoundException;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class StudentServiceImpl implements StudentService {
 
     private static final Class<Student> ENTITY_CLASS = Student.class;
-    private StudentRepository studentRepository;
-
-    @Autowired
-    public StudentServiceImpl(StudentRepository studentRepository) {
-        super();
-        this.studentRepository = studentRepository;
-    }
+    private final StudentRepository studentRepository;
 
     @Override
     public void save(Student student) {

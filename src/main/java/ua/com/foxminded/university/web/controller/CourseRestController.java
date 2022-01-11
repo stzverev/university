@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.service.CourseService;
 import ua.com.foxminded.university.web.dto.CourseDto;
@@ -28,20 +28,11 @@ import ua.com.foxminded.university.web.mapper.CourseMapper;
 @RestController
 @RequestMapping("/courses-rest")
 @Tag(name = "Course controller", description = "This conroller for managing courses.")
+@RequiredArgsConstructor
 public class CourseRestController {
 
-    private CourseService courseService;
-    private CourseMapper courseMapper;
-
-    @Autowired
-    public void setCourseService(CourseService courseService) {
-        this.courseService = courseService;
-    }
-
-    @Autowired
-    public void setCourseMapper(CourseMapper courseMapper) {
-        this.courseMapper = courseMapper;
-    }
+    private final CourseService courseService;
+    private final CourseMapper courseMapper;
 
     @GetMapping
     @Operation(description = "Returns courses depending on parameters 'limit' and 'offset.'")

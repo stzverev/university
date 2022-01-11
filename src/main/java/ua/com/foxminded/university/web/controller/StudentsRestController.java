@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -21,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.Student;
 import ua.com.foxminded.university.data.service.GroupService;
@@ -31,26 +31,12 @@ import ua.com.foxminded.university.web.mapper.StudentMapper;
 @RestController
 @RequestMapping("/students-rest")
 @Tag(name = "Students controller", description = "This conroller for managing students")
+@RequiredArgsConstructor
 public class StudentsRestController {
 
-    private StudentService studentService;
-    private StudentMapper studentMapper;
-    private GroupService groupService;
-
-    @Autowired
-    public void setGroupService(GroupService groupService) {
-        this.groupService = groupService;
-    }
-
-    @Autowired
-    public void setStudentService(StudentService studentService) {
-        this.studentService = studentService;
-    }
-
-    @Autowired
-    public void setStudentMapper(StudentMapper studentMapper) {
-        this.studentMapper = studentMapper;
-    }
+    private final StudentService studentService;
+    private final StudentMapper studentMapper;
+    private final GroupService groupService;
 
     @GetMapping
     @Operation(description = "Returns students depending on parameters 'limit' and 'offset'.")

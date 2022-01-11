@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.service.GroupService;
 import ua.com.foxminded.university.web.dto.GroupDto;
@@ -28,20 +28,11 @@ import ua.com.foxminded.university.web.mapper.GroupMapper;
 @RestController
 @RequestMapping("/groups-rest")
 @Tag(name = "Groups controller", description = "This conroller for managing groups")
+@RequiredArgsConstructor
 public class GroupsRestController {
 
-    private GroupService groupService;
-    private GroupMapper groupMapper;
-
-    @Autowired
-    public void setGroupService(GroupService groupService) {
-        this.groupService = groupService;
-    }
-
-    @Autowired
-    public void setGroupMapper(GroupMapper groupMapper) {
-        this.groupMapper = groupMapper;
-    }
+    private final GroupService groupService;
+    private final GroupMapper groupMapper;
 
     @GetMapping
     @Operation(description = "Returns groups depending on parameters 'limit' and 'offset'.")

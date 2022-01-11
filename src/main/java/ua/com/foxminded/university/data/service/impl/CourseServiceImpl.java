@@ -7,11 +7,11 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
 import ua.com.foxminded.university.data.db.repository.CourseRepository;
 import ua.com.foxminded.university.data.db.repository.GroupRepository;
 import ua.com.foxminded.university.data.db.repository.TeacherRepository;
@@ -23,24 +23,16 @@ import ua.com.foxminded.university.exceptions.ObjectNotFoundException;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class CourseServiceImpl implements CourseService {
 
     @PersistenceContext
     private EntityManager entityManager;
 
     private static final Class<Course> ENTITY_CLASS = Course.class;
-    private CourseRepository courseRepository;
-    private TeacherRepository teacherRepository;
-    private GroupRepository groupRepository;
-
-    @Autowired
-    public CourseServiceImpl(CourseRepository courseRepository, TeacherRepository teacherRepository,
-            GroupRepository groupRepository) {
-        super();
-        this.courseRepository = courseRepository;
-        this.teacherRepository = teacherRepository;
-        this.groupRepository = groupRepository;
-    }
+    private final CourseRepository courseRepository;
+    private final TeacherRepository teacherRepository;
+    private final GroupRepository groupRepository;
 
     @Override
     public void save(Course course) {

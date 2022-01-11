@@ -6,11 +6,11 @@ import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
 import ua.com.foxminded.university.data.db.repository.CourseRepository;
 import ua.com.foxminded.university.data.db.repository.TeacherRepository;
 import ua.com.foxminded.university.data.model.Course;
@@ -20,18 +20,12 @@ import ua.com.foxminded.university.exceptions.ObjectNotFoundException;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class TeacherServiceImpl implements TeacherService {
 
     private static final Class<Teacher> ENTITY_CLASS = Teacher.class;
-    private TeacherRepository teacherRepository;
-    private CourseRepository courseRepository;
-
-    @Autowired
-    public TeacherServiceImpl(TeacherRepository teacherRepository, CourseRepository courseRepository) {
-        super();
-        this.teacherRepository = teacherRepository;
-        this.courseRepository = courseRepository;
-    }
+    private final TeacherRepository teacherRepository;
+    private final CourseRepository courseRepository;
 
     @Override
     public void save(Teacher teacher) {
