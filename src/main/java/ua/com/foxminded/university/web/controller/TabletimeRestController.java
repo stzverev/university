@@ -24,7 +24,7 @@ import ua.com.foxminded.university.web.mapper.TabletimeMapper;
 
 @RestController
 @RequestMapping("/tabletime-rest")
-@Tag(name = "Tabletime REST controller", description = "This conroller for managing tabletime")
+@Tag(name = "Tabletime controller", description = "This conroller for managing tabletime")
 public class TabletimeRestController {
 
     private TabletimeService tabletimeService;

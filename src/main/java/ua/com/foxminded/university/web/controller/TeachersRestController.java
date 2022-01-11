@@ -29,7 +29,7 @@ import ua.com.foxminded.university.web.mapper.TeacherMapper;
 
 @RestController
 @RequestMapping("/teachers-rest")
-@Tag(name = "Teachers REST controller", description = "This conroller for managing teachers")
+@Tag(name = "Teachers controller", description = "This conroller for managing teachers")
 public class TeachersRestController {
 
     private TeacherService teacherService;

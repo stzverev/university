@@ -27,7 +27,7 @@ import ua.com.foxminded.university.web.mapper.CourseMapper;
 
 @RestController
 @RequestMapping("/courses-rest")
-@Tag(name = "Course REST controller", description = "This conroller for managing courses.")
+@Tag(name = "Course controller", description = "This conroller for managing courses.")
 public class CourseRestController {
 
     private CourseService courseService;
