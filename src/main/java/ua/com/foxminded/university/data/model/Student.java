@@ -5,8 +5,17 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
 @Entity
 @Table(name = "students")
+@NoArgsConstructor
+@Getter
+@Setter
+@ToString
 public class Student extends Person {
 
     private static final long serialVersionUID = -2114857038032581600L;
@@ -15,26 +24,8 @@ public class Student extends Person {
     @JoinColumn(name = "group_id")
     private Group group;
 
-    public Student() {
-        super();
-    }
-
     public Student(String firstName, String lastName) {
         super(firstName, lastName);
-    }
-
-    public Group getGroup() {
-        return group;
-    }
-
-    public void setGroup(Group group) {
-        this.group = group;
-    }
-
-    @Override
-    public String toString() {
-        return "Student [toString()="
-                + super.toString() + ", group=" + group + "]";
     }
 
 }

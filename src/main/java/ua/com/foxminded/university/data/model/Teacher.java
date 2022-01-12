@@ -9,8 +9,19 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.builder.ToStringExclude;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
 @Entity
 @Table(name = "teachers")
+@Getter
+@Setter
+@NoArgsConstructor
+@ToString
 public class Teacher extends Person {
 
     private static final long serialVersionUID = 8935312762675961276L;
@@ -19,33 +30,15 @@ public class Teacher extends Person {
     @JoinTable(name = "teachers_courses",
         joinColumns = {@JoinColumn(name = "teacher_id")},
         inverseJoinColumns = {@JoinColumn(name = "course_id")})
+    @ToStringExclude
     private Set<Course> courses;
 
     @OneToMany(mappedBy = "teacher")
+    @ToStringExclude
     private Set<TabletimeRow> tabletime;
-
-    public Teacher() {
-        super();
-    }
 
     public Teacher(String firstName, String lastName) {
         super(firstName, lastName);
-    }
-
-    public Set<Course> getCourses() {
-        return courses;
-    }
-
-    public void setCourses(Set<Course> courses) {
-        this.courses = courses;
-    }
-
-    public Set<TabletimeRow> getTabletime() {
-        return tabletime;
-    }
-
-    public void setTabletime(Set<TabletimeRow> tabletime) {
-        this.tabletime = tabletime;
     }
 
 }

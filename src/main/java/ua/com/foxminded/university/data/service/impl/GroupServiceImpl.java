@@ -6,11 +6,11 @@ import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
 import ua.com.foxminded.university.data.db.repository.CourseRepository;
 import ua.com.foxminded.university.data.db.repository.GroupRepository;
 import ua.com.foxminded.university.data.model.Course;
@@ -21,18 +21,12 @@ import ua.com.foxminded.university.exceptions.ObjectNotFoundException;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class GroupServiceImpl implements GroupService {
 
     private static final Class<Group> ENTITY_CLASS = Group.class;
-    private GroupRepository groupRepository;
-    private CourseRepository courseRepository;
-
-    @Autowired
-    public GroupServiceImpl(GroupRepository groupRepository, CourseRepository courseRepository) {
-        super();
-        this.groupRepository = groupRepository;
-        this.courseRepository = courseRepository;
-    }
+    private final GroupRepository groupRepository;
+    private final CourseRepository courseRepository;
 
     @Override
     public void save(Group group) {

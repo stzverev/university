@@ -11,8 +11,19 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.builder.ToStringExclude;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
 @Entity
 @Table(name = "groups")
+@NoArgsConstructor
+@Getter
+@Setter
+@ToString
 public class Group extends AbstractEntity {
 
     private static final long serialVersionUID = 7265594806602299033L;
@@ -24,58 +35,20 @@ public class Group extends AbstractEntity {
     @JoinTable(name = "groups_courses",
         joinColumns = @JoinColumn(name = "group_id"),
         inverseJoinColumns = @JoinColumn(name = "course_id"))
+    @ToStringExclude
     private Set<Course> courses = new HashSet<>();
 
     @OneToMany(mappedBy = "group")
+    @ToStringExclude
     private Set<Student> students = new HashSet<>();
 
     @OneToMany(mappedBy = "group")
+    @ToStringExclude
     private Set<TabletimeRow> tabletime;
-
-    public Group() {
-        super();
-    }
 
     public Group(String name) {
         super();
         this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Set<Course> getCourses() {
-        return courses;
-    }
-
-    public Set<Student> getStudents() {
-        return students;
-    }
-
-    public void setStudents(Set<Student> students) {
-        this.students = students;
-    }
-
-    public void setCourses(Set<Course> courses) {
-        this.courses = courses;
-    }
-
-    public Set<TabletimeRow> getTabletime() {
-        return tabletime;
-    }
-
-    public void setTabletime(Set<TabletimeRow> tabletime) {
-        this.tabletime = tabletime;
-    }
-
-    @Override
-    public String toString() {
-        return "Group [name=" + name + ", id=" + getId() + "]";
     }
 
 }

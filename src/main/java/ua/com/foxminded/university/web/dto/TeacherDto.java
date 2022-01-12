@@ -6,6 +6,10 @@ import java.util.List;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+import io.swagger.v3.oas.annotations.Hidden;
+import lombok.Data;
+
+@Data
 public class TeacherDto implements Serializable {
 
     private static final long serialVersionUID = 4444782064687733846L;
@@ -22,42 +26,7 @@ public class TeacherDto implements Serializable {
     @Size(max = LAST_NAME_MAX_LENGTH)
     private String lastName;
 
+    @Hidden
     private List<CourseDto> courses;
-
-    public TeacherDto() {
-        super();
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public List<CourseDto> getCourses() {
-        return courses;
-    }
-
-    public void setCourses(List<CourseDto> courses) {
-        this.courses = courses;
-    }
 
 }

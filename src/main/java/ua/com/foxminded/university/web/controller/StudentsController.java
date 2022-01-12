@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import lombok.RequiredArgsConstructor;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.Student;
 import ua.com.foxminded.university.data.service.GroupService;
@@ -28,34 +28,15 @@ import ua.com.foxminded.university.web.mapper.StudentMapper;
 
 @Controller
 @RequestMapping("/students")
+@RequiredArgsConstructor
 public class StudentsController {
 
     private static final String REDIRECT_TO_STUDENTS = "redirect:/students";
 
-    private StudentService studentService;
-    private GroupService groupService;
-    private StudentMapper studentMapper;
-    private GroupMapper groupMapper;
-
-    @Autowired
-    protected void setGroupMapper(GroupMapper groupMapper) {
-        this.groupMapper = groupMapper;
-    }
-
-    @Autowired
-    public void setStudentMapper(StudentMapper studentMapper) {
-        this.studentMapper = studentMapper;
-    }
-
-    @Autowired
-    public void setGroupService(GroupService groupService) {
-        this.groupService = groupService;
-    }
-
-    @Autowired
-    public void setStudentService(StudentService studentService) {
-        this.studentService = studentService;
-    }
+    private final StudentService studentService;
+    private final GroupService groupService;
+    private final StudentMapper studentMapper;
+    private final GroupMapper groupMapper;
 
     @GetMapping()
     public String showStudents(Model model) {
