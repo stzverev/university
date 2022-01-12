@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import ua.com.foxminded.university.data.model.TabletimeRow;
 import ua.com.foxminded.university.data.service.TabletimeService;
 import ua.com.foxminded.university.web.dto.TabletimeDto;
@@ -25,20 +25,11 @@ import ua.com.foxminded.university.web.mapper.TabletimeMapper;
 @RestController
 @RequestMapping("/tabletime-rest")
 @Tag(name = "Tabletime controller", description = "This conroller for managing tabletime")
+@RequiredArgsConstructor
 public class TabletimeRestController {
 
-    private TabletimeService tabletimeService;
-    private TabletimeMapper tabletimeMapper;
-
-    @Autowired
-    public void setTabletimeMapper(TabletimeMapper tabletimeMapper) {
-        this.tabletimeMapper = tabletimeMapper;
-    }
-
-    @Autowired
-    public void setTabletimeService(TabletimeService tabletimeService) {
-        this.tabletimeService = tabletimeService;
-    }
+    private final TabletimeService tabletimeService;
+    private final TabletimeMapper tabletimeMapper;
 
     @PostMapping
     @Operation(description = "Add new record to tabletime.")

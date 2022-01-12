@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import lombok.RequiredArgsConstructor;
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Teacher;
 import ua.com.foxminded.university.data.service.CourseService;
@@ -27,27 +27,13 @@ import ua.com.foxminded.university.web.mapper.TeacherMapper;
 
 @Controller
 @RequestMapping("/teachers")
+@RequiredArgsConstructor
 public class TeachersController {
 
-    private TeacherService teacherService;
-    private CourseService courseService;
-    private TeacherMapper teacherMapper;
+    private final TeacherService teacherService;
+    private final CourseService courseService;
+    private final TeacherMapper teacherMapper;
     private static final String REDIRECT_TO_TEACHERS = "redirect:/teachers";
-
-    @Autowired
-    public void setTeacherMapper(TeacherMapper teacherMapper) {
-        this.teacherMapper = teacherMapper;
-    }
-
-    @Autowired
-    public void setCourseService(CourseService courseService) {
-        this.courseService = courseService;
-    }
-
-    @Autowired
-    public void setTeacherService(TeacherService teacherService) {
-        this.teacherService = teacherService;
-    }
 
     @GetMapping()
     public String showTeachers(Model model) {
