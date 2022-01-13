@@ -3,6 +3,7 @@ package ua.com.foxminded.university.data.service.impl;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -11,18 +12,15 @@ import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.boot.test.context.SpringBootTest;
 
-import ua.com.foxminded.university.data.ConfigTest;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.Student;
 import ua.com.foxminded.university.data.service.GroupService;
 import ua.com.foxminded.university.data.service.StudentService;
 import ua.com.foxminded.university.exceptions.ObjectNotFoundException;
 
-@SpringJUnitConfig(ConfigTest.class)
-@Sql(scripts = "classpath:data.sql")
+@SpringBootTest
 class StudentServiceImplTest {
 
     private static final String GROUP_NAME = "test group";
@@ -41,24 +39,21 @@ class StudentServiceImplTest {
     void shouldGetStudentByFullNameWhenSaveStudent() {
         Group group = buildGroup();
         groupService.save(group);
-        Student expected = buildStudent(group);
-        studentService.save(expected);
+        Student student = buildStudent(group);
+        studentService.save(student);
 
-        Student actual = studentService
-                .getByFullName(STUDENT_FIRST_NAME, STUDENT_LAST_NAME);
-
-        assertEquals(expected, actual);
+        assertDoesNotThrow(() -> studentService.getByFullName(STUDENT_FIRST_NAME, STUDENT_LAST_NAME));
     }
 
     @Test
-    void shouldGetStudentByIdWhenSaveListOfStudents() {
+    void shouldFindByNameIdWhenSaveListOfStudents() {
         Group group = buildGroup();
         groupService.save(group);
         Student expected = buildStudent(group);
         studentService.save(Collections.singletonList(expected));
         assertNotEquals(0, expected.getId());
 
-        Student actual = studentService.findById(expected.getId());
+        Student actual = studentService.getByFullName(STUDENT_FIRST_NAME, STUDENT_LAST_NAME);
 
         assertEquals(expected, actual);
     }
