@@ -11,29 +11,25 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.Collections;
 
 import org.hamcrest.core.Is;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.service.GroupService;
 import ua.com.foxminded.university.web.dto.GroupDto;
-import ua.com.foxminded.university.web.exceptions.RestResponseEntityExceptionHandler;
 import ua.com.foxminded.university.web.mapper.GroupMapper;
 
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(GroupsRestController.class)
 class GroupsRestControllerTest {
 
     private static final int OFFSET = 0;
@@ -41,27 +37,17 @@ class GroupsRestControllerTest {
     private static final String REQUEST_MAIN = "/groups-rest";
     private static final String GROUP_NAME = "test group";
     private static final long GROUP_ID = 1L;
-    private static final String List = null;
 
-    @Mock
+    @MockBean
     private GroupService groupService;
 
-    @Mock
+    @MockBean
     private GroupMapper groupMapper;
 
-    @InjectMocks
-    private GroupsRestController groupRestController;
-
     private ObjectMapper mapper = new ObjectMapper();
-    private MockMvc mockMvc;
-    private RestResponseEntityExceptionHandler controllerAdvice = new RestResponseEntityExceptionHandler();
 
-    @BeforeEach
-    private void init() {
-        mockMvc = MockMvcBuilders.standaloneSetup(groupRestController)
-                .setControllerAdvice(controllerAdvice)
-                .build();
-    }
+    @Autowired
+    private MockMvc mockMvc;
 
     @Test
     void shouldGetAllGroupsWhenGetRequest() throws Exception {

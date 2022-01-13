@@ -19,16 +19,13 @@ import java.util.Set;
 import java.util.stream.IntStream;
 
 import org.hamcrest.core.Is;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
@@ -43,14 +40,14 @@ import ua.com.foxminded.university.data.service.TeacherService;
 import ua.com.foxminded.university.exceptions.ObjectNotFoundException;
 import ua.com.foxminded.university.web.dto.CourseDto;
 import ua.com.foxminded.university.web.dto.GroupDto;
-import ua.com.foxminded.university.web.exceptions.RestResponseEntityExceptionHandler;
+import ua.com.foxminded.university.web.dto.TabletimeDto;
 import ua.com.foxminded.university.web.mapper.CourseMapper;
 import ua.com.foxminded.university.web.mapper.GroupMapper;
 import ua.com.foxminded.university.web.mapper.StudentMapper;
 import ua.com.foxminded.university.web.mapper.TabletimeMapper;
 import ua.com.foxminded.university.web.mapper.TeacherMapper;
 
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(GroupsController.class)
 class GroupsControllerTest {
 
     private static final int GROUP_NAME_MAX_LENGTH = 150;
@@ -65,51 +62,38 @@ class GroupsControllerTest {
     private static final long COURSE_ID = 1L;
     private static final long TEACHER_ID = 1L;
 
-    @Mock
+    @MockBean
     private GroupService groupService;
 
-    @Mock
+    @MockBean
     private CourseService courseService;
 
-    @Mock
+    @MockBean
     private TabletimeService tabletimeService;
 
-    @Mock
+    @MockBean
     private StudentService studentService;
 
-    @Mock
+    @MockBean
     private TeacherService teacherService;
 
-    @Mock
+    @MockBean
     private GroupMapper groupMapper;
 
-    @Mock
+    @MockBean
     private StudentMapper studentMapper;
 
-    @Mock
+    @MockBean
     private CourseMapper courseMapper;
 
-    @Mock
+    @MockBean
     private TeacherMapper teacherMapper;
 
-    @Mock
+    @MockBean
     private TabletimeMapper tabletimeMapper;
 
-    private RestResponseEntityExceptionHandler controllerAdvice =
-        new RestResponseEntityExceptionHandler();
-
-    @InjectMocks
-    private GroupsController groupController;
-
+    @Autowired
     private MockMvc mockMvc;
-
-
-    @BeforeEach
-    void init() {
-        mockMvc = MockMvcBuilders.standaloneSetup(groupController)
-                .setControllerAdvice(controllerAdvice)
-                .build();
-    }
 
     @Test
     void shouldGetGroupsListWhenGetGroups() throws Exception {
@@ -124,6 +108,7 @@ class GroupsControllerTest {
         Set<Student> students = new HashSet<>();
         when(groupService.findById(GROUP_ID)).thenReturn(group);
         when(groupService.findStudents(group)).thenReturn(students);
+        when(groupMapper.toDto(group)).thenReturn(buildGroupDto());
         mockMvc.perform(get("/groups/" + GROUP_ID + "/edit"))
             .andExpect(status().isOk());
         verify(groupService).findById(GROUP_ID);
@@ -185,6 +170,7 @@ class GroupsControllerTest {
         Group group = buildGroup();
         when(groupService.findById(GROUP_ID)).thenReturn(group);
         when(courseService.findAll()).thenReturn(new ArrayList<>());
+        when(groupMapper.toDto(group)).thenReturn(buildGroupDto());
         mockMvc.perform(get("/groups/" + GROUP_ID + "/add-course"))
             .andExpect(status().isOk());
         verify(groupService).findById(GROUP_ID);
@@ -196,6 +182,7 @@ class GroupsControllerTest {
         Group group = buildGroup();
         when(groupService.findWithCoursesById(GROUP_ID)).thenReturn(group);
         when(groupService.findCourses(group)).thenReturn(new HashSet<>());
+        when(groupMapper.toDto(group)).thenReturn(buildGroupDto());
 
         mockMvc.perform(get("/groups/" + GROUP_ID + "/delete-course"))
             .andExpect(status().isOk());
@@ -236,19 +223,28 @@ class GroupsControllerTest {
     @Test
     void shouldShowTabletime() throws Exception {
         Group group = buildGroup();
-
         LocalDateTime begin = LocalDateTime.now();
         LocalDateTime end = LocalDateTime.now();
-        TabletimeRow tabletimeRow = new TabletimeRow(end, new Course(), group, new Teacher());
+        TabletimeRow tabletimeRow = buildTabletimeRow(group, end);
 
         when(groupService.findById(group.getId())).thenReturn(group);
         when(tabletimeService.getTabletimeForGroup(group.getId(), begin, end))
             .thenReturn(Collections.singletonList(tabletimeRow));
+        when(groupMapper.toDto(group)).thenReturn(buildGroupDto());
+        when(tabletimeMapper.toDto(tabletimeRow)).thenReturn(buildTabletimeDto(end));
 
         mockMvc.perform(get("/groups/" + group.getId() + "/tabletime")
                 .param("begin", begin.toString())
                 .param("end", end.toString()))
             .andExpect(status().isOk());
+    }
+
+    private TabletimeRow buildTabletimeRow(Group group, LocalDateTime dateTime) {
+        return new TabletimeRow(dateTime, new Course(), group, new Teacher());
+    }
+
+    private TabletimeDto buildTabletimeDto(LocalDateTime dateTime) {
+        return new TabletimeDto(dateTime, GROUP_NAME, COURSE_NAME, TEACHER_FIRST_NAME, TEACHER_LAST_NAME);
     }
 
     @Test

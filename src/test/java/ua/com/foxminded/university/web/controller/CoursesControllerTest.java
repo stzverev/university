@@ -14,22 +14,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.stream.IntStream;
 
 import org.hamcrest.core.Is;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.service.CourseService;
 import ua.com.foxminded.university.web.dto.CourseDto;
-import ua.com.foxminded.university.web.exceptions.RestResponseEntityExceptionHandler;
 import ua.com.foxminded.university.web.mapper.CourseMapper;
 
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(CourseController.class)
 class CoursesControllerTest {
 
     private static final int COURSE_NAME_MAX_LENGTH = 150;
@@ -39,26 +35,14 @@ class CoursesControllerTest {
     private static final long COURSE_ID = 0;
     private static final String COURSE_NAME = "test";
 
-    @Mock
+    @MockBean
     private CourseService courseService;
 
-    @Mock
+    @MockBean
     private CourseMapper courseMapper;
 
-    @InjectMocks
-    private CourseController courseController;
-
-    private RestResponseEntityExceptionHandler controllerAdvice =
-        new RestResponseEntityExceptionHandler();
-
+    @Autowired
     private MockMvc mockMvc;
-
-    @BeforeEach
-    void init() {
-        mockMvc = MockMvcBuilders.standaloneSetup(courseController)
-                .setControllerAdvice(controllerAdvice)
-                .build();
-    }
 
     @Test
     void shouldGetCoursesListWhenGetCourses() throws Exception {
@@ -69,7 +53,9 @@ class CoursesControllerTest {
 
     @Test
     void shouldGetByIdWhenGetWithId() throws Exception {
-        when(courseService.findById(COURSE_ID)).thenReturn(buildCourse());
+        Course course = buildCourse();
+        when(courseService.findById(COURSE_ID)).thenReturn(course);
+        when(courseMapper.toDto(course)).thenReturn(buildCourseDto());
         mockMvc.perform(get("/courses/" + COURSE_ID + "/edit"))
             .andExpect(status().isOk());
         verify(courseService).findById(COURSE_ID);

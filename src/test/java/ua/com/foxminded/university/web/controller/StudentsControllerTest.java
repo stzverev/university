@@ -14,25 +14,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.stream.IntStream;
 
 import org.hamcrest.core.Is;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.Student;
 import ua.com.foxminded.university.data.service.GroupService;
 import ua.com.foxminded.university.data.service.StudentService;
 import ua.com.foxminded.university.web.dto.StudentDto;
-import ua.com.foxminded.university.web.exceptions.RestResponseEntityExceptionHandler;
 import ua.com.foxminded.university.web.mapper.GroupMapper;
 import ua.com.foxminded.university.web.mapper.StudentMapper;
 
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(StudentsController.class)
 class StudentsControllerTest {
 
     private static final int STUDENT_FIRST_NAME_MAX_LENGTH = 100;
@@ -46,32 +42,20 @@ class StudentsControllerTest {
     private static final long GROUP_ID = 1L;
     private static final long STUDENT_ID = 1L;
 
-    @Mock
+    @MockBean
     private GroupService groupService;
 
-    @Mock
+    @MockBean
     private StudentService studentService;
 
-    @Mock
+    @MockBean
     private StudentMapper studentMapper;
 
-    @Mock
+    @MockBean
     private GroupMapper groupMapper;
 
-    @InjectMocks
-    private StudentsController studentsController;
-
-    private RestResponseEntityExceptionHandler controllerAdvice =
-        new RestResponseEntityExceptionHandler();
-
+    @Autowired
     private MockMvc mockMvc;
-
-    @BeforeEach
-    void init() {
-        mockMvc = MockMvcBuilders.standaloneSetup(studentsController)
-                .setControllerAdvice(controllerAdvice)
-                .build();
-    }
 
     @Test
     void shouldGetStudentsListWhenGetStudents() throws Exception {
@@ -82,6 +66,9 @@ class StudentsControllerTest {
 
     @Test
     void shouldGetByIdWhenGetWithId() throws Exception {
+        Student student = buildStudent();
+        when(studentService.findById(STUDENT_ID)).thenReturn(student);
+        when(studentMapper.toDto(student)).thenReturn(buildStudentDto());
 
         mockMvc.perform(get("/students/" + STUDENT_ID + "/edit"))
             .andExpect(status().isOk());
