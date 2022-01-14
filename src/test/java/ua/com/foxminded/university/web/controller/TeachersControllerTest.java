@@ -16,25 +16,21 @@ import java.util.HashSet;
 import java.util.stream.IntStream;
 
 import org.hamcrest.core.Is;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Teacher;
 import ua.com.foxminded.university.data.service.CourseService;
 import ua.com.foxminded.university.data.service.TeacherService;
 import ua.com.foxminded.university.web.dto.TeacherDto;
-import ua.com.foxminded.university.web.exceptions.RestResponseEntityExceptionHandler;
 import ua.com.foxminded.university.web.mapper.TeacherMapper;
 
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(TeachersController.class)
 class TeachersControllerTest {
 
     private static final String COURSE_NAME = "test";
@@ -47,29 +43,17 @@ class TeachersControllerTest {
             + "size must be between 0 and " + TEACHER_FIRST_NAME_MAX_LENGTH;
     private static final String VALID_ERROR_TEACHER_FIRST_NAME_BLANK = "must not be blank";
 
-    @Mock
+    @MockBean
     private TeacherService teacherService;
 
-    @Mock
+    @MockBean
     private CourseService courseService;
 
-    @Mock
+    @MockBean
     private TeacherMapper teacherMapper;
 
-    @InjectMocks
-    private TeachersController teachersController;
-
-    private RestResponseEntityExceptionHandler controllerAdvice =
-        new RestResponseEntityExceptionHandler();
-
+    @Autowired
     private MockMvc mockMvc;
-
-    @BeforeEach
-    void init() {
-        mockMvc = MockMvcBuilders.standaloneSetup(teachersController)
-                .setControllerAdvice(controllerAdvice)
-                .build();
-    }
 
     @Test
     void shouldGetTeachersListWhenGetTeachers() throws Exception {

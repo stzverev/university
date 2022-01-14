@@ -9,8 +9,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import org.apache.commons.lang3.builder.ToStringExclude;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -31,11 +29,11 @@ public class Course extends AbstractEntity {
     private Set<Teacher> teachers = new HashSet<>();
 
     @ManyToMany(mappedBy = "courses")
-    @ToStringExclude
+    @ToString.Exclude
     private Set<Group> groups = new HashSet<>();
 
     @OneToMany(mappedBy = "course")
-    @ToStringExclude
+    @ToString.Exclude
     private Set<TabletimeRow> tabletime = new HashSet<>();
 
     public Course(String name) {

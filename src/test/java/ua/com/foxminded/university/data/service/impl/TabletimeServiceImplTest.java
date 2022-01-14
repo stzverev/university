@@ -10,10 +10,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.boot.test.context.SpringBootTest;
 
-import ua.com.foxminded.university.data.ConfigTest;
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.TabletimeRow;
@@ -24,8 +22,7 @@ import ua.com.foxminded.university.data.service.TabletimeService;
 import ua.com.foxminded.university.data.service.TeacherService;
 import ua.com.foxminded.university.exceptions.ObjectNotFoundException;
 
-@SpringJUnitConfig(ConfigTest.class)
-@Sql(scripts = "classpath:data.sql")
+@SpringBootTest
 class TabletimeServiceImplTest {
 
     private static final String TEACHER_LAST_NAME = "Teacher";
@@ -95,7 +92,7 @@ class TabletimeServiceImplTest {
         tabletimeService.deleteById(tabletimeRow.getId());
         ObjectNotFoundException e = assertThrows(ObjectNotFoundException.class,
                 () -> tabletimeService.findById(tabletimeId));
-        assertEquals("ua.com.foxminded.university.data.model.TabletimeRow not found by id: 1", e.getMessage());
+        assertEquals("ua.com.foxminded.university.data.model.TabletimeRow not found by id: " + tabletimeId, e.getMessage());
     }
 
 }

@@ -10,10 +10,8 @@ import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.boot.test.context.SpringBootTest;
 
-import ua.com.foxminded.university.data.ConfigTest;
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.Student;
@@ -22,8 +20,7 @@ import ua.com.foxminded.university.data.service.GroupService;
 import ua.com.foxminded.university.data.service.StudentService;
 import ua.com.foxminded.university.exceptions.ObjectNotFoundException;
 
-@SpringJUnitConfig(ConfigTest.class)
-@Sql(scripts = "classpath:data.sql")
+@SpringBootTest
 class GroupServiceImplTest {
 
     private static final String STUDENT_FIRST_NAME = "TEST";
@@ -71,7 +68,7 @@ class GroupServiceImplTest {
 
         ObjectNotFoundException ex = assertThrows(ObjectNotFoundException.class,
                 () -> groupService.findById(groupId));
-        assertEquals("ua.com.foxminded.university.data.model.Group not found by id: 1",
+        assertEquals("ua.com.foxminded.university.data.model.Group not found by id: " + groupId,
                 ex.getMessage());
     }
 

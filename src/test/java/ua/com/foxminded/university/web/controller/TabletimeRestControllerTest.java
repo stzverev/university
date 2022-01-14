@@ -13,13 +13,11 @@ import java.util.Collections;
 import org.hamcrest.core.Is;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -30,10 +28,9 @@ import ua.com.foxminded.university.data.model.TabletimeRow;
 import ua.com.foxminded.university.data.model.Teacher;
 import ua.com.foxminded.university.data.service.TabletimeService;
 import ua.com.foxminded.university.web.dto.TabletimeDto;
-import ua.com.foxminded.university.web.exceptions.RestResponseEntityExceptionHandler;
 import ua.com.foxminded.university.web.mapper.TabletimeMapper;
 
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(TabletimeRestController.class)
 class TabletimeRestControllerTest {
 
     private static final long COURSE_ID = 1L;
@@ -52,27 +49,21 @@ class TabletimeRestControllerTest {
     private static final String REQUEST_FOR_COURSE = REQUEST_MAIN + "/courses";
     private static final String REQUEST_FOR_GROUP = REQUEST_MAIN + "/groups";
 
-    @Mock
+    @MockBean
     private TabletimeService tabletimeService;
 
-    @Mock
+    @MockBean
     private TabletimeMapper tabletimeMapper;
 
-    @InjectMocks
-    private TabletimeRestController tabletimeRestController;
-
-    private RestResponseEntityExceptionHandler controllerAdvice = new RestResponseEntityExceptionHandler();
-    private ObjectMapper mapper;
+    @Autowired
     private MockMvc mockMvc;
+
+    private ObjectMapper mapper;
 
     @BeforeEach
     private void init() {
         mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
-
-        mockMvc = MockMvcBuilders.standaloneSetup(tabletimeRestController)
-                .setControllerAdvice(controllerAdvice)
-                .build();
     }
 
     @Test
@@ -161,13 +152,9 @@ class TabletimeRestControllerTest {
     }
 
     private TabletimeDto buildTabletimeDto() {
-        TabletimeDto tabletimeDto = new TabletimeDto();
+        TabletimeDto tabletimeDto = new TabletimeDto(TABLETIME_DATETIME,
+                GROUP_NAME, COURSE_NAME, TEACHER_FIRST_NAME, TEACHER_LAST_NAME);
         tabletimeDto.setId(TABLETIME_ID);
-        tabletimeDto.setDateTime(TABLETIME_DATETIME);
-        tabletimeDto.setTeacherFirstName(TEACHER_FIRST_NAME);
-        tabletimeDto.setTeacherLastName(TEACHER_LAST_NAME);
-        tabletimeDto.setCourseName(COURSE_NAME);
-        tabletimeDto.setGroupName(GROUP_NAME);
         return tabletimeDto;
     }
 

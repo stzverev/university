@@ -12,10 +12,8 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.boot.test.context.SpringBootTest;
 
-import ua.com.foxminded.university.data.ConfigTest;
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Group;
 import ua.com.foxminded.university.data.model.Teacher;
@@ -24,8 +22,7 @@ import ua.com.foxminded.university.data.service.GroupService;
 import ua.com.foxminded.university.data.service.TeacherService;
 import ua.com.foxminded.university.exceptions.ObjectNotFoundException;
 
-@SpringJUnitConfig(ConfigTest.class)
-@Sql(scripts = "classpath:data.sql")
+@SpringBootTest
 class CourseServiceImplTest {
 
     private static final String TEACHER_LAST_NAME = "Teacher";
@@ -98,7 +95,7 @@ class CourseServiceImplTest {
         courseService.deleteById(courseId);
         ObjectNotFoundException e = assertThrows(ObjectNotFoundException.class,
                 () -> courseService.findById(courseId));
-        String message = "ua.com.foxminded.university.data.model.Course not found by id: 1";
+        String message = "ua.com.foxminded.university.data.model.Course not found by id: " + courseId;
         assertEquals(message, e.getMessage());
     }
 

@@ -9,8 +9,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import org.apache.commons.lang3.builder.ToStringExclude;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -30,11 +28,11 @@ public class Teacher extends Person {
     @JoinTable(name = "teachers_courses",
         joinColumns = {@JoinColumn(name = "teacher_id")},
         inverseJoinColumns = {@JoinColumn(name = "course_id")})
-    @ToStringExclude
+    @ToString.Exclude
     private Set<Course> courses;
 
     @OneToMany(mappedBy = "teacher")
-    @ToStringExclude
+    @ToString.Exclude
     private Set<TabletimeRow> tabletime;
 
     public Teacher(String firstName, String lastName) {

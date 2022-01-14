@@ -11,19 +11,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.Collections;
 
 import org.hamcrest.core.Is;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -33,10 +30,9 @@ import ua.com.foxminded.university.data.service.CourseService;
 import ua.com.foxminded.university.data.service.GroupService;
 import ua.com.foxminded.university.data.service.TeacherService;
 import ua.com.foxminded.university.web.dto.TeacherDto;
-import ua.com.foxminded.university.web.exceptions.RestResponseEntityExceptionHandler;
 import ua.com.foxminded.university.web.mapper.TeacherMapper;
 
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(TeachersRestController.class)
 class TeachersRestControllerTest {
 
     private static final int OFFSET = 0;
@@ -49,32 +45,22 @@ class TeachersRestControllerTest {
     private static final String TEACHER_LAST_NAME = "teacher";
     private static final String TEACHER_FIRST_NAME = "Test";
 
-    @Mock
+    @MockBean
     private TeacherService teacherService;
 
-    @Mock
+    @MockBean
     private CourseService courseService;
 
-    @Mock
+    @MockBean
     private TeacherMapper teacherMapper;
 
-    @Mock
+    @MockBean
     private GroupService groupService;
 
-    private RestResponseEntityExceptionHandler controllerAdvice = new RestResponseEntityExceptionHandler();
-
-    @InjectMocks
-    private TeachersRestController teachersRestController;
-
-    private ObjectMapper mapper = new ObjectMapper();;
+    @Autowired
     private MockMvc mockMvc;
 
-    @BeforeEach
-    private void init() {
-        mockMvc = MockMvcBuilders.standaloneSetup(teachersRestController)
-                .setControllerAdvice(controllerAdvice)
-                .build();
-    }
+    private ObjectMapper mapper = new ObjectMapper();;
 
     @Test
     void shouldGetAllTeacherWhenGetRequest() throws Exception {

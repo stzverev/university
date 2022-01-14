@@ -11,18 +11,15 @@ import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.boot.test.context.SpringBootTest;
 
-import ua.com.foxminded.university.data.ConfigTest;
 import ua.com.foxminded.university.data.model.Course;
 import ua.com.foxminded.university.data.model.Teacher;
 import ua.com.foxminded.university.data.service.CourseService;
 import ua.com.foxminded.university.data.service.TeacherService;
 import ua.com.foxminded.university.exceptions.ObjectNotFoundException;
 
-@SpringJUnitConfig(ConfigTest.class)
-@Sql(scripts = "classpath:data.sql")
+@SpringBootTest
 class TeacherServiceImplTest {
 
     private static final String COURSE_NAME = "TEST COURSE";
