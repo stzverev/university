@@ -13,10 +13,19 @@ public class TabletimeDto implements Serializable {
 
     private Long id;
 
-    private @NonNull LocalDateTime dateTime;
-    private @NonNull String groupName;
-    private @NonNull String courseName;
-    private @NonNull String teacherFirstName;
-    private @NonNull String teacherLastName;
+    @NonNull
+    private LocalDateTime dateTime;
+
+    @NonNull
+    private String groupName;
+
+    @NonNull
+    private String courseName;
+
+    @NonNull
+    private String teacherFirstName;
+
+    @NonNull
+    private String teacherLastName;
 
 }
